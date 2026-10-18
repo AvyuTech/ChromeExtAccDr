@@ -11,7 +11,7 @@ const fonts = html.match(/<link[^>]+fonts\.googleapis\.com\/css2[^>]+>/)?.[0] ??
 
 const out = [
   '<title>Nearhood</title>',
-  '<meta name="description" content="Nearhood: ask anything about your city.">',
+  '<meta name="description" content="Nearhood: a little closer to your city.">',
   '<link rel="preconnect" href="https://fonts.googleapis.com">',
   '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>',
   fonts,
