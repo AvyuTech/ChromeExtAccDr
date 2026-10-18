@@ -1,154 +1,202 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CorridorRow, DepartureRow, ParkingRow, shiftClock } from '../components/city';
-import { PageHeader, SectionHead, Segmented, Tile } from '../components/ui';
-import { BRTS_RIDE_MIN, LAST_MILE_WALK_MIN, METRO_RIDE_MIN, MODE_META, PARK_AND_WALK_MIN, WALK_ONLY_MIN } from '../data/cityExtra';
-import { neighbourhoodName } from '../data/core';
-import { ALERTS } from '../data/city';
-import type { TransitArrival } from '../data/types';
+import { CorridorRow, ParkingRow, shiftClock } from '../components/city';
+import { CityMap, NEIGHBOURHOOD_POS, TRAFFIC_COLOR } from '../components/CityMap';
+import { PageHeader, SectionHead } from '../components/ui';
+import { NEIGHBOURHOODS, neighbourhoodName } from '../data/core';
 import { useT } from '../i18n';
-import { ChevronRightGlyph, NamedGlyph, RouteGlyph } from '../icons';
+import { ClockGlyph, TrafficGlyph, TRAFFIC_LABEL } from '../icons';
+import type { TrafficLevel } from '../icons/live';
+import { heatSpots, planRoutes, roadLevels, ROUTABLE, whyBest } from '../lib/traffic';
 import { useLiveCity } from '../state/live';
-import { useSettings, type CommuteMode } from '../state/settings';
+import { useSettings } from '../state/settings';
 
-type ModeFilter = 'all' | TransitArrival['mode'];
+const LEGEND: Array<{ level: TrafficLevel; key: string }> = [
+  { level: 0, key: 'city.legend.free' },
+  { level: 1, key: 'city.legend.moderate' },
+  { level: 2, key: 'city.legend.heavy' },
+  { level: 3, key: 'city.legend.jam' },
+];
 
-export default function Transit() {
+function nowClock() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+/** Traffic: a live heat map of west Ahmedabad and the quickest way between two areas right now. */
+export default function Traffic() {
   const t = useT();
   const pulse = useLiveCity();
   const { settings } = useSettings();
-  const [filter, setFilter] = useState<ModeFilter>('all');
   const loc = settings.location;
+  const places = NEIGHBOURHOODS.filter((n) => ROUTABLE.includes(n.id));
+  const hasCommute = ROUTABLE.includes(loc.home) && ROUTABLE.includes(loc.work) && loc.home !== loc.work;
 
-  const corridor = (id: string) => pulse.corridors.find((c) => c.id === id);
-  const sg = corridor('sg');
-  const local = corridor('judges');
-  const drive = (sg?.minutes ?? 0) + (local?.minutes ?? 0);
-  const usualDrive = (sg?.usual ?? 0) + (local?.usual ?? 0);
-  const nextOf = (mode: TransitArrival['mode']) => [...pulse.arrivals].filter((a) => a.mode === mode).sort((a, b) => a.minutes - b.minutes)[0];
-  const metro = nextOf('metro');
-  const brts = nextOf('brts');
+  const [from, setFrom] = useState(ROUTABLE.includes(loc.home) ? loc.home : 'bodakdev');
+  const [to, setTo] = useState(hasCommute ? loc.work : from === 'navrangpura' ? 'bodakdev' : 'navrangpura');
+  const [picked, setPicked] = useState<string | null>(null);
 
-  const trip: Record<CommuteMode, { now: number; usual: number }> = {
-    car: { now: drive + PARK_AND_WALK_MIN, usual: usualDrive + PARK_AND_WALK_MIN },
-    'two-wheeler': { now: drive, usual: usualDrive },
-    auto: { now: drive + 3, usual: usualDrive + 3 },
-    metro: {
-      now: (metro?.walkMin ?? 9) + (metro?.minutes ?? 4) + METRO_RIDE_MIN + LAST_MILE_WALK_MIN,
-      usual: (metro?.walkMin ?? 9) + 4 + METRO_RIDE_MIN + LAST_MILE_WALK_MIN,
-    },
-    brts: {
-      now: (brts?.walkMin ?? 12) + (brts?.minutes ?? 5) + BRTS_RIDE_MIN + LAST_MILE_WALK_MIN,
-      usual: (brts?.walkMin ?? 12) + 5 + BRTS_RIDE_MIN + LAST_MILE_WALK_MIN,
-    },
-    walk: { now: WALK_ONLY_MIN, usual: WALK_ONLY_MIN },
+  const routes = useMemo(() => planRoutes(from, to, NEIGHBOURHOOD_POS[from], NEIGHBOURHOOD_POS[to], pulse.corridors), [from, to, pulse.corridors]);
+  const roads = useMemo(() => roadLevels(pulse.corridors), [pulse.corridors]);
+  const heat = useMemo(() => heatSpots(pulse.corridors), [pulse.corridors]);
+  const centre = useMemo<[number, number]>(() => {
+    const [a, b] = [NEIGHBOURHOOD_POS[from], NEIGHBOURHOOD_POS[to]];
+    return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  }, [from, to]);
+
+  const best = routes[0];
+  const selected = routes.find((r) => r.id === picked) ?? best;
+  const isCommute = from === loc.home && to === loc.work;
+  const hotspots = heat.filter((h) => h.level > 0).sort((a, b) => b.level - a.level);
+
+  const choose = (nextFrom: string, nextTo: string) => {
+    setFrom(nextFrom);
+    setTo(nextTo);
+    setPicked(null);
   };
-
-  const mode = MODE_META[loc.commuteMode];
-  const mine = trip[loc.commuteMode];
-  const delay = mine.now - mine.usual;
-  const commuteAlert = ALERTS.find((a) => a.active && a.affectsCommute && settings.alerts.kinds[a.kind]);
-
-  const departures = [...pulse.arrivals].filter((a) => filter === 'all' || a.mode === filter).sort((a, b) => a.minutes - b.minutes);
-  const others: CommuteMode[] = ['metro', 'auto', 'two-wheeler', 'car', 'brts', 'walk'];
 
   return (
     <>
-      <PageHeader title={t('city.transit')} fallback="/city" />
-      <main className="page page--with-header">
-        <section className="commute-card" aria-labelledby="commute-title">
-          <div className="row" style={{ gap: 12 }}>
-            <span className="commute-card__icon">
-              <NamedGlyph name={mode.glyph} size={24} live={!pulse.paused} />
-            </span>
-            <div className="stack grow" style={{ gap: 2, minWidth: 0 }}>
-              <span id="commute-title" className="eyebrow commute-card__eyebrow">
-                {t('city.commute')}
-              </span>
-              {loc.work ? (
-                <span className="commute-card__route">
-                  {neighbourhoodName(loc.home)}
-                  <RouteGlyph size={16} />
-                  {neighbourhoodName(loc.work)}
-                </span>
-              ) : (
-                <span className="commute-card__route">Add your work area to see your commute</span>
-              )}
-              <span className="commute-card__muted">
-                {mode.label} · usually leave at {shiftClock(loc.leaveAt, 0)}
-              </span>
-            </div>
+      <PageHeader title={t('city.traffic')} fallback="/city" sub={pulse.paused ? 'Live updates paused' : 'Live · updates every 20 s'} />
+      <main className="page page--with-header traffic">
+        <section className="trip" aria-label="Plan a trip">
+          <span className="trip__rail" aria-hidden="true">
+            <span className="trip__dot" />
+            <span className="trip__line" />
+            <span className="trip__dot trip__dot--to" />
+          </span>
+          <div className="trip__fields">
+            <label className="trip__field">
+              <span className="trip__label">{t('city.from')}</span>
+              <select value={from} onChange={(e) => choose(e.target.value, e.target.value === to ? from : to)}>
+                {places.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.name}
+                    {n.id === loc.home ? ' · home' : n.id === loc.work ? ' · work' : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="trip__field">
+              <span className="trip__label">{t('city.to')}</span>
+              <select value={to} onChange={(e) => choose(e.target.value === from ? to : from, e.target.value)}>
+                {places.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.name}
+                    {n.id === loc.home ? ' · home' : n.id === loc.work ? ' · work' : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
-          {loc.work ? (
-            <>
-              <div className="row" style={{ alignItems: 'baseline', gap: 10 }}>
-                <span className="commute-card__time">{mine.now} min</span>
-                <span className={`commute-card__badge${delay > 0 ? ' is-late' : ''}`}>{delay > 0 ? `+${delay} min today` : delay < 0 ? `${-delay} min faster` : 'Usual time'}</span>
-              </div>
-              <div className="commute-line" aria-hidden="true">
-                <span className="commute-line__end">
-                  <span className="commute-line__dot" />
-                  <b>{shiftClock(loc.leaveAt, delay > 0 ? -delay : 0)}</b>
-                  <span>Leave</span>
-                </span>
-                <span className="commute-line__track">
-                  <span className="commute-line__mode">
-                    <NamedGlyph name={mode.glyph} size={16} />
-                  </span>
-                </span>
-                <span className="commute-line__end commute-line__end--to">
-                  <span className="commute-line__dot commute-line__dot--to" />
-                  <b>{shiftClock(loc.leaveAt, delay > 0 ? mine.usual : mine.now)}</b>
-                  <span>Arrive</span>
-                </span>
-              </div>
-              <p className="commute-card__text">
-                {delay > 0 ? (
-                  <>
-                    Leave by <b>{shiftClock(loc.leaveAt, -delay)}</b> to arrive at your usual time ({shiftClock(loc.leaveAt, mine.usual)}).
-                  </>
-                ) : (
-                  <>
-                    Leave at <b>{shiftClock(loc.leaveAt, 0)}</b> as usual; you should arrive around {shiftClock(loc.leaveAt, mine.now)}.
-                  </>
-                )}
-              </p>
-              {commuteAlert ? (
-                <Link to={`/city/alerts/${commuteAlert.id}`} className="commute-card__alert">
-                  <NamedGlyph name="alert" size={18} />
-                  <span className="grow">{commuteAlert.title}</span>
-                  <ChevronRightGlyph size={16} />
-                </Link>
-              ) : null}
-            </>
-          ) : null}
-          <Link to="/settings/location" className="commute-card__link">
-            Change commute
-          </Link>
+          <button type="button" className="icon-btn icon-btn--ghost" aria-label={t('city.swap')} onClick={() => choose(to, from)}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M8 4v15M4.5 7.5 8 4l3.5 3.5M16 20V5M12.5 16.5 16 20l3.5-3.5" />
+            </svg>
+          </button>
         </section>
 
-        <section className="section" aria-labelledby="dep-title">
-          <SectionHead id="dep-title" title={t('city.departures')} />
-          <Segmented<ModeFilter>
-            label="Filter departures"
-            value={filter}
-            onChange={setFilter}
-            options={[
-              { value: 'all', label: t('city.all') },
-              { value: 'metro', label: 'Metro' },
-              { value: 'brts', label: 'BRTS' },
-              { value: 'amts', label: 'Bus' },
-            ]}
-          />
-          <div className="list" aria-live="polite">
-            {departures.length ? (
-              departures.map((a) => <DepartureRow key={a.id} a={a} />)
-            ) : (
-              <p className="list-row meta">Nothing due in the next few minutes.</p>
-            )}
-          </div>
-          <p className="meta">{pulse.paused ? 'Live times paused by Data saver.' : 'Times update live from the metro and bus feeds.'}</p>
-        </section>
+        <CityMap
+          className="city-map--bleed city-map--tall"
+          pins={[]}
+          home={centre}
+          radiusKm={0}
+          showYou={false}
+          heat={heat}
+          roads={roads}
+          routes={routes.map((r) => ({ id: r.id, points: r.points, selected: r.id === selected?.id }))}
+          ends={{ from: NEIGHBOURHOOD_POS[from], to: NEIGHBOURHOOD_POS[to] }}
+          onRoute={setPicked}
+        />
+        <div className="traffic-legend" aria-label="Map key">
+          {LEGEND.map((l) => (
+            <span key={l.level}>
+              <i style={{ background: TRAFFIC_COLOR[l.level] }} />
+              {t(l.key)}
+            </span>
+          ))}
+          <span className="grow" />
+          {pulse.paused ? (
+            <Link to="/settings/data" className="traffic-live is-paused">
+              Paused
+            </Link>
+          ) : (
+            <span className="traffic-live">
+              <span className="live-dot" />
+              Live
+            </span>
+          )}
+        </div>
+
+        {selected ? (
+          <section className="section" aria-labelledby="routes-title">
+            <h2 id="routes-title" className="sr-only">
+              {t('city.routes')}
+            </h2>
+            <div className="list" role="radiogroup" aria-label={t('city.routes')}>
+              {routes.map((r) => {
+                const delta = r.minutes - r.usual;
+                const on = r.id === selected.id;
+                return (
+                  <button key={r.id} type="button" role="radio" aria-checked={on} className="list-row route-row" onClick={() => setPicked(r.id)}>
+                    <span className={`route-row__swatch${on ? ' is-on' : ''}`} aria-hidden="true" />
+                    <span className="list-row__body">
+                      <span className="list-row__title row" style={{ gap: 6 }}>
+                        via {r.via}
+                        {r.id === best.id ? <span className="badge badge--sm badge--lime">{t('city.bestNow')}</span> : null}
+                      </span>
+                      <span className="list-row__meta">
+                        {r.km} km · usually {r.usual} min
+                        {r.worst?.cause && r.id !== best.id ? ` · ${r.worst.cause}` : ''}
+                      </span>
+                      {r.id === best.id && routes.length > 1 ? <span className="route-row__why">{whyBest(best, routes)}</span> : null}
+                    </span>
+                    <span className="city-trail">
+                      <span className="route-row__min num">{r.minutes} min</span>
+                      <span className={`route-row__delta${delta > 1 ? ' is-late' : delta < 0 ? ' is-early' : ''}`}>
+                        {delta > 1 ? `+${delta} min` : delta < 0 ? `${-delta} min faster` : 'As usual'}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="trip-leave">
+              <ClockGlyph size={15} />
+              {isCommute ? (
+                <span>
+                  Leave by <b>{shiftClock(loc.leaveAt, selected.usual - selected.minutes)}</b> to reach {neighbourhoodName(to)} at your usual{' '}
+                  {shiftClock(loc.leaveAt, selected.usual)}.
+                </span>
+              ) : (
+                <span>
+                  Leave now and reach {neighbourhoodName(to)} by <b>{shiftClock(nowClock(), selected.minutes)}</b>.
+                </span>
+              )}
+            </p>
+          </section>
+        ) : null}
+
+        {hotspots.length ? (
+          <section className="section" aria-labelledby="hot-title">
+            <SectionHead id="hot-title" title={t('city.hotspots')} />
+            <div className="list">
+              {hotspots.map((h) => (
+                <div key={h.id} className="list-row">
+                  <span className="hot-dot" style={{ background: TRAFFIC_COLOR[h.level] }} aria-hidden="true">
+                    <TrafficGlyph level={h.level} size={17} />
+                  </span>
+                  <span className="list-row__body">
+                    <span className="list-row__title">{h.label}</span>
+                  </span>
+                  <span className="list-row__trail" style={{ color: 'var(--ink)' }}>
+                    {TRAFFIC_LABEL[h.level]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="section" aria-labelledby="roads-title">
           <SectionHead id="roads-title" title={t('city.roads')} />
@@ -166,28 +214,6 @@ export default function Transit() {
               <ParkingRow key={p.id} p={p} />
             ))}
           </div>
-        </section>
-
-        <section className="section" aria-labelledby="ways-title">
-          <SectionHead id="ways-title" title={t('city.otherWays')} />
-          <div className="list">
-            {others.map((m) => (
-              <div key={m} className="list-row glyph-host">
-                <Tile glyph={MODE_META[m].glyph} tone={m === loc.commuteMode ? 'violet' : 'blue'} size="sm" />
-                <span className="list-row__body">
-                  <span className="list-row__title">{MODE_META[m].label}</span>
-                  <span className="list-row__meta">{m === 'metro' ? `${metro?.stop ?? 'Nearest station'} · ${metro?.walkMin ?? 9} min walk` : m === 'brts' ? `${brts?.stop ?? 'Nearest stop'} · ${brts?.walkMin ?? 12} min walk` : m === 'walk' ? 'Footpaths most of the way' : 'Door to door'}</span>
-                </span>
-                <span className="city-trail">
-                  <span className="num" style={{ fontSize: '1rem' }}>
-                    ~{trip[m].now} min
-                  </span>
-                  {m === loc.commuteMode ? <span className="badge badge--sm tone-violet">Your usual</span> : null}
-                </span>
-              </div>
-            ))}
-          </div>
-          <p className="meta">Time estimates for right now. Fares vary, so check them in the app you book with.</p>
         </section>
       </main>
     </>

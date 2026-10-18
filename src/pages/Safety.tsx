@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCard } from '../components/cards';
+import { AlertRow } from '../components/city';
 import { PageHeader, SectionHead, ToggleRow } from '../components/ui';
 import { EMERGENCY, FACILITIES } from '../data/city';
 import { useT } from '../i18n';
@@ -102,11 +102,11 @@ function SosButton({ onCalled }: { onCalled: () => void }) {
           />
         </svg>
         <span className="sos__label">
-          <SosGlyph size={34} live={progress === 0} />
-          <span className="display" style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '0.02em' }}>
+          <SosGlyph size={28} live={progress === 0} />
+          <span className="display" style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '0.02em' }}>
             SOS
           </span>
-          <span style={{ fontSize: '0.78125rem', fontWeight: 600 }}>{progress > 0 ? `${Math.ceil((1 - progress) * 2)}…` : t('city.holdSos')}</span>
+          <span style={{ fontSize: '0.71875rem', fontWeight: 600 }}>{progress > 0 ? `${Math.ceil((1 - progress) * 2)}…` : t('city.holdSos')}</span>
         </span>
       </button>
       <p id="sos-hint" className={`body-sm ${hint ? 'sos__hint--on' : 'muted'}`} aria-live="polite" style={{ textAlign: 'center' }}>
@@ -185,8 +185,8 @@ export default function Safety() {
           </div>
         ) : null}
 
-        <button type="button" className="btn btn--secondary btn--block btn--lg" onClick={shareLocation} disabled={sharing}>
-          <PinGlyph size={20} />
+        <button type="button" className="btn btn--secondary btn--block" onClick={shareLocation} disabled={sharing}>
+          <PinGlyph size={18} />
           {sharing ? 'Getting your location…' : 'Share my live location'}
         </button>
 
@@ -196,14 +196,14 @@ export default function Safety() {
             {EMERGENCY.map((e) => (
               <a key={e.id} href={`tel:${e.number}`} className="list-row glyph-host" aria-label={`Call ${e.name}, ${e.number}`}>
                 <span className={`city-card__icon city-card__icon--sm tone-${e.tone}`}>
-                  <NamedGlyph name={e.glyph} size={20} />
+                  <NamedGlyph name={e.glyph} size={18} />
                 </span>
                 <span className="list-row__body">
                   <span className="list-row__title">{e.name}</span>
                   <span className="list-row__meta">{e.description}</span>
                 </span>
                 <span className="safety-number">
-                  <PhoneGlyph size={15} />
+                  <PhoneGlyph size={13} />
                   {e.number}
                 </span>
               </a>
@@ -232,7 +232,7 @@ export default function Safety() {
                     <span className="list-row__meta">{c.phone || 'No number yet'}</span>
                   </span>
                   {c.phone ? (
-                    <a href={`tel:${c.phone}`} className="icon-btn" aria-label={`Call ${c.name}`}>
+                    <a href={`tel:${c.phone}`} className="icon-btn icon-btn--ghost" aria-label={`Call ${c.name}`}>
                       <PhoneGlyph size={18} />
                     </a>
                   ) : (
@@ -275,7 +275,7 @@ export default function Safety() {
               .map((f) => (
                 <div key={f.id} className="list-row">
                   <span className={`city-card__icon city-card__icon--sm tone-${f.kind === 'Police station' ? 'blue' : f.kind === 'Fire station' ? 'peach' : 'red'}`}>
-                    <NamedGlyph name={f.glyph} size={20} />
+                    <NamedGlyph name={f.glyph} size={18} />
                   </span>
                   <span className="list-row__body">
                     <span className="list-row__title">{f.name}</span>
@@ -285,7 +285,7 @@ export default function Safety() {
                   </span>
                   {f.open24h ? <span className="badge badge--sm tone-mint">24h</span> : null}
                   <a
-                    className="icon-btn"
+                    className="icon-btn icon-btn--ghost"
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${f.kind} ${f.area} Ahmedabad`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -301,9 +301,11 @@ export default function Safety() {
         {safetyAlerts.length ? (
           <section className="section" aria-labelledby="sos-alerts">
             <SectionHead id="sos-alerts" title="Safety alerts" to="/city/alerts" />
-            {safetyAlerts.map((a) => (
-              <AlertCard key={a.id} alert={a} />
-            ))}
+            <div className="list">
+              {safetyAlerts.map((a) => (
+                <AlertRow key={a.id} alert={a} />
+              ))}
+            </div>
           </section>
         ) : null}
       </main>

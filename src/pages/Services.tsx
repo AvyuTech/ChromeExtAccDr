@@ -32,7 +32,7 @@ export default function Services() {
       <main className="page page--with-header">
         <form role="search" onSubmit={(e) => e.preventDefault()}>
           <label htmlFor="svc-q" className="search-field">
-            <SearchGlyph size={22} />
+            <SearchGlyph size={18} />
             <input
               id="svc-q"
               type="search"
@@ -46,7 +46,7 @@ export default function Services() {
         </form>
 
         <div className="notice tone-mint">
-          <ShieldGlyph size={20} />
+          <ShieldGlyph size={16} />
           <span>
             <b>Nearhood never asks for card details or OTPs.</b> Payments and applications open on the provider's official site or app.
           </span>
@@ -68,10 +68,10 @@ export default function Services() {
             {due.map((s) => (
               <button key={s.id} type="button" className="row services-due glyph-host" onClick={() => setOpen(s)}>
                 <span className={`city-card__icon city-card__icon--sm tone-${s.tone}`}>
-                  <NamedGlyph name={s.glyph} size={20} />
+                  <NamedGlyph name={s.glyph} size={18} />
                 </span>
                 <span className="stack grow" style={{ gap: 1, textAlign: 'left' }}>
-                  <span className="strong" style={{ fontSize: '0.9375rem' }}>
+                  <span className="strong" style={{ fontSize: '0.875rem' }}>
                     {s.name}
                   </span>
                   <span className="meta">{s.provider}</span>
@@ -94,7 +94,7 @@ export default function Services() {
               {found.filter((s) => s.group === g.id).map((s) => (
                 <button key={s.id} type="button" className="list-row glyph-host" onClick={() => setOpen(s)}>
                   <span className={`city-card__icon city-card__icon--sm tone-${s.tone}`}>
-                    <NamedGlyph name={s.glyph} size={20} />
+                    <NamedGlyph name={s.glyph} size={18} />
                   </span>
                   <span className="list-row__body">
                     <span className="list-row__title">{s.name}</span>

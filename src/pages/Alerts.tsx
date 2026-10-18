@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCard } from '../components/cards';
+import { AlertRow } from '../components/city';
 import { EmptyState, PageHeader } from '../components/ui';
 import { ALERT_KIND_META, ALERTS } from '../data/city';
 import type { AlertKind, CityAlert } from '../data/types';
@@ -25,7 +25,8 @@ export default function Alerts() {
 
   const visible = visibleAlerts(settings, data);
   const shown = kind === 'all' ? visible : visible.filter((a) => a.kind === kind);
-  const kinds = (Object.keys(ALERT_KIND_META) as AlertKind[]).filter((k) => settings.alerts.kinds[k]);
+  // Only kinds with something to show; public transport is not covered.
+  const kinds = (Object.keys(ALERT_KIND_META) as AlertKind[]).filter((k) => k !== 'transit' && settings.alerts.kinds[k] && visible.some((a) => a.kind === k));
   const dismissed = ALERTS.filter((a) => a.active && data.dismissedAlerts.includes(a.id));
   const hidden = ALERTS.filter((a) => a.active && !data.dismissedAlerts.includes(a.id)).length - visible.length;
 
@@ -36,8 +37,8 @@ export default function Alerts() {
         fallback="/city"
         sub={`${visible.length} active near you`}
         actions={
-          <Link to="/settings/alerts" className="icon-btn" aria-label="Alert settings">
-            <SlidersGlyph size={20} />
+          <Link to="/settings/alerts" className="icon-btn icon-btn--ghost" aria-label="Alert settings">
+            <SlidersGlyph size={19} />
           </Link>
         }
       />
@@ -64,7 +65,7 @@ export default function Alerts() {
             const n = visible.filter((a) => a.kind === k).length;
             return (
               <button key={k} type="button" className="chip city-chip" aria-pressed={kind === k} onClick={() => setKind(k)}>
-                <NamedGlyph name={ALERT_KIND_META[k].glyph} size={17} />
+                <NamedGlyph name={ALERT_KIND_META[k].glyph} size={15} />
                 {ALERT_KIND_META[k].label}
                 {n ? <span className="meta" style={{ color: 'inherit', opacity: 0.75 }}>{n}</span> : null}
               </button>
@@ -79,16 +80,16 @@ export default function Alerts() {
             body={kind === 'all' ? 'No alerts match your settings right now.' : `No ${ALERT_KIND_META[kind].label.toLowerCase()} alerts near you.`}
           />
         ) : (
-          <div className="stack">
+          <div className="list">
             {shown.map((a) => (
-              <AlertCard key={a.id} alert={a} />
+              <AlertRow key={a.id} alert={a} />
             ))}
           </div>
         )}
 
         {hidden > 0 ? (
           <Link to="/settings/alerts" className="notice" style={{ textDecoration: 'none' }}>
-            <SlidersGlyph size={18} />
+            <SlidersGlyph size={16} />
             <span className="grow">
               {hidden} {hidden === 1 ? 'alert is' : 'alerts are'} hidden by your alert settings (type, severity or area). <b>Change settings</b>
             </span>

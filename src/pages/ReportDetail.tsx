@@ -4,7 +4,7 @@ import { findReport, issueMeta, plusOneCount, Timeline, type TimelineItem } from
 import { EmptyState, PageHeader } from '../components/ui';
 import { REPORT_STEPS } from '../data/city';
 import { useT } from '../i18n';
-import { BellGlyph, ChatGlyph, CheckGlyph, NamedGlyph, StepRing, UpvoteGlyph } from '../icons';
+import { BellGlyph, ChatGlyph, CheckGlyph, ChevronRightGlyph, NamedGlyph, StepRing, UpvoteGlyph } from '../icons';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
 
@@ -56,63 +56,65 @@ export default function ReportDetail() {
       <PageHeader title={meta.label} fallback="/city/reports" sub={report.ticket} actions={<ShareButton title={report.title} path={`/city/reports/${report.id}`} />} />
       <main className="page page--with-header">
         <section className="report-hero" aria-labelledby="report-title">
-          <StepRing step={report.status} size={104}>
+          <StepRing step={report.status} size={64}>
             <span className={`report-hero__icon tone-${meta.tone}`}>
-              <NamedGlyph name={meta.glyph} size={34} live={!resolved} />
+              <NamedGlyph name={meta.glyph} size={22} live={!resolved} />
             </span>
           </StepRing>
-          <span className={`badge ${resolved ? 'tone-mint' : report.status >= 2 ? 'tone-violet' : 'tone-amber'}`}>
-            {resolved ? <CheckGlyph size={12} /> : null}
-            {REPORT_STEPS[report.status]} · step {report.status + 1} of {REPORT_STEPS.length}
-          </span>
-          <h2 id="report-title" className="report-hero__title">
-            {report.title}
-          </h2>
-          <span className="meta" style={{ textAlign: 'center' }}>
-            {report.landmark} · {report.area}
-            {report.ward !== report.area ? ` · ${report.ward} ward` : ''} · {report.createdAgo}
+          <span className="stack grow" style={{ gap: 4, minWidth: 0 }}>
+            <span className={`badge badge--sm ${resolved ? 'tone-mint' : report.status >= 2 ? 'tone-violet' : 'tone-amber'}`} style={{ alignSelf: 'flex-start' }}>
+              {resolved ? <CheckGlyph size={11} /> : null}
+              {REPORT_STEPS[report.status]} · step {report.status + 1} of {REPORT_STEPS.length}
+            </span>
+            <h2 id="report-title" className="report-hero__title">
+              {report.title}
+            </h2>
+            <span className="meta">
+              {report.landmark} · {report.area}
+              {report.ward !== report.area ? ` · ${report.ward} ward` : ''} · {report.createdAgo}
+            </span>
           </span>
         </section>
 
-        <p className="card body">{report.description}</p>
+        <p className="body">{report.description}</p>
 
         {report.status === 0 && report.mine ? (
           <div className="notice tone-amber">
-            <NamedGlyph name="users" size={20} />
+            <NamedGlyph name="users" size={18} />
             <span>Waiting for neighbours to verify. Share it with your society group to speed things up.</span>
           </div>
         ) : null}
 
         <div className="grid-2">
           {report.mine ? (
-            <span className="btn btn--soft" style={{ cursor: 'default' }}>
-              <UpvoteGlyph size={18} active />
+            <span className="btn btn--sm btn--soft" style={{ cursor: 'default' }}>
+              <UpvoteGlyph size={16} active />
               {count === 0 ? 'No +1s yet' : `${count} ${count === 1 ? 'neighbour' : 'neighbours'} +1`}
             </span>
           ) : (
             <button
               type="button"
-              className={`btn ${plussed ? 'btn--secondary' : 'btn--primary'}`}
+              className={`btn btn--sm ${plussed ? 'btn--secondary' : 'btn--primary'}`}
               aria-pressed={plussed}
               onClick={() => {
                 const on = toggle('plusOned', report.id);
                 toast(on ? 'Added your +1' : 'Removed your +1');
               }}
             >
-              <UpvoteGlyph size={18} active={plussed} />
+              <UpvoteGlyph size={16} active={plussed} />
               {plussed ? `+1 added · ${count}` : `Add +1 · ${count}`}
             </button>
           )}
           <button
             type="button"
-            className="btn btn--outline"
+            className="btn btn--sm btn--outline"
             aria-pressed={following}
             onClick={() => {
               const on = toggle('followedReports', report.id);
               toast(on ? 'You will get updates on this report' : 'Stopped following');
             }}
           >
-            <BellGlyph size={18} active={following} />
+            <BellGlyph size={16} active={following} />
             {following ? 'Following' : 'Follow'}
           </button>
         </div>
@@ -120,7 +122,7 @@ export default function ReportDetail() {
         {resolved ? (
           <button
             type="button"
-            className={`btn btn--block ${confirmedFixed ? 'btn--secondary' : 'btn--mint'}`}
+            className={`btn btn--sm btn--block ${confirmedFixed ? 'btn--secondary' : 'btn--mint'}`}
             aria-pressed={confirmedFixed}
             onClick={() => {
               const on = toggle('plusOned', FIXED + report.id);
@@ -136,21 +138,18 @@ export default function ReportDetail() {
           <h2 id="report-progress" className="section__title">
             {t('city.timeline')}
           </h2>
-          <div className="card">
-            <Timeline label={t('city.timeline')} items={items} />
-          </div>
+          <Timeline label={t('city.timeline')} items={items} />
         </section>
 
-        <Link to="/messages/c-ward" className="list card card--link" style={{ padding: 0 }}>
-          <span className="list-row">
-            <span className="city-card__icon city-card__icon--sm tone-blue">
-              <ChatGlyph size={20} />
-            </span>
-            <span className="list-row__body">
-              <span className="list-row__title">Message the ward desk</span>
-              <span className="list-row__meta">Ask about {report.ticket}</span>
-            </span>
+        <Link to="/messages/c-ward" className="list-row report-ward-link">
+          <span className="city-card__icon city-card__icon--sm tone-blue">
+            <ChatGlyph size={18} />
           </span>
+          <span className="list-row__body">
+            <span className="list-row__title">Message the ward desk</span>
+            <span className="list-row__meta">Ask about {report.ticket}</span>
+          </span>
+          <ChevronRightGlyph size={16} style={{ color: 'var(--muted)' }} />
         </Link>
       </main>
     </>

@@ -146,7 +146,7 @@ export default function Report() {
                   }}
                 >
                   <span className={`issue-icon tone-${it.tone}`}>
-                    <NamedGlyph name={it.glyph} size={26} />
+                    <NamedGlyph name={it.glyph} size={22} />
                   </span>
                   <span>{it.label}</span>
                 </button>
@@ -157,9 +157,9 @@ export default function Report() {
 
         {step === 1 && meta ? (
           <>
-            <div className="row card card--tight" style={{ gap: 12 }}>
+            <div className="row report-chosen" style={{ gap: 12 }}>
               <span className={`issue-icon issue-icon--sm tone-${meta.tone}`}>
-                <NamedGlyph name={meta.glyph} size={22} />
+                <NamedGlyph name={meta.glyph} size={19} />
               </span>
               <span className="stack grow" style={{ gap: 1 }}>
                 <span className="eyebrow muted">Reporting</span>
@@ -171,7 +171,7 @@ export default function Report() {
             </div>
 
             {duplicate ? (
-              <section className="card card--accent stack" aria-label="Possible duplicate" style={{ gap: 10 }}>
+              <section className="report-dup stack" aria-label="Possible duplicate" style={{ gap: 8 }}>
                 <span className="eyebrow" style={{ color: 'var(--accent-strong)' }}>
                   Already reported nearby
                 </span>
@@ -244,8 +244,8 @@ export default function Report() {
                   </button>
                 </div>
               ) : null}
-              <label htmlFor="rep-photo" className="btn btn--outline" style={{ alignSelf: 'flex-start' }}>
-                <CameraGlyph size={18} />
+              <label htmlFor="rep-photo" className="btn btn--sm btn--outline" style={{ alignSelf: 'flex-start' }}>
+                <CameraGlyph size={16} />
                 {photo ? 'Change photo' : 'Add a photo'}
               </label>
               <input id="rep-photo" type="file" accept="image/*" capture="environment" className="sr-only" onChange={onPhoto} />
@@ -263,12 +263,12 @@ export default function Report() {
                   onArea={locate}
                 />
               </div>
-              <div className="card card--tight row" style={{ gap: 12 }}>
+              <div className="row report-chosen" style={{ gap: 12 }}>
                 <span className="issue-icon issue-icon--sm tone-violet">
-                  <PinGlyph size={20} />
+                  <PinGlyph size={18} />
                 </span>
-                <span className="stack grow" style={{ gap: 2 }}>
-                  <span className="strong" style={{ fontSize: '0.9375rem' }}>
+                <span className="stack grow" style={{ gap: 1 }}>
+                  <span className="strong" style={{ fontSize: '0.875rem' }}>
                     Near {nb.name}
                   </span>
                   <span className="meta">{precise ? `Precise location added (±${precise.accuracy} m)` : `${nb.ward} ward · neighbourhood only`}</span>
@@ -287,10 +287,10 @@ export default function Report() {
 
         {step === 2 && meta ? (
           <>
-            <section className="card stack" aria-label="Your report" style={{ gap: 12 }}>
+            <section className="stack report-review" aria-label="Your report" style={{ gap: 10 }}>
               <div className="row" style={{ gap: 12 }}>
-                <span className={`issue-icon tone-${meta.tone}`}>
-                  <NamedGlyph name={meta.glyph} size={26} />
+                <span className={`issue-icon issue-icon--sm tone-${meta.tone}`}>
+                  <NamedGlyph name={meta.glyph} size={19} />
                 </span>
                 <span className="stack" style={{ gap: 2 }}>
                   <span className="strong">{meta.label}</span>
@@ -318,7 +318,7 @@ export default function Report() {
               <ToggleRow title="Show my name to neighbours" meta="The city's team always sees who reported it." checked={showName} onChange={setShowName} />
             </div>
             <div className="notice tone-violet">
-              <NamedGlyph name="users" size={20} />
+              <NamedGlyph name="users" size={18} />
               <span>
                 <b>What happens next:</b> neighbours nearby can verify it. Once verified, it goes to the {nb.ward} ward team and you get every update here.
               </span>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { allReports, issueMeta, plusOneCount } from '../components/city';
 import { EmptyState, PageHeader } from '../components/ui';
@@ -18,9 +18,9 @@ function ReportRow({ r, count }: { r: CivicReport; count: number }) {
   const resolved = r.status === 4;
   return (
     <Link to={`/city/reports/${r.id}`} className="list-row glyph-host">
-      <StepRing step={r.status} size={48}>
+      <StepRing step={r.status} size={42}>
         <span className={`tone-${meta.tone}`} style={{ color: 'var(--tone-ink)', display: 'inline-flex' }}>
-          <NamedGlyph name={meta.glyph} size={22} duo />
+          <NamedGlyph name={meta.glyph} size={19} duo />
         </span>
       </StepRing>
       <span className="list-row__body">
@@ -33,7 +33,7 @@ function ReportRow({ r, count }: { r: CivicReport; count: number }) {
         </span>
       </span>
       <span className="city-trail">
-        <span className="num" style={{ fontSize: '0.9375rem' }}>
+        <span className="num" style={{ fontSize: '0.875rem' }}>
           +{count}
         </span>
         <span className="meta">neighbours</span>
@@ -62,12 +62,12 @@ export default function Reports() {
         sub={`${neighbourhoodName(settings.location.home)} and around`}
         actions={
           <Link to="/city/report" className="icon-btn icon-btn--accent" aria-label={t('city.report')}>
-            <PlusGlyph size={20} />
+            <PlusGlyph size={18} />
           </Link>
         }
       />
       <main className="page page--with-header">
-        <section className="city-ward city-ward--compact" aria-label={`${civic.ward} ward`}>
+        <section className="city-ward" aria-label={`${civic.ward} ward`}>
           <div className="row row--between" style={{ alignItems: 'flex-end', gap: 12 }}>
             <span className="stack" style={{ gap: 2 }}>
               <span className="eyebrow city-ward__eyebrow">{t('city.ward')}</span>
@@ -78,7 +78,7 @@ export default function Reports() {
           <div className="city-ward__bar" role="img" aria-label={`${civic.resolvedPct}% of reports resolved`}>
             <span style={{ width: `${civic.resolvedPct}%` }} />
           </div>
-          <div className="grid-3">
+          <div className="city-ward__stats" style={{ '--cols': 3 } as CSSProperties}>
             <div className="city-ward__stat">
               <span className="num" style={{ color: '#dfff8a' }}>
                 {civic.resolvedPct}%
@@ -124,7 +124,7 @@ export default function Reports() {
           </div>
         )}
 
-        <Link to="/city/report" className="btn btn--soft btn--block">
+        <Link to="/city/report" className="btn btn--sm btn--soft btn--block">
           {t('city.report')}
         </Link>
       </main>

@@ -1,7 +1,20 @@
 import { Link } from 'react-router-dom';
-import { ISSUE_TYPES, REPORTS } from '../data/city';
-import type { CityPulse, CivicReport, Corridor, IssueCategory, TransitArrival, Tone } from '../data/types';
-import { CheckGlyph, CountdownRing, NamedGlyph, PowerGlyph, TrafficGlyph, TRAFFIC_LABEL, WaterGlyph, type WeatherCondition } from '../icons';
+import { ALERT_KIND_META, ISSUE_TYPES, REPORTS } from '../data/city';
+import { SOURCES } from '../data/core';
+import type { CityAlert, CityPulse, CivicReport, Corridor, IssueCategory, Tone } from '../data/types';
+import { useT } from '../i18n';
+import {
+  AlertGlyph,
+  CheckGlyph,
+  ChevronRightGlyph,
+  NamedGlyph,
+  PowerGlyph,
+  ShieldGlyph,
+  TrafficGlyph,
+  TRAFFIC_LABEL,
+  WaterGlyph,
+  type WeatherCondition,
+} from '../icons';
 import type { AppData } from '../state/appData';
 
 /* ---------- Helpers shared by the City screens ---------- */
@@ -63,12 +76,45 @@ export function shiftClock(hhmm: string, deltaMin: number) {
 
 /* ---------- Rows ---------- */
 
+export const SEVERITY_TONE: Record<CityAlert['severity'], Tone> = { info: 'teal', advisory: 'amber', warning: 'peach', critical: 'red' };
+
+/** A city update as a flat row: tinted round icon, kind and age, title, source. */
+export function AlertRow({ alert }: { alert: CityAlert }) {
+  const t = useT();
+  const tone = SEVERITY_TONE[alert.severity];
+  const kind = ALERT_KIND_META[alert.kind];
+  return (
+    <Link to={`/city/alerts/${alert.id}`} className={`list-row alert-row glyph-host tone-${tone}`}>
+      <span className="alert-row__icon">
+        {alert.kind === 'safety' ? (
+          <ShieldGlyph size={18} duo />
+        ) : alert.severity === 'info' ? (
+          <NamedGlyph name={kind.glyph} size={18} duo />
+        ) : (
+          <AlertGlyph size={18} live={alert.active} duo />
+        )}
+      </span>
+      <span className="list-row__body">
+        <span className="alert-row__eyebrow">
+          {kind.label} · {alert.ago}
+        </span>
+        <span className="list-row__title">{alert.title}</span>
+        <span className="list-row__meta">
+          {SOURCES[alert.source].label}
+          {alert.verified ? ` · ${t('common.verified')}` : ''}
+        </span>
+      </span>
+      <ChevronRightGlyph size={16} style={{ color: 'var(--muted)', flexShrink: 0 }} />
+    </Link>
+  );
+}
+
 export function CorridorRow({ c }: { c: Corridor }) {
   const delay = c.minutes - c.usual;
   return (
     <div className="list-row">
-      <span className={`tile tone-${TRAFFIC_TONE[c.level]}`}>
-        <TrafficGlyph level={c.level} size={22} duo title={`${c.name}: ${TRAFFIC_LABEL[c.level]}`} />
+      <span className={`city-card__icon city-card__icon--sm tone-${TRAFFIC_TONE[c.level]}`}>
+        <TrafficGlyph level={c.level} size={19} duo title={`${c.name}: ${TRAFFIC_LABEL[c.level]}`} />
       </span>
       <span className="list-row__body">
         <span className="list-row__title">{c.name}</span>
@@ -78,7 +124,7 @@ export function CorridorRow({ c }: { c: Corridor }) {
         </span>
       </span>
       <span className="city-trail">
-        <span className="num" style={{ fontSize: '1rem' }}>
+        <span className="num" style={{ fontSize: '0.9375rem' }}>
           {c.minutes} min
         </span>
         <span className={`badge badge--sm tone-${TRAFFIC_TONE[c.level]}`}>{delay > 0 ? `+${delay} · ${TRAFFIC_LABEL[c.level]}` : TRAFFIC_LABEL[c.level]}</span>
@@ -87,44 +133,12 @@ export function CorridorRow({ c }: { c: Corridor }) {
   );
 }
 
-const CROWD_TONE: Record<TransitArrival['crowd'], Tone> = { Light: 'mint', Moderate: 'amber', Busy: 'peach' };
-const MODE_GLYPH: Record<TransitArrival['mode'], 'transit' | 'bus'> = { metro: 'transit', brts: 'bus', amts: 'bus' };
-
-export function DepartureRow({ a, linkTo }: { a: TransitArrival; linkTo?: string }) {
-  const body = (
-    <>
-      <span className={`tone-${a.lineTone}`} style={{ display: 'inline-flex' }}>
-        <CountdownRing value={a.minutes} max={a.mode === 'metro' ? 8 : 12} size={48} />
-      </span>
-      <span className="list-row__body">
-        <span className="list-row__title row" style={{ gap: 6 }}>
-          <span className={`tone-${a.lineTone}`} style={{ display: 'inline-flex', color: 'var(--tone-ink)' }}>
-            <NamedGlyph name={MODE_GLYPH[a.mode]} size={16} />
-          </span>
-          {a.line} → {a.towards}
-        </span>
-        <span className="list-row__meta">
-          {a.stop} · {a.walkMin} min walk
-        </span>
-      </span>
-      <span className={`badge badge--sm tone-${CROWD_TONE[a.crowd]}`}>{a.crowd}</span>
-    </>
-  );
-  return linkTo ? (
-    <Link to={linkTo} className="list-row">
-      {body}
-    </Link>
-  ) : (
-    <div className="list-row">{body}</div>
-  );
-}
-
 export function WaterRow({ w }: { w: CityPulse['water'][number] }) {
   const label = WATER_LABEL[w.status];
   return (
     <div className="list-row">
-      <span className="tile tone-blue">
-        <WaterGlyph level={WATER_LEVEL[w.status]} size={22} title={`${w.ward} water: ${label.text}`} />
+      <span className="city-card__icon city-card__icon--sm tone-blue">
+        <WaterGlyph level={WATER_LEVEL[w.status]} size={19} title={`${w.ward} water: ${label.text}`} />
       </span>
       <span className="list-row__body">
         <span className="list-row__title">{w.ward}</span>
@@ -148,8 +162,8 @@ export function PowerRow({ p }: { p: CityPulse['power'][number] }) {
   const label = POWER_LABEL[p.status];
   return (
     <div className="list-row">
-      <span className="tile tone-yellow">
-        <PowerGlyph status={p.status === 'restored' ? 'ok' : p.status} size={22} duo title={`${p.area}: ${label.text}`} />
+      <span className="city-card__icon city-card__icon--sm tone-yellow">
+        <PowerGlyph status={p.status === 'restored' ? 'ok' : p.status} size={19} duo title={`${p.area}: ${label.text}`} />
       </span>
       <span className="list-row__body">
         <span className="list-row__title">{p.area}</span>
@@ -167,8 +181,8 @@ export function ParkingRow({ p }: { p: CityPulse['parking'][number] }) {
   const tone: Tone = share > 0.25 ? 'mint' : share > 0.08 ? 'amber' : 'red';
   return (
     <div className="list-row">
-      <span className="tile tone-violet">
-        <NamedGlyph name="parking" size={20} duo />
+      <span className="city-card__icon city-card__icon--sm tone-violet">
+        <NamedGlyph name="parking" size={18} duo />
       </span>
       <span className="list-row__body">
         <span className="list-row__title">{p.name}</span>
@@ -178,7 +192,7 @@ export function ParkingRow({ p }: { p: CityPulse['parking'][number] }) {
         </span>
       </span>
       <span className="city-trail">
-        <span className="num" style={{ fontSize: '1rem' }}>
+        <span className="num" style={{ fontSize: '0.9375rem' }}>
           {p.free}
         </span>
         <span className="meta">free</span>

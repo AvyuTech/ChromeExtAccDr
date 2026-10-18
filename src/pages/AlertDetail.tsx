@@ -2,7 +2,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ShareButton } from '../components/cards';
 import { shiftClock, Timeline } from '../components/city';
 import { EmptyState, PageHeader } from '../components/ui';
-import { MODE_META } from '../data/cityExtra';
 import { ALERT_KIND_META, alertById } from '../data/city';
 import { neighbourhoodName, SOURCES } from '../data/core';
 import type { CityAlert, Tone } from '../data/types';
@@ -57,7 +56,6 @@ export default function AlertDetail() {
   const work = settings.location.work;
   const nearHome = alert.areas.includes(home) || alert.areas.includes('all');
   const nearWork = !!work && alert.areas.includes(work);
-  const mode = MODE_META[settings.location.commuteMode];
 
   const toggleMute = () => {
     const before = settings.alerts.kinds;
@@ -81,7 +79,7 @@ export default function AlertDetail() {
         <section className={`alert-hero tone-${sev.tone}`} aria-labelledby="alert-title">
           <div className="alert-hero__top">
             <span className="alert-hero__icon">
-              {alert.severity === 'info' ? <NamedGlyph name={kind.glyph} size={26} live /> : <AlertGlyph size={26} live={alert.active} />}
+              {alert.severity === 'info' ? <NamedGlyph name={kind.glyph} size={20} live /> : <AlertGlyph size={20} live={alert.active} />}
             </span>
             <span className="alert-hero__sev">{sev.label}</span>
             <span className="grow" />
@@ -99,19 +97,19 @@ export default function AlertDetail() {
             {alert.title}
           </h2>
           <span className="alert-hero__window">
-            <ClockGlyph size={16} />
+            <ClockGlyph size={14} />
             {alert.window}
           </span>
         </section>
 
         {alert.affectsCommute ? (
-          <div className="notice tone-violet">
-            <NamedGlyph name={mode.glyph} size={20} duo />
+          <Link to="/city/traffic" className="notice tone-violet" style={{ textDecoration: 'none' }}>
+            <NamedGlyph name="route" size={18} duo />
             <span>
-              <b>This affects your commute.</b> You usually go from {neighbourhoodName(home)} to {neighbourhoodName(work) || 'work'} by {mode.label.toLowerCase()} around{' '}
-              {shiftClock(settings.location.leaveAt, 0)}. Leave about 10 minutes earlier.
+              <b>This affects your commute.</b> You usually leave {neighbourhoodName(home)} for {neighbourhoodName(work) || 'work'} around {shiftClock(settings.location.leaveAt, 0)}.{' '}
+              <b>See the quickest route now</b>
             </span>
-          </div>
+          </Link>
         ) : nearHome || nearWork ? (
           <div className="notice tone-mint">
             <CheckGlyph size={18} />
@@ -121,10 +119,10 @@ export default function AlertDetail() {
           </div>
         ) : null}
 
-        <section className="card stack" style={{ gap: 12 }}>
+        <section className="stack alert-body" style={{ gap: 12 }}>
           <p className="body">{alert.body}</p>
           <div className="row" style={{ gap: 10 }}>
-            <TrustRing agree={agree} size={28} />
+            <TrustRing agree={agree} size={24} />
             <span className="stack" style={{ gap: 1 }}>
               <span className="strong" style={{ fontSize: '0.875rem' }}>
                 Source: {SOURCES[alert.source].label}
@@ -154,7 +152,7 @@ export default function AlertDetail() {
               {alert.tips.map((tip) => (
                 <li key={tip} className="list-row">
                   <span className="alert-tip__check">
-                    <CheckGlyph size={15} />
+                    <CheckGlyph size={13} />
                   </span>
                   <span className="body-sm grow">{tip}</span>
                 </li>
@@ -168,22 +166,20 @@ export default function AlertDetail() {
             <h2 id="alert-updates" className="section__title">
               {t('city.updates')}
             </h2>
-            <div className="card">
-              <Timeline
-                label={t('city.updates')}
-                items={[...alert.updates].reverse().map((u, i) => ({ title: u.text, time: u.time, state: i === 0 ? 'current' : 'done' }))}
-              />
-            </div>
+            <Timeline
+              label={t('city.updates')}
+              items={[...alert.updates].reverse().map((u, i) => ({ title: u.text, time: u.time, state: i === 0 ? 'current' : 'done' }))}
+            />
           </section>
         ) : null}
 
         <div className="grid-2">
-          <button type="button" className="btn btn--outline" onClick={toggleMute}>
-            <BellOffGlyph size={18} />
+          <button type="button" className="btn btn--sm btn--outline" onClick={toggleMute}>
+            <BellOffGlyph size={16} />
             {muted ? `Unmute ${kind.label.toLowerCase()}` : 'Mute alerts like this'}
           </button>
-          <button type="button" className="btn btn--outline" onClick={dismiss} disabled={dismissed}>
-            <CloseGlyph size={18} />
+          <button type="button" className="btn btn--sm btn--outline" onClick={dismiss} disabled={dismissed}>
+            <CloseGlyph size={16} />
             {dismissed ? 'Dismissed' : 'Dismiss'}
           </button>
         </div>

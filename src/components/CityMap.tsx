@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDownGlyph, ChevronRightGlyph, CloseGlyph, LocateGlyph, NamedGlyph, NavigateGlyph, type GlyphName } from '../icons';
+import type { TrafficLevel } from '../icons/live';
 
 /* An illustrative map of west Ahmedabad, drawn in SVG so it works offline and
    follows the theme. Pins and labels are HTML on top so they stay crisp and focusable. */
@@ -59,6 +60,28 @@ const LABELS: Array<{ text: string; x: number; y: number; size?: 'sm' | 'road' |
   { text: 'SG Highway', x: 172, y: 360, size: 'road', rotate: 87 },
   { text: 'Sabarmati', x: 748, y: 200, size: 'water', rotate: 82 },
 ];
+
+/** Live traffic colours, free flow to jammed. */
+export const TRAFFIC_COLOR: Record<TrafficLevel, string> = { 0: '#2fbf71', 1: '#f2b33d', 2: '#f07a2e', 3: '#e5484f' };
+
+/** Optional traffic layers: congestion heat, roads coloured by level, and routes. */
+export interface MapHeat {
+  id: string;
+  x: number;
+  y: number;
+  level: TrafficLevel;
+}
+export interface MapRoad {
+  id: string;
+  d: string;
+  level: TrafficLevel;
+}
+export interface MapRoute {
+  id: string;
+  points: Array<[number, number]>;
+  selected?: boolean;
+  label?: string;
+}
 
 export interface MapPin {
   id: string;
@@ -131,6 +154,7 @@ function MapArt() {
           <path d="M650 214 L770 200" />
           <path d="M650 430 L770 420" />
           <path d="M300 -10 L330 572" />
+          <path d="M524 262 L530 323" />
         </g>
         <g stroke="var(--map-road-major)" strokeWidth="9">
           <path d="M178 -10 L196 572" />
@@ -146,8 +170,73 @@ function MapArt() {
           <path d="M650 214 L770 200" />
           <path d="M650 430 L770 420" />
           <path d="M300 -10 L330 572" />
+          <path d="M524 262 L530 323" />
         </g>
       </g>
+    </svg>
+  );
+}
+
+const pointsAttr = (pts: Array<[number, number]>) => pts.map(([x, y]) => `${x},${y}`).join(' ');
+
+/** Heat, coloured roads and routes, drawn on the same canvas as the map art. */
+function TrafficLayer({
+  heat,
+  roads,
+  routes,
+  ends,
+  onRoute,
+}: {
+  heat?: MapHeat[];
+  roads?: MapRoad[];
+  routes?: MapRoute[];
+  ends?: { from: [number, number]; to: [number, number] };
+  onRoute?: (id: string) => void;
+}) {
+  const uid = useId().replace(/:/g, '');
+  const ordered = routes ? [...routes].sort((a, b) => Number(!!a.selected) - Number(!!b.selected)) : [];
+  return (
+    <svg className="city-map__layer" width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
+      <defs>
+        {([0, 1, 2, 3] as TrafficLevel[]).map((l) => (
+          <radialGradient key={l} id={`${uid}-heat-${l}`}>
+            <stop offset="0" stopColor={TRAFFIC_COLOR[l]} stopOpacity={l === 0 ? 0.32 : 0.62} />
+            <stop offset="0.55" stopColor={TRAFFIC_COLOR[l]} stopOpacity={l === 0 ? 0.12 : 0.26} />
+            <stop offset="1" stopColor={TRAFFIC_COLOR[l]} stopOpacity="0" />
+          </radialGradient>
+        ))}
+      </defs>
+      {heat?.map((h, i) => (
+        <circle
+          key={h.id}
+          className="city-map__heat"
+          cx={h.x}
+          cy={h.y}
+          r={44 + h.level * 22}
+          fill={`url(#${uid}-heat-${h.level})`}
+          style={{ animationDelay: `${(i % 4) * -1.1}s` }}
+        />
+      ))}
+      {roads ? (
+        <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+          {roads.map((r) => (
+            <path key={r.id} className="city-map__road" d={r.d} stroke={TRAFFIC_COLOR[r.level]} strokeWidth={r.level >= 2 ? 6 : 5} />
+          ))}
+        </g>
+      ) : null}
+      {ordered.map((r) => (
+        <g key={r.id} className={`city-map__route${r.selected ? ' is-selected' : ''}`} onClick={onRoute ? () => onRoute(r.id) : undefined}>
+          <polyline points={pointsAttr(r.points)} className="city-map__route-casing" />
+          <polyline points={pointsAttr(r.points)} className="city-map__route-line" />
+        </g>
+      ))}
+      {ends ? (
+        <g className="city-map__ends">
+          <circle cx={ends.from[0]} cy={ends.from[1]} r="7" fill="#1d2330" stroke="#ffffff" strokeWidth="3" />
+          <circle cx={ends.to[0]} cy={ends.to[1]} r="9" fill="#6c52ee" stroke="#ffffff" strokeWidth="3" />
+          <circle cx={ends.to[0]} cy={ends.to[1]} r="3" fill="#ffffff" />
+        </g>
+      ) : null}
     </svg>
   );
 }
@@ -158,12 +247,28 @@ export function CityMap({
   radiusKm,
   areaLabel,
   onArea,
+  heat,
+  roads,
+  routes,
+  ends,
+  onRoute,
+  showYou = true,
+  className,
 }: {
   pins: MapPin[];
+  /** Where "you are here" sits; the map opens centred on it. */
   home: [number, number];
   radiusKm: number;
-  areaLabel: string;
-  onArea: () => void;
+  areaLabel?: string;
+  onArea?: () => void;
+  heat?: MapHeat[];
+  roads?: MapRoad[];
+  routes?: MapRoute[];
+  ends?: { from: [number, number]; to: [number, number] };
+  onRoute?: (id: string) => void;
+  /** Hide the "you are here" dot and radius, e.g. when planning a trip. */
+  showYou?: boolean;
+  className?: string;
 }) {
   const viewport = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 354, h: 236 });
@@ -223,7 +328,7 @@ export function CityMap({
   const ring = radiusKm * PX_PER_KM;
 
   return (
-    <div className="city-map card">
+    <div className={`city-map card${className ? ` ${className}` : ''}`}>
       <div
         ref={viewport}
         className="city-map__viewport"
@@ -234,6 +339,7 @@ export function CityMap({
       >
         <div className={`city-map__canvas${animate ? ' is-animating' : ''}`} style={{ width: W, height: H, transform: `translate3d(${pos[0]}px, ${pos[1]}px, 0)` }}>
           <MapArt />
+          {heat || roads || routes || ends ? <TrafficLayer heat={heat} roads={roads} routes={routes} ends={ends} onRoute={onRoute} /> : null}
           {LABELS.map((l) => (
             <span
               key={l.text}
@@ -243,9 +349,13 @@ export function CityMap({
               {l.text}
             </span>
           ))}
-          <span className="city-map__radius" style={{ left: home[0], top: home[1], width: ring * 2, height: ring * 2 }} />
-          <span className="city-map__halo" style={{ left: home[0], top: home[1] }} />
-          <span className="city-map__you" style={{ left: home[0], top: home[1] }} aria-label="You are here" role="img" />
+          {showYou ? (
+            <>
+              <span className="city-map__radius" style={{ left: home[0], top: home[1], width: ring * 2, height: ring * 2 }} />
+              <span className="city-map__halo" style={{ left: home[0], top: home[1] }} />
+              <span className="city-map__you" style={{ left: home[0], top: home[1] }} aria-label="You are here" role="img" />
+            </>
+          ) : null}
           {pins.map((p, i) => (
             <button
               key={p.id}
@@ -266,12 +376,14 @@ export function CityMap({
           ))}
         </div>
 
-        <button type="button" className="city-map__area" onClick={onArea}>
-          <NavigateGlyph size={15} />
-          {areaLabel}
-          <ChevronDownGlyph size={14} />
-        </button>
-        <button type="button" className="city-map__locate" onClick={locate} aria-label="Centre on me">
+        {areaLabel && onArea ? (
+          <button type="button" className="city-map__area" onClick={onArea}>
+            <NavigateGlyph size={15} />
+            {areaLabel}
+            <ChevronDownGlyph size={14} />
+          </button>
+        ) : null}
+        <button type="button" className="city-map__locate" onClick={locate} aria-label={showYou ? 'Centre on me' : 'Centre the map'}>
           <LocateGlyph size={22} />
         </button>
         <span className="city-map__note" aria-hidden="true">
