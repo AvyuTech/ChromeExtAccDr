@@ -78,20 +78,6 @@ export const DEALS: Deal[] = [
     claimedBy: 63,
     distanceKm: 1.4,
   },
-  {
-    id: 'metro-pass',
-    title: 'Monthly metro pass: save on daily rides',
-    merchant: 'Metro',
-    area: 'Citywide',
-    discount: 'Commuter pass',
-    ends: 'Ongoing',
-    category: 'transport',
-    terms: ['Buy at any station counter', 'Check current fares at the station'],
-    tone: 'violet',
-    glyph: 'transit',
-    claimedBy: 520,
-    distanceKm: 0.9,
-  },
 ];
 
 export const dealById = (id: string) => DEALS.find((d) => d.id === id);
@@ -128,9 +114,9 @@ export const GROUPS: Group[] = [
     name: 'West Ahmedabad Commuters',
     members: 5600,
     postsToday: 42,
-    description: 'Live road updates, carpools and metro tips for SG Highway, Thaltej and Satellite.',
+    description: 'Live road updates, carpools and shortcuts for SG Highway, Thaltej and Satellite.',
     tone: 'blue',
-    glyph: 'transit',
+    glyph: 'car',
     area: 'West zone',
     rules: ['Road updates must say where and when', 'No speeding videos'],
     admins: ['nikhil'],

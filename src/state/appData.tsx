@@ -62,7 +62,7 @@ export const DEFAULT_APP_DATA: AppData = {
   myReports: [],
   myReplies: {},
   sentMessages: {},
-  recentSearches: ['quiet café with wifi', 'free events this weekend', 'metro timings'],
+  recentSearches: ['quiet café with wifi', 'free events this weekend', 'best way to CG Road'],
   following: DEFAULT_FOLLOWING,
   myCheckIns: [],
   wantToTry: MY_WANT_TO_TRY,

@@ -14,7 +14,6 @@ export type SourceId =
   | 'cyber'
   | 'amc'
   | 'utility'
-  | 'metro'
   | 'imd'
   | 'cpcb';
 
@@ -149,7 +148,7 @@ export interface Deal {
   discount: string;
   ends: string;
   code?: string;
-  category: 'food' | 'cafe' | 'shopping' | 'wellness' | 'movies' | 'transport';
+  category: 'food' | 'cafe' | 'shopping' | 'wellness' | 'movies';
   terms: string[];
   tone: Tone;
   glyph: GlyphName;
@@ -186,7 +185,7 @@ export interface Post {
   groupId?: string;
 }
 
-export type AlertKind = 'traffic' | 'weather' | 'water' | 'power' | 'safety' | 'health' | 'civic' | 'transit';
+export type AlertKind = 'traffic' | 'weather' | 'water' | 'power' | 'safety' | 'health' | 'civic';
 export type Severity = 'info' | 'advisory' | 'warning' | 'critical';
 
 export interface CityAlert {
@@ -278,18 +277,6 @@ export interface Corridor {
   cause?: string;
 }
 
-export interface TransitArrival {
-  id: string;
-  mode: 'metro' | 'brts' | 'amts';
-  line: string;
-  lineTone: Tone;
-  stop: string;
-  towards: string;
-  minutes: number;
-  walkMin: number;
-  crowd: 'Light' | 'Moderate' | 'Busy';
-}
-
 export interface HourForecast {
   hour: string;
   temp: number;
@@ -315,7 +302,6 @@ export interface CityPulse {
   };
   aqi: { value: number; dominant: string; station: string; advice: string; trend: number[] };
   corridors: Corridor[];
-  arrivals: TransitArrival[];
   water: Array<{ ward: string; slot: string; status: 'on-schedule' | 'delayed' | 'low-pressure' | 'no-supply'; note?: string }>;
   power: Array<{ area: string; window: string; reason: string; status: 'scheduled' | 'outage' | 'restored' }>;
   civic: { ward: string; resolvedPct: number; open: number; avgDays: number; resolvedThisWeek: number };

@@ -6,6 +6,8 @@ import { NEIGHBOURHOODS, PEOPLE } from '../data/core';
 import { DEALS, GROUPS, POSTS } from '../data/social';
 import type { CityEvent, CityPulse, Place, SourceId } from '../data/types';
 import { aqiBand, TRAFFIC_LABEL } from '../icons/live';
+import { NEIGHBOURHOOD_POS } from '../data/mapPositions';
+import { planRoutes, whyBest } from './traffic';
 import { price, rupees } from './format';
 
 /*
@@ -41,7 +43,6 @@ export type ResultRef =
   | { type: 'deal'; id: string }
   | { type: 'alert'; id: string }
   | { type: 'corridor'; id: string }
-  | { type: 'arrival'; id: string }
   | { type: 'group'; id: string }
   | { type: 'service'; id: string }
   | { type: 'emergency'; id: string }
@@ -290,7 +291,13 @@ export function ask(query: string, o: AskOptions): AskResult {
       const dest = NEIGHBOURHOODS.find((n) => new RegExp(`\\b${n.name}`, 'i').test(q) && n.name !== o.homeArea);
       const publicTransport = has(q, ['metro', 'brts', 'bus', 'transit']);
       let lead: string;
-      if (dest) {
+      const homeId = NEIGHBOURHOODS.find((n) => n.name === o.homeArea)?.id;
+      const routes = dest && homeId ? planRoutes(homeId, dest.id, NEIGHBOURHOOD_POS[homeId], NEIGHBOURHOOD_POS[dest.id], o.pulse.corridors) : [];
+      if (dest && routes.length) {
+        // Same route finder as the Traffic page, so the answer and the map agree.
+        const best = routes[0];
+        lead = `Best way to **${dest.name}** right now: take **${best.via}**, about **${best.minutes} min** (usually ${best.usual}). ${whyBest(best, routes)}.`;
+      } else if (dest) {
         const best = [...o.pulse.corridors].filter((c) => c.id !== worst.id).sort((a, b) => a.level - b.level || a.minutes - a.usual - (b.minutes - b.usual))[0];
         lead = `Best way to **${dest.name}** right now: take **${best.name}** (${best.minutes} min on its stretch, usually ${best.usual})${
           worst.level > 0 ? ` and skip **${worst.name}**${worst.cause ? `, ${lowerFirst(worst.cause)}` : ''}` : ''
@@ -448,7 +455,6 @@ export function ask(query: string, o: AskOptions): AskResult {
       let deals = [...DEALS];
       if (has(q, ['food', 'eat', 'buffet', 'dinner'])) deals = deals.filter((d) => d.category === 'food');
       if (has(q, ['coffee', 'café', 'cafe'])) deals = deals.filter((d) => d.category === 'cafe');
-      if (has(q, ['metro', 'transport', 'pass'])) deals = deals.filter((d) => d.category === 'transport');
       if (has(q, ['movie', 'film', 'cinema'])) deals = deals.filter((d) => d.category === 'movies');
       if (deals.length === 0) deals = [...DEALS];
       deals.sort((a, b) => b.claimedBy - a.claimedBy);

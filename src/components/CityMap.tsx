@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type 
 import { Link } from 'react-router-dom';
 import { ChevronDownGlyph, ChevronRightGlyph, CloseGlyph, LocateGlyph, NamedGlyph, NavigateGlyph, type GlyphName } from '../icons';
 import type { TrafficLevel } from '../icons/live';
+import { NEIGHBOURHOOD_POS } from '../data/mapPositions';
 
 /* An illustrative map of west Ahmedabad, drawn in SVG so it works offline and
    follows the theme. Pins and labels are HTML on top so they stay crisp and focusable. */
@@ -11,16 +12,7 @@ const H = 560;
 /** Map pixels per kilometre, used for the radius ring. */
 const PX_PER_KM = 46;
 
-export const NEIGHBOURHOOD_POS: Record<string, [number, number]> = {
-  thaltej: [262, 112],
-  bodakdev: [352, 214],
-  'sg-highway': [190, 270],
-  vastrapur: [470, 300],
-  satellite: [500, 412],
-  'prahlad-nagar': [300, 458],
-  navrangpura: [628, 160],
-  paldi: [668, 470],
-};
+export { NEIGHBOURHOOD_POS };
 
 export const PLACE_POS: Record<string, [number, number]> = {
   'quiet-cup': [322, 474],

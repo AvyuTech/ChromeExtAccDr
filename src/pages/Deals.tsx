@@ -20,7 +20,6 @@ const FILTERS: Array<{ id: 'all' | Deal['category'] | 'near'; label: string }> =
   { id: 'cafe', label: 'Café' },
   { id: 'wellness', label: 'Wellness' },
   { id: 'movies', label: 'Movies' },
-  { id: 'transport', label: 'Transport' },
 ];
 
 const CATEGORY_LABEL: Record<Deal['category'], string> = {
@@ -29,7 +28,6 @@ const CATEGORY_LABEL: Record<Deal['category'], string> = {
   shopping: 'Shopping',
   wellness: 'Wellness',
   movies: 'Movies',
-  transport: 'Getting around',
 };
 
 export function DealTile({ deal }: { deal: Deal }) {

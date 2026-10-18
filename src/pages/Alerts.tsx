@@ -26,7 +26,7 @@ export default function Alerts() {
   const visible = visibleAlerts(settings, data);
   const shown = kind === 'all' ? visible : visible.filter((a) => a.kind === kind);
   // Only kinds with something to show; public transport is not covered.
-  const kinds = (Object.keys(ALERT_KIND_META) as AlertKind[]).filter((k) => k !== 'transit' && settings.alerts.kinds[k] && visible.some((a) => a.kind === k));
+  const kinds = (Object.keys(ALERT_KIND_META) as AlertKind[]).filter((k) => settings.alerts.kinds[k] && visible.some((a) => a.kind === k));
   const dismissed = ALERTS.filter((a) => a.active && data.dismissedAlerts.includes(a.id));
   const hidden = ALERTS.filter((a) => a.active && !data.dismissedAlerts.includes(a.id)).length - visible.length;
 

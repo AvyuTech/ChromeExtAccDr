@@ -10,7 +10,6 @@ export const SOURCES: Record<SourceId, Source> = {
   cyber: { id: 'cyber', label: 'Police cyber cell', kind: 'official' },
   amc: { id: 'amc', label: 'Municipal corporation', kind: 'official' },
   utility: { id: 'utility', label: 'Power utility', kind: 'official' },
-  metro: { id: 'metro', label: 'Metro & BRTS', kind: 'official' },
   imd: { id: 'imd', label: 'Weather department', kind: 'official' },
   cpcb: { id: 'cpcb', label: 'Air quality board', kind: 'official' },
 };

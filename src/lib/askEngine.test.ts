@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { PULSE } from '../data/city';
 import type { SourceId } from '../data/types';
+import { NEIGHBOURHOOD_POS } from '../data/mapPositions';
 import { ask, detectIntent, type AskOptions } from './askEngine';
+import { planRoutes } from './traffic';
 
 const base: AskOptions = {
   sourceAllowed: () => true,
@@ -33,12 +35,12 @@ describe('detectIntent', () => {
 });
 
 describe('ask', () => {
-  it('suggests a road for a trip and skips the jammed one', () => {
+  it('suggests the same road for a trip as the Traffic page', () => {
     const r = ask('Best way to Navrangpura now', base);
+    const best = planRoutes('bodakdev', 'navrangpura', NEIGHBOURHOOD_POS.bodakdev, NEIGHBOURHOOD_POS.navrangpura, PULSE.corridors)[0];
     expect(r.intent).toBe('traffic');
     expect(r.heading).toBe('Getting to Navrangpura');
-    expect(r.answer).toMatch(/Best way to \*\*Navrangpura\*\*/);
-    expect(r.answer).toMatch(/skip \*\*SG Highway\*\*/);
+    expect(r.answer).toContain(`Best way to **Navrangpura** right now: take **${best.via}**, about **${best.minutes} min**`);
   });
 
   it('answers bus and metro questions with roads', () => {

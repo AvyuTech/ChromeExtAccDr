@@ -39,8 +39,7 @@ const PROMISES: Array<{ G: GlyphComp; title: string; body: string }> = [
   { G: ReportGlyph, title: 'onboarding.fix', body: 'onboarding.fixBody' },
 ];
 
-// Nearhood covers roads, not public transport, so transit notices are not offered.
-const KINDS = Object.keys(ALERT_KIND_META).filter((k) => k !== 'transit') as AlertKind[];
+const KINDS = Object.keys(ALERT_KIND_META) as AlertKind[];
 
 /** The first-run collage: real places and people, with a few live Nearhood moments floating on top. */
 function Collage() {

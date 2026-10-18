@@ -369,8 +369,7 @@ export function NotificationsSection() {
 
 /* ======================= City alerts ======================= */
 
-// Nearhood covers roads, not public transport, so transit notices are not offered.
-const KINDS = Object.keys(ALERT_KIND_META).filter((k) => k !== 'transit') as AlertKind[];
+const KINDS = Object.keys(ALERT_KIND_META) as AlertKind[];
 const SEVERITIES: Severity[] = ['info', 'advisory', 'warning', 'critical'];
 
 export function AlertsSection() {

@@ -72,23 +72,6 @@ export const ALERTS: CityAlert[] = [
     active: true,
   },
   {
-    id: 'metro-delay',
-    kind: 'transit',
-    severity: 'advisory',
-    title: 'Blue Line trains every 12 min this evening',
-    body: 'Reduced frequency between 8 and 10 pm for track inspection.',
-    area: 'Blue Line',
-    areas: ['thaltej', 'bodakdev', 'navrangpura'],
-    ago: '3 h ago',
-    window: 'Today 8 – 10 pm',
-    source: 'metro',
-    verified: true,
-    affectsCommute: true,
-    tips: ['Leave 10 minutes earlier if you take the metro home'],
-    updates: [],
-    active: true,
-  },
-  {
     id: 'phishing',
     kind: 'safety',
     severity: 'warning',
@@ -150,7 +133,6 @@ export const ALERT_KIND_META: Record<CityAlert['kind'], { label: string; glyph: 
   safety: { label: 'Safety', glyph: 'shield', tone: 'red' },
   health: { label: 'Health', glyph: 'health', tone: 'green' },
   civic: { label: 'Civic', glyph: 'services', tone: 'teal' },
-  transit: { label: 'Transit', glyph: 'transit', tone: 'violet' },
 };
 
 export const PULSE: CityPulse = {
@@ -191,12 +173,6 @@ export const PULSE: CityPulse = {
     { id: 'cg', name: 'CG Road', stretch: 'Panchvati → Swastik', level: 1, minutes: 9, usual: 8 },
     { id: 'ashram', name: 'Ashram Road', stretch: 'Income Tax → Paldi', level: 0, minutes: 10, usual: 11 },
     { id: 'judges', name: 'Judges Bungalow Rd', stretch: 'Bodakdev → Vastrapur', level: 0, minutes: 5, usual: 6 },
-  ],
-  arrivals: [
-    { id: 'a1', mode: 'metro', line: 'Blue Line', lineTone: 'blue', stop: 'Doordarshan Kendra', towards: 'Vastral Gam', minutes: 4, walkMin: 9, crowd: 'Moderate' },
-    { id: 'a2', mode: 'metro', line: 'Blue Line', lineTone: 'blue', stop: 'Doordarshan Kendra', towards: 'Thaltej', minutes: 7, walkMin: 9, crowd: 'Light' },
-    { id: 'a3', mode: 'brts', line: 'BRTS 1', lineTone: 'red', stop: 'Shivranjani', towards: 'RTO Circular', minutes: 3, walkMin: 12, crowd: 'Busy' },
-    { id: 'a4', mode: 'amts', line: 'Bus 501', lineTone: 'amber', stop: 'Judges Bungalow', towards: 'Lal Darwaja', minutes: 11, walkMin: 4, crowd: 'Light' },
   ],
   water: [
     { ward: 'Bodakdev', slot: '6 – 8 am', status: 'low-pressure', note: 'Valve maintenance until 4 pm' },

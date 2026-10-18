@@ -101,7 +101,6 @@ const SOURCE_GLYPH: Record<SourceId, GlyphName> = {
   cyber: 'shield',
   amc: 'services',
   utility: 'bolt',
-  metro: 'transit',
   imd: 'cloud',
   cpcb: 'air',
 };

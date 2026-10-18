@@ -5,7 +5,7 @@ import { mergeDefaults, readJSON, removeKey, writeJSON } from './storage';
 
 export type Language = 'en' | 'gu' | 'hi';
 export type ThemeChoice = 'system' | 'light' | 'dark';
-export type CommuteMode = 'metro' | 'brts' | 'car' | 'two-wheeler' | 'auto' | 'walk';
+export type CommuteMode = 'car' | 'two-wheeler' | 'auto' | 'walk';
 
 export interface Settings {
   onboarded: boolean;
@@ -95,6 +95,15 @@ export interface Settings {
   };
 }
 
+const COMMUTE_MODES: CommuteMode[] = ['car', 'two-wheeler', 'auto', 'walk'];
+
+/** Stored settings over the defaults, dropping values from older versions (metro and bus commutes). */
+function loadSettings(): Settings {
+  const s = mergeDefaults(DEFAULT_SETTINGS, readJSON<Partial<Settings>>(KEY));
+  if (!COMMUTE_MODES.includes(s.location.commuteMode)) s.location = { ...s.location, commuteMode: 'car' };
+  return s;
+}
+
 export const DEFAULT_SETTINGS: Settings = {
   onboarded: false,
   profile: {
@@ -129,7 +138,7 @@ export const DEFAULT_SETTINGS: Settings = {
     quietTo: '07:00',
   },
   alerts: {
-    kinds: { traffic: true, weather: true, water: true, power: true, safety: true, health: true, civic: true, transit: true },
+    kinds: { traffic: true, weather: true, water: true, power: true, safety: true, health: true, civic: true },
     minSeverity: 'info',
     commuteOnly: false,
     criticalBypassQuiet: true,
@@ -175,7 +184,7 @@ interface SettingsContextValue {
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<Settings>(() => mergeDefaults(DEFAULT_SETTINGS, readJSON<Partial<Settings>>(KEY)));
+  const [settings, setSettings] = useState<Settings>(() => loadSettings());
 
   useEffect(() => {
     writeJSON(KEY, settings);

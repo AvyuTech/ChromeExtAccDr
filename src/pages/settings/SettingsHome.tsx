@@ -21,7 +21,7 @@ function trailFor(id: SectionId, s: Settings, t: (k: string, v?: Record<string, 
     case 'notifications':
       return s.notifications.push ? t('settings.on') : t('settings.off');
     case 'alerts': {
-      const kinds = Object.keys(ALERT_KIND_META).filter((k) => k !== 'transit') as Array<keyof typeof ALERT_KIND_META>;
+      const kinds = Object.keys(ALERT_KIND_META) as Array<keyof typeof ALERT_KIND_META>;
       return `${kinds.filter((k) => s.alerts.kinds[k]).length}/${kinds.length}`;
     }
     case 'appearance':

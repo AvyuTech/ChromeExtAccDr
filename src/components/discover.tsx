@@ -7,8 +7,8 @@ import { eventById } from '../data/events';
 import { placeById } from '../data/places';
 import { dealById, groupById, postById } from '../data/social';
 import { alertById } from '../data/city';
-import type { CityEvent, CityPulse, Corridor, Group, Place, Tone, TransitArrival } from '../data/types';
-import { CheckGlyph, ChevronRightGlyph, CountdownRing, NamedGlyph, PhoneGlyph, ShieldGlyph, TrafficGlyph, UsersGlyph } from '../icons';
+import type { CityEvent, CityPulse, Corridor, Group, Place, Tone } from '../data/types';
+import { CheckGlyph, ChevronRightGlyph, NamedGlyph, PhoneGlyph, ShieldGlyph, TrafficGlyph, UsersGlyph } from '../icons';
 import { TRAFFIC_LABEL } from '../icons/live';
 import type { ResultRef } from '../lib/askEngine';
 import { compact, km, rupees } from '../lib/format';
@@ -30,7 +30,7 @@ const TRAFFIC_TONE: Record<number, Tone> = { 0: 'mint', 1: 'amber', 2: 'peach', 
 export function CorridorRow({ corridor }: { corridor: Corridor }) {
   const slower = corridor.minutes - corridor.usual;
   return (
-    <Link to="/city/transit" className="list-row">
+    <Link to="/city/traffic" className="list-row">
       <span className={`tile tone-${TRAFFIC_TONE[corridor.level]}`}>
         <TrafficGlyph level={corridor.level} size={22} />
       </span>
@@ -52,28 +52,9 @@ export function CorridorRow({ corridor }: { corridor: Corridor }) {
   );
 }
 
-export function ArrivalRow({ arrival }: { arrival: TransitArrival }) {
-  return (
-    <Link to="/city/transit" className="list-row">
-      <span className={`tone-${arrival.lineTone}`} style={{ display: 'inline-flex' }}>
-        <CountdownRing value={arrival.minutes} max={12} size={46} />
-      </span>
-      <span className="list-row__body">
-        <span className="list-row__title">
-          {arrival.line} → {arrival.towards}
-        </span>
-        <span className="list-row__meta">
-          {arrival.stop} · {arrival.walkMin} min walk · {arrival.crowd}
-        </span>
-      </span>
-      <ChevronRightGlyph size={16} style={{ color: 'var(--muted)' }} />
-    </Link>
-  );
-}
-
 /* ---------- Render any answer result ---------- */
 
-const LIST_TYPES = new Set<ResultRef['type']>(['place', 'corridor', 'arrival', 'emergency', 'facility', 'service', 'report']);
+const LIST_TYPES = new Set<ResultRef['type']>(['place', 'corridor', 'emergency', 'facility', 'service', 'report']);
 
 function renderListItem(ref: ResultRef, pulse: CityPulse, last: boolean): ReactNode {
   switch (ref.type) {
@@ -84,10 +65,6 @@ function renderListItem(ref: ResultRef, pulse: CityPulse, last: boolean): ReactN
     case 'corridor': {
       const c = pulse.corridors.find((x) => x.id === ref.id);
       return c ? <CorridorRow key={ref.id} corridor={c} /> : null;
-    }
-    case 'arrival': {
-      const a = pulse.arrivals.find((x) => x.id === ref.id);
-      return a ? <ArrivalRow key={ref.id} arrival={a} /> : null;
     }
     case 'emergency': {
       const e = EMERGENCY.find((x) => x.id === ref.id);

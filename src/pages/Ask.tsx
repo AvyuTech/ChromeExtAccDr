@@ -56,7 +56,6 @@ function suggestionLook(q: string): { glyph: GlyphName; tone: string } {
   if (s.includes('weekend') || s.includes('happening')) return { glyph: 'events', tone: 'peach' };
   if (s.includes('café') || s.includes('cafe') || s.includes('coffee')) return { glyph: 'cafe', tone: 'clay' };
   if (s.includes('traffic')) return { glyph: 'car', tone: 'amber' };
-  if (s.includes('metro') || s.includes('bus')) return { glyph: 'transit', tone: 'blue' };
   if (s.includes('water') || s.includes('power')) return { glyph: 'services', tone: 'teal' };
   if (s.includes('kids')) return { glyph: 'kids', tone: 'mint' };
   return { glyph: 'spark', tone: 'violet' };

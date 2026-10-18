@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PULSE } from '../data/city';
-import type { CityPulse, TransitArrival } from '../data/types';
+import type { CityPulse } from '../data/types';
 import type { TrafficLevel } from '../icons/live';
 import { useSettings } from './settings';
 
 const TICK_MS = 20_000;
 
 /**
- * A simulated live feed for the City pulse. Every tick the next trains get
- * closer, roads drift a little and AQI wobbles, so the dynamic glyphs move.
+ * A simulated live feed for the City pulse. Every tick roads drift a little
+ * and AQI wobbles, so the heat map and the dynamic glyphs move.
  * Paused when Data saver is on or live updates are switched off.
  */
 export function useLiveCity(): CityPulse & { tick: number; paused: boolean } {
@@ -23,11 +23,6 @@ export function useLiveCity(): CityPulse & { tick: number; paused: boolean } {
   }, [paused]);
 
   return useMemo(() => {
-    const arrivals: TransitArrival[] = PULSE.arrivals.map((a, i) => {
-      const cycle = a.mode === 'metro' ? 8 : 12;
-      const m = (a.minutes - tick + cycle * 50) % cycle;
-      return { ...a, minutes: m === 0 && i % 2 ? cycle : m };
-    });
     const corridors = PULSE.corridors.map((c, i) => {
       const wobble = Math.round(Math.sin((tick + i * 3) / 2) * 1.4);
       const minutes = Math.max(c.usual - 2, c.minutes + wobble);
@@ -36,6 +31,6 @@ export function useLiveCity(): CityPulse & { tick: number; paused: boolean } {
       return { ...c, minutes, level };
     });
     const aqi = { ...PULSE.aqi, value: PULSE.aqi.value + Math.round(Math.sin(tick / 3) * 4) };
-    return { ...PULSE, arrivals, corridors, aqi, tick, paused, updatedAgo: paused ? 'Paused' : 'Live' };
+    return { ...PULSE, corridors, aqi, tick, paused, updatedAgo: paused ? 'Paused' : 'Live' };
   }, [tick, paused]);
 }
