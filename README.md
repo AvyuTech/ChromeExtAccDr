@@ -1,22 +1,32 @@
 # Nearhood
 
-**Your city, answered.** Nearhood is a smart, city-level companion app, starting with Ahmedabad. Ask anything about the city and get one answer merged from ticketing sites, social posts, maps, local news, official feeds and your neighbours, with a clear signal of how many sources agree.
+**A little closer to your city.** Nearhood is a smart, city-level companion app, starting with Ahmedabad. Ask anything about the city and get one answer merged from ticketing sites, social posts, maps, local news, official feeds and your neighbours, with a clear signal of how many sources agree.
 
-It is built from the Nearhood design canvas (Home feed, Search and Explore artboards) and extends it into a complete app.
+It started from the Nearhood design canvas and now follows the **Porcelain** design: every screen, from the splash to the last settings page, uses the new palette, type, photography and icons.
 
 ## What's inside
 
 | Area | Screens |
 | --- | --- |
-| **Home** | Ask bar, feed filters, *Today in your city* band (weather, alerts, tonight, deals), For you / Near me / Trending / Questions feed with AI-summarised threads, city alerts, weekend events and deals interleaved |
+| **Home** | *Your neighbourhood, alive with possibilities*: ask bar, friends' check-in stories, today card (weather and plans tonight), For you / Friends / Nearby feed with *The neighbourhood says* summaries, city updates, friends' must-tries, weekend events and deals, plus a filter sheet |
 | **Ask** | On-device answer engine: detects intent (events, cafés, food, traffic, metro, weather, air, water, power, civic, deals, groups, safety, services), merges sources, shows how many agree, filters and follow-ups |
-| **Explore** | Category grid, category pages (food, events, movies, getaways, places), deals and deal details, place and event pages with source trust panel, groups |
+| **Explore** | *Find your next favourite*: radius picker, mood chips (coffee, food, outdoors, culture), an illustrative map of west Ahmedabad with pins you can tap and a draggable view, *Worth stepping out for* picked from your friends' visits, tonight's events, photo category tiles, category pages, deals, place and event pages with source trust panel, groups |
 | **City** | Live *City pulse* dashboard (weather, AQI dial, roads, next metro/BRTS/bus, water and power, ward civic health, parking), alerts and alert details, transit and commute, **report a civic issue** with duplicate detection and a tracker, city services, safety & SOS |
 | **Social** | Post details with replies, composer (question, recommendation, alert, lost & found, event, give away) with similar-question detection, updates, messages and chat |
 | **Friends & community reviews** | Follow friends; a strip on Home shows who checked in today. **Quick check-in** (place → what you had → Must try / Good / Skip, in about ten seconds) instead of long posts. Places show the share of locals who say *must try* and what people actually order, with friends' reviews first. Profiles with a **Want to try** list (a to-do list for the city), curated lists, taste match and "you both want to try" plans |
 | **Me & Settings** | Profile, saved items, onboarding, and full settings: account, location & commute, notifications, city alerts, appearance (light/dark/system, text size), language (English, ગુજરાતી, हिन्दी), accessibility, privacy, sources & AI answers, data & storage, safety contacts, help, about |
 
 Settings change behaviour, not just switches: turning off a source removes its listings and chips from answers, alert preferences filter the alert feed and tab badge, *Data saver* pauses the live city feed, theme, contrast, motion and text size apply app-wide, and language switches the interface.
+
+## Design
+
+| | |
+| --- | --- |
+| **Colours** | Porcelain `#F7F7F2` (ground), Ink `#1D2330` (text), Violet `#6C52EE` (actions, active states), Lime `#DFFF8A` (highlights, *you are here*). Dark and high-contrast themes are derived from the same tokens in `src/styles/tokens.css` |
+| **Type** | Plus Jakarta Sans (bold headlines) and Manrope (body), loaded from Google Fonts |
+| **Photography** | Real photos of people, places, dishes and events (`src/assets/photos`, about 2 MB of WebP), with a tinted glyph fallback wherever a photo is missing |
+| **Icons** | The Nearhood glyph family below: outline icons with a soft tint, a lime dot and live states |
+| **Presentation** | On a laptop or desktop the app runs inside a phone frame with a live status bar, next to the brand palette; on a phone it is full screen. A brand splash (the arch draws itself and faces and places drift in) plays once per visit |
 
 ## Reviews you can trust
 
@@ -29,7 +39,7 @@ Community verdicts replace star ratings. A verdict is one tap (Must try, Good or
 
 ## Nearhood glyphs
 
-All icons are drawn for this app; no icon library is used. They share one anatomy (rounded 1.9 strokes, a soft tint layer and the logo's mint dot), and many are **driven by live data**:
+All icons are drawn for this app; no icon library is used. They share one anatomy (rounded 1.9 strokes, a soft tint layer and the logo's lime dot), and many are **driven by live data**:
 
 - **Weather** glyph changes with conditions (rays turn, rain falls, haze drifts).
 - **AQI dial** uses the Indian National AQI bands and moves to the current value.
@@ -59,6 +69,7 @@ The app is a PWA: open it on a phone and use *Add to Home Screen* to install it.
 
 ```
 src/
+  assets/photos Photos (WebP) and sources.json with credits and licences
   icons/        Nearhood glyph family (nav, categories, live data, UI) + animations
   data/         Sample Ahmedabad data: places, events, deals, posts, alerts, city pulse, services
   state/        Persisted settings, user activity, toasts, simulated live city feed
@@ -68,6 +79,10 @@ src/
   i18n/         English, Gujarati and Hindi strings
   styles/       Design tokens (light/dark/high contrast), base, components, page styles
 ```
+
+## Photo credits
+
+Most photos are from [Unsplash](https://unsplash.com) under the [Unsplash License](https://unsplash.com/license). A few Ahmedabad places, dishes and events come from Flickr (via [Openverse](https://openverse.org)) and Wikimedia Commons under Creative Commons licences (CC BY 2.0, CC BY-SA 2.0 / 3.0). Every photo's author, source link and licence is listed in `src/assets/photos/sources.json` and shown in the app under **Settings › About › Photo credits**. People in the photos are not the people named in the sample content.
 
 ## About the data
 

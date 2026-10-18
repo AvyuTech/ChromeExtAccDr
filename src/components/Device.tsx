@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
+import { photo } from '../assets/photos';
 import { Logo, Wordmark } from '../icons';
 
 /* Presentation chrome. On desktop the app sits in a phone with a live status
@@ -40,6 +41,17 @@ export function StatusBar() {
 
 const SPLASH_KEY = 'nearhood.splash.v2';
 
+/** Faces and places that drift in around the mark: the city, a little closer. */
+const ORBIT: Array<{ key: string; x: number; y: number; size: number; round?: boolean }> = [
+  { key: 'person-riya', x: -118, y: -214, size: 62, round: true },
+  { key: 'place-quiet-cup', x: 112, y: -236, size: 76 },
+  { key: 'person-karan', x: 146, y: -96, size: 50, round: true },
+  { key: 'dish-cold-brew', x: -150, y: -52, size: 58 },
+  { key: 'event-rooftop-acoustic', x: -118, y: 196, size: 72 },
+  { key: 'person-aditi', x: 128, y: 214, size: 58, round: true },
+  { key: 'place-vastrapur-lake', x: 8, y: 300, size: 48 },
+];
+
 /** Brand splash: the arch draws itself, the lime dot drops in, then it fades. Once per visit. */
 export function Splash() {
   const [show] = useState(() => {
@@ -60,6 +72,17 @@ export function Splash() {
   if (!show || gone) return null;
   return (
     <div className="splash" role="presentation">
+      <span className="splash__orbit" aria-hidden="true">
+        {ORBIT.map((o, i) => (
+          <img
+            key={o.key}
+            src={photo(o.key)}
+            alt=""
+            className={`splash__photo${o.round ? ' splash__photo--round' : ''}`}
+            style={{ '--x': `${o.x}px`, '--y': `${o.y}px`, width: o.size, height: o.size, animationDelay: `${0.15 + i * 0.07}s` } as CSSProperties}
+          />
+        ))}
+      </span>
       <Logo size={96} />
       <Wordmark size={40} />
       <p className="splash__tag">A little closer to your city.</p>

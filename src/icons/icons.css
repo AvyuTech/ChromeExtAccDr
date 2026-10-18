@@ -1012,12 +1012,13 @@
   color: var(--ink);
 }
 .logo--animated .logo__arch {
-  stroke-dasharray: 64;
+  /* Longer than the arch (about 65 units) so the end cap is never clipped */
+  stroke-dasharray: 70;
   animation: logo-arch 0.8s cubic-bezier(0.6, 0, 0.3, 1) both;
 }
 @keyframes logo-arch {
   from {
-    stroke-dashoffset: 64;
+    stroke-dashoffset: 70;
   }
   to {
     stroke-dashoffset: 0;

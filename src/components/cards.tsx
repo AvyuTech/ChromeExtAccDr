@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { eventPhoto, personPhoto, placePhoto } from '../assets/photos';
 import { ALERT_KIND_META } from '../data/city';
@@ -9,6 +9,8 @@ import {
   AlertGlyph,
   CheckGlyph,
   ChevronRightGlyph,
+  FlagGlyph,
+  KebabGlyph,
   NamedGlyph,
   ReplyGlyph,
   SaveGlyph,
@@ -24,7 +26,7 @@ import { placeCommunity } from '../lib/friends';
 import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
-import { RichText } from './ui';
+import { RichText, Sheet } from './ui';
 
 /* ---------- Avatar: a real photo when we have one, initials otherwise ---------- */
 export function Avatar({ who, size = 40, ring }: { who: Person; size?: number; ring?: boolean }) {
@@ -202,6 +204,7 @@ export function PostCard({ post }: { post: Post }) {
           </span>
         </div>
         <span className={`badge tone-${TOPIC_TONE[post.type]}`}>{post.topic}</span>
+        <PostMenu post={post} />
       </div>
       <p className="post-card__text" onClick={open}>
         {post.text}
@@ -263,6 +266,79 @@ export function PostCard({ post }: { post: Post }) {
         </button>
       </div>
     </article>
+  );
+}
+
+/** The ⋮ menu on a post: save, share, open the thread or flag it. */
+function PostMenu({ post }: { post: Post }) {
+  const t = useT();
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { has, toggle } = useAppData();
+  const [open, setOpen] = useState(false);
+  const saved = has('savedPosts', post.id);
+  const share = async () => {
+    setOpen(false);
+    const url = `${window.location.origin}${window.location.pathname}#/post/${post.id}`;
+    try {
+      if (navigator.share) await navigator.share({ title: 'Nearhood', text: post.text, url });
+      else {
+        await navigator.clipboard.writeText(url);
+        toast('Link copied');
+      }
+    } catch {
+      /* dismissed */
+    }
+  };
+  const rows: Array<{ label: string; glyph: ReactNode; onClick: () => void; danger?: boolean }> = [
+    {
+      label: saved ? 'Remove from saved' : t('common.save'),
+      glyph: <SaveGlyph size={20} active={saved} />,
+      onClick: () => {
+        const on = toggle('savedPosts', post.id);
+        toast(on ? 'Saved to your list' : 'Removed from saved');
+        setOpen(false);
+      },
+    },
+    { label: t('common.share'), glyph: <ShareGlyph size={20} />, onClick: share },
+    { label: 'Open the thread', glyph: <ReplyGlyph size={20} />, onClick: () => navigate(`/post/${post.id}`) },
+    {
+      label: t('social.reportPost'),
+      glyph: <FlagGlyph size={20} />,
+      danger: true,
+      onClick: () => {
+        setOpen(false);
+        toast(t('social.reportThanks'));
+      },
+    },
+  ];
+  return (
+    <>
+      <button
+        type="button"
+        className="icon-btn icon-btn--ghost post-card__menu"
+        aria-label="Post options"
+        aria-haspopup="dialog"
+        style={{ width: 34, height: 40, marginRight: -10, color: 'var(--muted)' }}
+        onClick={() => setOpen(true)}
+      >
+        <KebabGlyph size={20} />
+      </button>
+      <Sheet open={open} onClose={() => setOpen(false)} title="Post options">
+        <div className="list">
+          {rows.map((r) => (
+            <button key={r.label} type="button" className="list-row" onClick={r.onClick} style={r.danger ? { color: 'var(--red)' } : undefined}>
+              <span className="tile" style={r.danger ? { background: 'var(--red-tint)', color: 'var(--red)' } : undefined}>
+                {r.glyph}
+              </span>
+              <span className="list-row__body">
+                <span className="list-row__title">{r.label}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </Sheet>
+    </>
   );
 }
 

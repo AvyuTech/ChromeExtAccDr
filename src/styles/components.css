@@ -1410,6 +1410,36 @@ button.list-row:active {
   color: var(--ink);
   animation: rise 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) 0.45s both;
 }
+.splash .wordmark {
+  animation: rise 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) 0.45s both;
+}
+.splash__orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+.splash__photo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  object-fit: cover;
+  border-radius: 20px;
+  border: 3px solid var(--surface);
+  box-shadow: 0 12px 28px rgba(29, 35, 48, 0.16);
+  transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%));
+  animation: orbit-in 0.9s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.splash__photo--round {
+  border-radius: 50%;
+}
+@keyframes orbit-in {
+  from {
+    opacity: 0;
+    transform: translate(calc(var(--x) * 1.5 - 50%), calc(var(--y) * 1.5 - 50%)) scale(0.6);
+  }
+}
 .splash__tag {
   font-size: 1rem;
   font-weight: 500;
