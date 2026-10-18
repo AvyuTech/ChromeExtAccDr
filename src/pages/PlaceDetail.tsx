@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ownItemPhoto, photo, placePhoto } from '../assets/photos';
 import { AnswerCard, PlaceRow, PostCard } from '../components/cards';
-import { FriendVerdictRow, RecommendSheet, TrustSheet } from '../components/community';
-import { AwayLine, EventLinkRow, IconAction, OwnerReplyView, PageHistorySheet, PageUpdateRow, PlaceClaim, PlaceOriginLine, ProfileHead, useShare } from '../components/discover';
+import { FriendVerdictRow, TrustSheet } from '../components/community';
+import { ShareSheet } from '../components/share';
+import { AwayLine, EventLinkRow, IconAction, OwnerReplyView, PageHistorySheet, PageUpdateRow, PlaceClaim, PlaceOriginLine, ProfileHead } from '../components/discover';
 import { CheckInCard, TasteMatchPill, VerdictBar, WantButton } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { EVENTS } from '../data/events';
 import { PLACES, placeById } from '../data/places';
 import { POSTS } from '../data/social';
 import { useT } from '../i18n';
-import { CheckGlyph, CheckInGlyph, ClockGlyph, EditGlyph, InfoGlyph, MustGlyph, NamedGlyph, NavigateGlyph, PhoneGlyph, PinGlyph, SaveGlyph, SendGlyph, ShareGlyph, ShieldGlyph, SparkGlyph, WantGlyph } from '../icons';
+import { CheckGlyph, CheckInGlyph, ClockGlyph, EditGlyph, InfoGlyph, MustGlyph, NamedGlyph, NavigateGlyph, PhoneGlyph, PinGlyph, SaveGlyph, ShareGlyph, ShieldGlyph, SparkGlyph } from '../icons';
 import { isWanted, itemsFor, placeCommunity } from '../lib/friends';
 import { compact, km, priceLevel } from '../lib/format';
 import { ownerReplyFor, pageUpdates, runsPage, withOwnerEdits } from '../lib/places';
@@ -23,12 +24,11 @@ export default function PlaceDetail() {
   const t = useT();
   const toast = useToast();
   const { settings } = useSettings();
-  const { data, has, toggle, toggleWant } = useAppData();
-  const share = useShare();
+  const { data, has, add, remove, toggleWant } = useAppData();
   const found = placeById(id);
   const [trustOpen, setTrustOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [recommendOpen, setRecommendOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const [allReviews, setAllReviews] = useState(false);
 
   if (!found) {
@@ -80,6 +80,7 @@ export default function PlaceDetail() {
   const signature = gallery[0]?.src;
   const wantItem = { id: `w-place-${place.id}`, kind: 'place' as const, refId: place.id, title: place.name, sub: `${place.kind} · ${place.area}` };
   const wanted = isWanted(data, wantItem);
+  const kept = wanted || saved;
 
   return (
     <>
@@ -133,29 +134,27 @@ export default function PlaceDetail() {
           ) : (
             <IconAction primary to={checkInLink} icon={<CheckInGlyph size={19} />} label={t('discover.action.checkIn')} ariaLabel={t('community.checkInHere')} />
           )}
+          {/* Save and Want to try are one thing: saving a page puts it on your Want to try list. */}
           <IconAction
-            pressed={wanted}
+            pressed={kept}
             onClick={() => {
-              const added = toggleWant(wantItem);
-              toast(added ? `Added "${place.name}" to Want to try` : 'Removed from Want to try');
+              if (kept) {
+                if (wanted) toggleWant(wantItem);
+                remove('savedPlaces', place.id);
+                toast('Removed from Want to try');
+              } else {
+                toggleWant(wantItem);
+                add('savedPlaces', place.id);
+                toast(`Saved ${place.name} to Want to try`);
+              }
             }}
-            icon={<WantGlyph size={19} active={wanted} />}
-            label={t('discover.action.want')}
-            ariaLabel={wanted ? 'On your Want to try list' : 'Add to Want to try'}
-          />
-          <IconAction
-            pressed={saved}
-            onClick={() => {
-              const on = toggle('savedPlaces', place.id);
-              toast(on ? `Saved ${place.name}` : 'Removed from saved');
-            }}
-            icon={<SaveGlyph size={19} active={saved} />}
-            label={saved ? t('discover.action.saved') : t('discover.action.save')}
+            icon={<SaveGlyph size={19} active={kept} />}
+            label={kept ? t('discover.action.saved') : t('discover.action.save')}
+            ariaLabel={kept ? 'Saved to Want to try' : 'Save to Want to try'}
           />
           <IconAction href={mapsUrl} icon={<NavigateGlyph size={19} />} label={t('discover.action.directions')} />
-          <IconAction to={`/ask?q=${encodeURIComponent(askQuery)}`} icon={<SparkGlyph size={19} />} label={t('discover.place.askShort')} ariaLabel={t('discover.place.ask')} />
-          <IconAction onClick={() => share(place.name, `/place/${place.id}`)} icon={<ShareGlyph size={18} />} label={t('common.share')} />
-          <IconAction onClick={() => setRecommendOpen(true)} icon={<SendGlyph size={17} />} label={t('discover.action.recommend')} />
+          {/* Share holds every way to pass it on: send to friends (what was Recommend), copy the link, other apps. */}
+          <IconAction onClick={() => setShareOpen(true)} icon={<ShareGlyph size={18} />} label={t('common.share')} />
         </nav>
 
         <section className="dsec" aria-labelledby="verdict-title">
@@ -229,7 +228,7 @@ export default function PlaceDetail() {
         ) : null}
 
         <section className="dsec" aria-label={t('discover.place.whatLocalsSay')}>
-          <SectionHead title={t('discover.place.whatLocalsSay')} />
+          <SectionHead title={t('discover.place.whatLocalsSay')} to={`/ask?q=${encodeURIComponent(askQuery)}`} linkLabel="Ask about it" />
           <AnswerCard text={place.summary} sources={sources} agree={sources.length} />
           {!settings.ai.answers ? <p className="body-sm">{place.summary}</p> : null}
         </section>
@@ -405,7 +404,7 @@ export default function PlaceDetail() {
       </main>
       <TrustSheet open={trustOpen} onClose={() => setTrustOpen(false)} />
       <PageHistorySheet place={place} open={historyOpen} onClose={() => setHistoryOpen(false)} />
-      <RecommendSheet open={recommendOpen} onClose={() => setRecommendOpen(false)} placeName={place.name} area={place.area} />
+      <ShareSheet open={shareOpen} onClose={() => setShareOpen(false)} title={place.name} path={`/place/${place.id}`} message={`Try ${place.name} in ${place.area}`} />
     </>
   );
 }

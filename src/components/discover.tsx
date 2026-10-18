@@ -114,7 +114,7 @@ function renderListItem(ref: ResultRef, pulse: CityPulse, last: boolean): ReactN
           glyph={type?.glyph ?? 'report'}
           tone={type?.tone ?? 'amber'}
           title={r.title}
-          meta={`${REPORT_STEPS[r.status]} · ${r.area} · +${r.plusOnes}`}
+          meta={`${REPORT_STEPS[r.status]} · ${r.area} · ▲ ${r.plusOnes}`}
         />
       );
     }

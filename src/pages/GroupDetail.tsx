@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { FaceStack, PostCard } from '../components/cards';
 import { buysOf, BuyRow, clubById, clubPhoto, meetupsOf, memberCount, MeetupRow, PlanSheet, type PlanMode } from '../components/clubs';
-import { IconAction, ProfileHead, useShare } from '../components/discover';
+import { IconAction, ProfileHead } from '../components/discover';
+import { ShareSheet } from '../components/share';
 import { HeroRow, useBoardContext } from '../components/helpful';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { person } from '../data/core';
 import { CLUB_POSTS, POSTS } from '../data/social';
 import { useT } from '../i18n';
-import { CalendarGlyph, ChatGlyph, CheckGlyph, GlobeGlyph, LockGlyph, NamedGlyph, ShareGlyph, UsersGlyph } from '../icons';
+import { ChatGlyph, CheckGlyph, GlobeGlyph, LockGlyph, NamedGlyph, ShareGlyph, UsersGlyph } from '../icons';
 import { compact } from '../lib/format';
 import { clubMemberIds, leaderboard } from '../lib/helpful';
 import { ageMinutes, hotScore, netScore } from '../lib/thread';
@@ -19,11 +20,11 @@ export default function GroupDetail() {
   const { id = '' } = useParams();
   const t = useT();
   const toast = useToast();
-  const share = useShare();
   const { data, has, add, remove } = useAppData();
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [plan, setPlan] = useState<PlanMode | null>(null);
   const [sort, setSort] = useState<'hot' | 'new' | 'top'>('hot');
+  const [shareOpen, setShareOpen] = useState(false);
   const club = clubById(id, data);
   const boardCtx = useBoardContext();
 
@@ -108,9 +109,8 @@ export default function GroupDetail() {
             icon={joined ? <CheckGlyph size={18} /> : <UsersGlyph size={18} />}
             label={joined ? t('clubs.action.joined') : t('clubs.action.join')}
           />
-          <IconAction onClick={() => startPlan('meetup')} icon={<CalendarGlyph size={17} />} label={t('clubs.action.plan')} ariaLabel={t('clubs.form.meetup')} />
-          <IconAction onClick={() => startPlan('buy')} icon={<NamedGlyph name="users" size={17} />} label={t('clubs.action.buy')} />
-          <IconAction onClick={() => share(club.name, `/clubs/${club.id}`)} icon={<ShareGlyph size={17} />} label={t('clubs.action.invite')} />
+          {/* Planning a meetup or a group buy lives in those sections below, next to what's already planned. */}
+          <IconAction onClick={() => setShareOpen(true)} icon={<ShareGlyph size={17} />} label={t('clubs.action.invite')} />
           {club.admins[0] && club.admins[0] !== 'me' ? (
             <IconAction to={`/messages/c-${club.admins[0]}`} icon={<ChatGlyph size={17} />} label={t('clubs.action.message')} ariaLabel={`Message ${person(club.admins[0]).name}`} />
           ) : null}
@@ -249,6 +249,7 @@ export default function GroupDetail() {
       </main>
 
       <PlanSheet mode={plan ?? 'meetup'} club={club} open={plan !== null} onClose={() => setPlan(null)} />
+      <ShareSheet open={shareOpen} onClose={() => setShareOpen(false)} title={club.name} path={`/clubs/${club.id}`} message={`Join ${club.name} on Nearhood`} />
 
       <Sheet open={confirmLeave} onClose={() => setConfirmLeave(false)} title={t('clubs.leave')}>
         <p className="body-sm">{t('clubs.leaveBody', { name: club.name })}</p>

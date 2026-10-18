@@ -26,7 +26,6 @@ export interface AppData {
   following: string[];
   myCheckIns: CheckIn[];
   wantToTry: WantItem[];
-  likedCheckIns: string[];
   checkInComments: Record<string, Array<{ id: string; authorId: string; text: string; ago: string }>>;
   /** Friends whose latest check-ins were already viewed from the Home strip. */
   seenStories: string[];
@@ -63,7 +62,7 @@ export interface AppData {
 }
 
 export const DEFAULT_APP_DATA: AppData = {
-  upvoted: ['brunch-wifi'],
+  upvoted: ['brunch-wifi', 'ci-aditi-seoul'],
   savedPosts: [],
   savedPlaces: ['quiet-cup'],
   savedEvents: ['sufi-night'],
@@ -82,7 +81,6 @@ export const DEFAULT_APP_DATA: AppData = {
   following: DEFAULT_FOLLOWING,
   myCheckIns: [],
   wantToTry: MY_WANT_TO_TRY,
-  likedCheckIns: ['ci-aditi-seoul'],
   checkInComments: {},
   seenStories: [],
   myCollections: [],

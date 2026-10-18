@@ -1069,3 +1069,15 @@ main .report-ward-link:last-child {
 .list-row.route-row[aria-checked='true'] {
   background: transparent;
 }
+
+/* A report's votes: ▲ score ▼, a hint, and Follow. */
+.report-votes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.report-votes .meta {
+  min-width: 0;
+  font-size: 0.75rem;
+  line-height: 1.3;
+}

@@ -30,7 +30,7 @@ Every page looks and works the same, whatever it is. No restaurant pages, sports
 
 1. Cover, photo, *must try* %, locals, distance; name, what it is, area, price, open now.
 2. Who added it and how many locals confirmed it; who runs it (or *Claim it*, or *Public place*).
-3. Icons: check in, want to try, save, directions, ask, share, recommend.
+3. Four icons: **Check in** (*Manage* if you run it), **Save** (saving is the same as *Want to try*), **Directions**, **Share** (send to friends, copy the link or another app; this replaced a separate Recommend). *Ask about it* sits on *What locals say*.
 4. Community verdict (Must try / Good / Skip from verified visits).
 5. Friends who've been.
 6. Most loved here: the dishes, sessions or things people pick most, with photos.
@@ -98,7 +98,7 @@ Only verified residents can post, review and run clubs.
 
 Reddit's best ideas keep good answers on top without anyone in charge. Nearhood uses them, with real names:
 
-- **Up and down votes** on every post, reply, meetup and group buy (▲ score ▼). One vote each; tap again to take it back. Only verified residents' votes count. Friends' check-ins keep a simple like, because a check-in is someone's own experience, not an answer to rank.
+- **Up and down votes, and nothing else:** every post, reply, check-in, meetup, group buy and city report uses the same ▲ score ▼. No likes or hearts anywhere, and no separate +1 on city issues (voting a report up means it affects you too). One vote each; tap again to take it back. Only verified residents' votes count.
 - **Down votes sink, they never punish:** they don't take helpful points away. A reply at −4 or lower starts *folded* ("folded by neighbours' votes") but is never deleted, so anyone can open it.
 - **Threads:** reply to a reply; conversations nest under the answer they're about. Tap the line beside a thread to fold it. The person who posted is tagged *Author*.
 - **Sorting replies:** *Most helpful* (marked helpful, then people known for helping, then votes), *Top* (votes) and *New*.
@@ -147,11 +147,20 @@ Points are tagged by topic (Food, Cafés, Traffic & roads, Parenting, Pets, Fitn
 
 ## Filling the city before people do
 
-A new city is empty on day one. Public sources fill the gap so the app is useful immediately:
+A new city is empty on day one. Phase 1 fills it with people, not scraping, because events, reels and listings are hard and risky to collect:
 
-- Reels and posts about places and dishes, news, organisers' event pages and official feeds become **labelled source content** ("Seen on 12 reels", "From the organiser's Instagram").
-- Source content never appears as a person's review. It can rank and describe, but verdicts only come from people with verified visits.
-- As friends and neighbours check in, their verdicts take over and source content steps back.
+- **Founding guides:** before launch, around 50 verified locals per city (food writers, sports club captains, heritage walkers, parents' group admins) add and check the first few hundred pages and lists. They start as Nearhood guides.
+- **Links people paste:** a reel, an organiser's page or a news story can be attached to a check-in, page or event by a person, and shows as a labelled link. Nothing is pulled in automatically.
+- **Official feeds only for city info:** alerts and water timings come from the city and utilities, labelled.
+- Verdicts only ever come from people with verified visits.
+
+## Explore: finding pages
+
+Explore is for finding pages, and everything on it is something people made: pages they added and confirmed, their check-ins and their lists. One row of filters (Cafés, Food, Sports, Outdoors, Culture, Shopping, Day trips) applies to everything below it: friends' must-tries, new in the city (new pages and spotted ones waiting for confirmations), popular this week, and lists by locals. There is no events or clubs section: clubs have their own tab, and events are posts by a person, a page or a club, so they show on Home and on whoever posted them.
+
+## Profiles: the short version
+
+A profile shows who someone is at a glance: photo, check-ins, followers, following, name, area, work, one line for their level and verification, whether they run any pages, and their bio. Follow, Message and More. Tabs: Check-ins, Want to try, Lists. Everything else (verification details, rank, known for, ask me about, interests, taste match, clubs, member since) sits in **About**, one tap away.
 
 ## Other cities
 

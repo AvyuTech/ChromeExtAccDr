@@ -1,15 +1,11 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { person } from '../data/core';
 import { placeById } from '../data/places';
 import type { CheckIn, WantItem } from '../data/types';
 import { useT } from '../i18n';
 import { eventPhoto, itemPhoto, placePhoto } from '../assets/photos';
-import { ChevronRightGlyph, HeartGlyph, NamedGlyph, SendGlyph, type GlyphName } from '../icons';
-import { profileInfo, VERDICT_LABEL } from '../lib/friends';
-import { nowTime } from '../lib/format';
-import { useAppData } from '../state/appData';
-import { useToast } from '../state/toast';
+import { ChevronRightGlyph, NamedGlyph, type GlyphName } from '../icons';
+import { VERDICT_LABEL } from '../lib/friends';
 import { Avatar, Cover } from './cards';
 import { VERDICT_META, VerdictBadge } from './friends';
 import { Sheet } from './ui';
@@ -18,10 +14,8 @@ import { Sheet } from './ui';
 
 /** Compact card for a friend's must-try: who, what, where. */
 export function FriendPickCard({ c }: { c: CheckIn }) {
-  const { has, toggle } = useAppData();
   const who = person(c.authorId);
   const place = c.placeId ? placeById(c.placeId) : undefined;
-  const liked = has('likedCheckIns', c.id);
   const src = itemPhoto(c.items[0], c.placeId, c.eventId);
   return (
     <article className="pick-card">
@@ -46,9 +40,6 @@ export function FriendPickCard({ c }: { c: CheckIn }) {
           </span>
         </span>
       </Link>
-      <button type="button" className="photo-action photo-action--sm" style={{ top: 8, right: 8 }} aria-pressed={liked} aria-label={liked ? 'Unlike' : 'Like'} onClick={() => toggle('likedCheckIns', c.id)}>
-        <HeartGlyph size={17} active={liked} style={{ color: liked ? 'var(--red)' : undefined }} />
-      </button>
     </article>
   );
 }
@@ -132,74 +123,6 @@ export function TrustSheet({ open, onClose }: { open: boolean; onClose: () => vo
       </ul>
       <button type="button" className="btn btn--primary btn--block" onClick={onClose}>
         {t('common.done')}
-      </button>
-    </Sheet>
-  );
-}
-
-/** Send a place to friends as chat messages. */
-export function RecommendSheet({ open, onClose, placeName, area }: { open: boolean; onClose: () => void; placeName: string; area: string }) {
-  const t = useT();
-  const toast = useToast();
-  const { data, sendMessage } = useAppData();
-  const [picked, setPicked] = useState<string[]>([]);
-  const [note, setNote] = useState('');
-
-  const close = () => {
-    setPicked([]);
-    setNote('');
-    onClose();
-  };
-
-  const send = () => {
-    const text = `Try ${placeName} in ${area}${note.trim() ? ` — ${note.trim()}` : ''}`;
-    picked.forEach((id, i) => sendMessage(`c-${id}`, { id: `rec-${Date.now()}-${i}`, from: 'me', text, time: nowTime() }));
-    toast(picked.length === 1 ? `Sent to ${person(picked[0]).name.split(' ')[0]}` : `Sent to ${picked.length} friends`);
-    close();
-  };
-
-  return (
-    <Sheet open={open} onClose={close} title={t('community.recommendTitle')}>
-      <p className="body-sm muted">{t('community.recommendIntro', { place: placeName })}</p>
-      {data.following.length === 0 ? (
-        <p className="body-sm">
-          {t('community.recommendNoFriends')}{' '}
-          <Link to="/friends?tab=find" onClick={close}>
-            {t('feed.friends.find')}
-          </Link>
-        </p>
-      ) : (
-        <fieldset className="recommend-list">
-          <legend className="sr-only">{t('community.recommendWho')}</legend>
-          {data.following.map((id) => {
-            const who = person(id);
-            const checked = picked.includes(id);
-            return (
-              <label key={id} className={`recommend-row${checked ? ' is-checked' : ''}`} htmlFor={`rec-${id}`}>
-                <Avatar who={who} size={36} />
-                <span className="list-row__body">
-                  <span className="list-row__title">{who.name}</span>
-                  <span className="list-row__meta">@{profileInfo(id).handle}</span>
-                </span>
-                <input
-                  id={`rec-${id}`}
-                  type="checkbox"
-                  className="recommend-check"
-                  checked={checked}
-                  onChange={() => setPicked((p) => (checked ? p.filter((x) => x !== id) : [...p, id]))}
-                />
-              </label>
-            );
-          })}
-        </fieldset>
-      )}
-      <label className="field" htmlFor="rec-note">
-        <span className="field__label">{t('community.recommendNote')}</span>
-        <input id="rec-note" className="input" value={note} maxLength={140} onChange={(e) => setNote(e.target.value)} placeholder="Get the kimchi pancake, go before 7" />
-      </label>
-      <button type="button" className="btn btn--primary btn--block" disabled={picked.length === 0} onClick={send}>
-        <SendGlyph size={18} />
-        {picked.length > 1 ? t('community.sendTo', { n: picked.length }) : t('community.send')}
       </button>
     </Sheet>
   );

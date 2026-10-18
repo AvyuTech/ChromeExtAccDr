@@ -1,10 +1,10 @@
 import { Link, useParams } from 'react-router-dom';
-import { ShareButton } from '../components/cards';
-import { findReport, issueMeta, plusOneCount, Timeline, type TimelineItem } from '../components/city';
+import { ShareButton, Votes } from '../components/cards';
+import { findReport, issueMeta, reportScore, Timeline, type TimelineItem } from '../components/city';
 import { EmptyState, PageHeader } from '../components/ui';
 import { REPORT_STEPS } from '../data/city';
 import { useT } from '../i18n';
-import { BellGlyph, ChatGlyph, CheckGlyph, ChevronRightGlyph, NamedGlyph, StepRing, UpvoteGlyph } from '../icons';
+import { BellGlyph, ChatGlyph, CheckGlyph, ChevronRightGlyph, NamedGlyph, StepRing } from '../icons';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
 
@@ -39,11 +39,10 @@ export default function ReportDetail() {
   }
 
   const meta = issueMeta(report.category);
-  const plussed = has('plusOned', report.id);
   const following = has('followedReports', report.id);
   const confirmedFixed = has('plusOned', FIXED + report.id);
   const resolved = report.status === 4;
-  const count = plusOneCount(report, data);
+  const count = reportScore(report, data);
 
   const items: TimelineItem[] = REPORT_STEPS.map((label, i) => {
     const entry = report.timeline.find((e) => e.status === i);
@@ -85,26 +84,11 @@ export default function ReportDetail() {
           </div>
         ) : null}
 
-        <div className="grid-2">
-          {report.mine ? (
-            <span className="btn btn--sm btn--soft" style={{ cursor: 'default' }}>
-              <UpvoteGlyph size={16} active />
-              {count === 0 ? 'No +1s yet' : `${count} ${count === 1 ? 'neighbour' : 'neighbours'} +1`}
-            </span>
-          ) : (
-            <button
-              type="button"
-              className={`btn btn--sm ${plussed ? 'btn--secondary' : 'btn--primary'}`}
-              aria-pressed={plussed}
-              onClick={() => {
-                const on = toggle('plusOned', report.id);
-                toast(on ? 'Added your +1' : 'Removed your +1');
-              }}
-            >
-              <UpvoteGlyph size={16} active={plussed} />
-              {plussed ? `+1 added · ${count}` : `Add +1 · ${count}`}
-            </button>
-          )}
+        <div className="report-votes">
+          <Votes id={report.id} up={report.plusOnes} />
+          <span className="meta grow">
+            {report.mine ? `${count} ${count === 1 ? 'vote' : 'votes'} from neighbours` : 'Vote up if it affects you too, down if it’s not a problem'}
+          </span>
           <button
             type="button"
             className="btn btn--sm btn--outline"

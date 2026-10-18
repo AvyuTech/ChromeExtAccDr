@@ -3,15 +3,15 @@ import { Link, useParams } from 'react-router-dom';
 import { eventPhoto, placePhoto } from '../assets/photos';
 import { Avatar, SourceChips } from '../components/cards';
 import { clubPhoto } from '../components/clubs';
-import { RecommendSheet } from '../components/community';
-import { downloadEventIcs, EventLinkRow, eventFriends, eventSourceLine, friendsLine, useShare } from '../components/discover';
+import { ShareSheet } from '../components/share';
+import { downloadEventIcs, EventLinkRow, eventFriends, eventSourceLine, friendsLine } from '../components/discover';
 import { AvatarStack } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { person } from '../data/core';
 import { EVENTS, eventById } from '../data/events';
 import { groupById } from '../data/social';
 import { useT } from '../i18n';
-import { AlertGlyph, CalendarGlyph, ExternalGlyph, FriendsGlyph, NavigateGlyph, PinGlyph, SendGlyph, ShareGlyph, TrustRing, WantGlyph } from '../icons';
+import { AlertGlyph, CalendarGlyph, ExternalGlyph, FriendsGlyph, NavigateGlyph, PinGlyph, SaveGlyph, ShareGlyph, TrustRing } from '../icons';
 import { km, price } from '../lib/format';
 import { isWanted } from '../lib/friends';
 import { eventHost, venuePage, type Host } from '../lib/hosts';
@@ -83,7 +83,6 @@ export default function EventDetail() {
   const { id = '' } = useParams();
   const t = useT();
   const toast = useToast();
-  const share = useShare();
   const { settings } = useSettings();
   const { data, toggleWant } = useAppData();
   const [sendOpen, setSendOpen] = useState(false);
@@ -169,8 +168,8 @@ export default function EventDetail() {
                 toast(added ? `Added "${event.title}" to Want to try` : 'Removed from Want to try');
               }}
             >
-              <WantGlyph size={20} active={wanted} />
-              {t('discover.action.wantToGo')}
+              <SaveGlyph size={20} active={wanted} />
+              {wanted ? t('discover.action.saved') : t('discover.action.save')}
             </button>
             <button
               type="button"
@@ -184,10 +183,7 @@ export default function EventDetail() {
               <NavigateGlyph size={20} />
             </a>
             <span className="grow" />
-            <button type="button" className="feed-action" aria-label={t('discover.event.send')} onClick={() => setSendOpen(true)}>
-              <SendGlyph size={19} />
-            </button>
-            <button type="button" className="feed-action" aria-label={t('common.share')} onClick={() => share(event.title, `/event/${event.id}`)}>
+            <button type="button" className="feed-action" aria-label={t('common.share')} onClick={() => setSendOpen(true)}>
               <ShareGlyph size={19} />
             </button>
           </div>
@@ -243,7 +239,7 @@ export default function EventDetail() {
           </section>
         ) : null}
       </main>
-      <RecommendSheet open={sendOpen} onClose={() => setSendOpen(false)} placeName={event.title} area={event.area} />
+      <ShareSheet open={sendOpen} onClose={() => setSendOpen(false)} title={event.title} path={`/event/${event.id}`} message={`${event.title}, ${event.day} ${event.time} in ${event.area}`} />
     </>
   );
 }

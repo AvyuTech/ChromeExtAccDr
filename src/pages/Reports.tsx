@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { allReports, issueMeta, plusOneCount } from '../components/city';
+import { allReports, issueMeta, reportScore } from '../components/city';
 import { EmptyState, PageHeader } from '../components/ui';
 import { REPORT_STEPS } from '../data/city';
 import { neighbourhoodName } from '../data/core';
@@ -34,9 +34,9 @@ function ReportRow({ r, count }: { r: CivicReport; count: number }) {
       </span>
       <span className="city-trail">
         <span className="num" style={{ fontSize: '0.875rem' }}>
-          +{count}
+          ▲ {count}
         </span>
-        <span className="meta">neighbours</span>
+        <span className="meta">votes</span>
       </span>
     </Link>
   );
@@ -119,7 +119,7 @@ export default function Reports() {
         ) : (
           <div className="list">
             {list.map((r) => (
-              <ReportRow key={r.id} r={r} count={plusOneCount(r, data)} />
+              <ReportRow key={r.id} r={r} count={reportScore(r, data)} />
             ))}
           </div>
         )}

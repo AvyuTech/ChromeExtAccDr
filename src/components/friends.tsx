@@ -4,13 +4,13 @@ import { person } from '../data/core';
 import { itemPhoto, placePhoto } from '../assets/photos';
 import { placeById } from '../data/places';
 import type { CheckIn, Collection, Tone, Verdict, WantItem } from '../data/types';
-import { CheckGlyph, HeartGlyph, NamedGlyph, PlusGlyph, ReplyGlyph, ShieldGlyph, WantGlyph, type GlyphName } from '../icons';
+import { CheckGlyph, NamedGlyph, PlusGlyph, ReplyGlyph, ShieldGlyph, WantGlyph, type GlyphName } from '../icons';
 import { compact, rupees } from '../lib/format';
 import { canSee, isFriend, isWanted, profileInfo, storyPeople, tasteMatch, VERDICT_LABEL, type PlaceCommunity } from '../lib/friends';
-import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
+import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
-import { Avatar, ShareButton } from './cards';
+import { Avatar, Votes } from './cards';
 
 /* Shared pieces of the friends layer. Styles live in styles/pages/friends.css. */
 
@@ -154,11 +154,9 @@ export function WantButton({ item, variant = 'chip' }: { item: WantItem; variant
 export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { c: CheckIn; showPlace?: boolean; footer?: ReactNode; layout?: 'card' | 'hero' }) {
   const navigate = useNavigate();
   const { settings } = useSettings();
-  const { data, has, toggle } = useAppData();
+  const { data } = useAppData();
   const author = person(c.authorId);
   const place = c.placeId ? placeById(c.placeId) : undefined;
-  const liked = has('likedCheckIns', c.id);
-  const likes = c.likes + (liked ? 1 : 0) - (DEFAULT_APP_DATA.likedCheckIns.includes(c.id) ? 1 : 0);
   const comments = c.comments.length + (data.checkInComments[c.id]?.length ?? 0);
   const tone = place?.tone ?? (c.kind === 'ate' ? 'peach' : 'teal');
   const glyph: GlyphName = place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events');
@@ -245,24 +243,13 @@ export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { 
       )}
 
       <div className="feed-post__actions">
-        <button
-          type="button"
-          className="feed-action"
-          aria-pressed={liked}
-          aria-label={`Like, ${likes}`}
-          style={liked ? { color: 'var(--red)' } : undefined}
-          onClick={() => toggle('likedCheckIns', c.id)}
-        >
-          <HeartGlyph size={21} active={liked} />
-          {likes}
-        </button>
+        <Votes id={c.id} up={c.likes} />
         <Link to={`/checkin/${c.id}`} className="feed-action" aria-label={`Comments, ${comments}`}>
           <ReplyGlyph size={20} />
           {comments}
         </Link>
         <span className="grow" />
         {c.authorId !== 'me' ? <WantButton item={wantFromCheckIn(c)} variant="icon" /> : null}
-        <ShareButton title={`${author.name}: ${c.items.join(', ')} at ${c.placeName}`} path={`/checkin/${c.id}`} />
       </div>
 
       {c.note ? <p className={hero ? 'feed-post__text feed-post__text--lg' : 'feed-post__text'}>{c.note}</p> : null}

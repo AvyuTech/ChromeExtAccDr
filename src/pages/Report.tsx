@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { allReports, issueMeta, plusOneCount } from '../components/city';
+import { allReports, issueMeta, reportScore } from '../components/city';
 import { CityMap, NEIGHBOURHOOD_POS } from '../components/CityMap';
 import { Sheet, ToggleRow } from '../components/ui';
 import { ISSUE_TYPES } from '../data/city';
@@ -20,7 +20,7 @@ export default function Report() {
   const navigate = useNavigate();
   const toast = useToast();
   const { settings } = useSettings();
-  const { data, addReport, add } = useAppData();
+  const { data, addReport, add, vote } = useAppData();
 
   const [step, setStep] = useState(0);
   const [category, setCategory] = useState<IssueCategory | null>(null);
@@ -79,9 +79,9 @@ export default function Report() {
   };
 
   const plusOne = (r: CivicReport) => {
-    add('plusOned', r.id);
+    if (!data.upvoted.includes(r.id)) vote(r.id, 'up');
     add('followedReports', r.id);
-    toast('Added your +1. You will get updates on this report.');
+    toast('Voted up. You will get updates on this report.');
     navigate(`/city/reports/${r.id}`, { replace: true });
   };
 
@@ -182,7 +182,7 @@ export default function Report() {
                 <p className="body-sm">
                   {duplicate.mine
                     ? 'You already reported something similar here. Following it is faster than a new report.'
-                    : `${plusOneCount(duplicate, data)} neighbours already reported this. Add your +1 instead and the crew sees it is still a problem.`}
+                    : `${reportScore(duplicate, data)} neighbours already reported this. Vote it up instead and the crew sees it is still a problem.`}
                 </p>
                 <div className="grid-2">
                   {duplicate.mine ? (
@@ -190,9 +190,9 @@ export default function Report() {
                       View my report
                     </Link>
                   ) : (
-                    <button type="button" className="btn btn--primary btn--sm" disabled={data.plusOned.includes(duplicate.id)} onClick={() => plusOne(duplicate)}>
+                    <button type="button" className="btn btn--primary btn--sm" disabled={data.upvoted.includes(duplicate.id)} onClick={() => plusOne(duplicate)}>
                       <UpvoteGlyph size={16} />
-                      {data.plusOned.includes(duplicate.id) ? 'Added' : 'Add my +1'}
+                      {data.upvoted.includes(duplicate.id) ? 'Voted up' : 'Vote it up'}
                     </button>
                   )}
                   <Link to={`/city/reports/${duplicate.id}`} className="btn btn--secondary btn--sm">

@@ -44,9 +44,9 @@ export function findReport(id: string, data: AppData) {
   return allReports(data).find((r) => r.id === id);
 }
 
-/** Neighbour +1s, counting this person's own +1. */
-export function plusOneCount(r: CivicReport, data: AppData) {
-  return r.plusOnes + (data.plusOned.includes(r.id) ? 1 : 0);
+/** A report's vote score: neighbours who said it affects them too, with this person's vote. */
+export function reportScore(r: CivicReport, data: AppData) {
+  return r.plusOnes + (data.upvoted.includes(r.id) ? 1 : 0) - (data.downvoted.includes(r.id) ? 1 : 0);
 }
 
 const WATER_LEVEL: Record<CityPulse['water'][number]['status'], number> = {
