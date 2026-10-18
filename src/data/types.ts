@@ -58,7 +58,7 @@ export interface PlaceOrigin {
   /** Nearhood guide who reviewed the listing. */
   guide?: string;
   /** Owner or manager verified with a licence and a code sent to the venue's phone. */
-  claimed?: { name: string; role: string; since: string };
+  claimed?: { name: string; role: string; since: string; /** When the person who runs it is on Nearhood. */ personId?: string };
   /** Parks, lakes, markets and streets belong to everyone and can't be claimed. */
   publicPlace?: boolean;
   /** Outside the city: reachable through friends and people's lists, not city browsing. */
@@ -149,7 +149,10 @@ export interface Reply {
   text: string;
   ago: string;
   upvotes: number;
+  downvotes?: number;
   helpful?: boolean;
+  /** The reply this one answers; top-level replies have none. */
+  parentId?: string;
 }
 
 export interface Post {
@@ -161,6 +164,7 @@ export interface Post {
   topic: string;
   text: string;
   upvotes: number;
+  downvotes?: number;
   replies: Reply[];
   replyCount: number;
   /** A Nearhood answer distilled from replies and the wider web. */
@@ -206,6 +210,7 @@ export interface Meetup {
   note?: string;
   /** Replies in the club thread about it. */
   replies?: number;
+  upvotes?: number;
 }
 
 /**
@@ -223,6 +228,7 @@ export interface GroupBuy {
   ends: string;
   /** Replies in the club thread about it. */
   replies?: number;
+  upvotes?: number;
 }
 
 /** A club or group: neighbours, founders, cricket lovers, parents… created and run by people. */

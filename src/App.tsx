@@ -27,6 +27,7 @@ import Me from './pages/Me';
 import Messages from './pages/Messages';
 import NotFound from './pages/NotFound';
 import Onboarding from './pages/Onboarding';
+import PageManage from './pages/PageManage';
 import PageNew from './pages/PageNew';
 import PlaceDetail from './pages/PlaceDetail';
 import PostDetail from './pages/PostDetail';
@@ -83,6 +84,7 @@ function Shell() {
                   <Route path="/explore/:category" element={<Category />} />
                   <Route path="/deals/*" element={<Navigate to="/explore" replace />} />
                   <Route path="/place/:id" element={<PlaceDetail />} />
+                  <Route path="/place/:id/manage" element={<PageManage />} />
                   <Route path="/pages/new" element={<PageNew />} />
                   <Route path="/claim/:id" element={<Claim />} />
                   <Route path="/event/:id" element={<EventDetail />} />

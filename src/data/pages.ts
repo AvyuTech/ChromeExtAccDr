@@ -124,6 +124,21 @@ export const PAGE_UPDATES: PageUpdate[] = [
 
 export const updatesFor = (placeId: string) => PAGE_UPDATES.filter((u) => u.placeId === placeId);
 
+/** Facts the person who runs a page changed. Every change is public in the page's history. */
+export interface PageEdit {
+  hours?: string;
+  phone?: string;
+  address?: string;
+  /** What they offer: a menu, classes, court timings. */
+  offers?: string[];
+  /** A photo the owner chose for the cover (data URL in the prototype). */
+  cover?: string;
+  /** "Today", "2d", for "Updated by the owner". */
+  editedAt?: string;
+  /** What changed, newest first: "Hours: 7 am – 11 pm → 6 am – 11 pm". */
+  log?: Array<{ what: string; when: string }>;
+}
+
 /* ---------- Adding a page ---------- */
 
 /** Connection the person adding a page has to it. */
