@@ -137,6 +137,8 @@ export interface CityEvent {
   glyph: GlyphName;
   fillingFast?: boolean;
   unconfirmedNote?: string;
+  /** Where to read more or get tickets. Nearhood never books or sells. */
+  link?: { label: string; url: string };
 }
 
 export interface Deal {
@@ -206,6 +208,37 @@ export interface CityAlert {
   active: boolean;
 }
 
+export type ClubKind = 'neighbours' | 'founders' | 'sports' | 'parents' | 'food' | 'outdoors' | 'books';
+
+/** A small get-together a member posts in a club. No tickets, no payments: just who's in. */
+export interface Meetup {
+  id: string;
+  title: string;
+  when: string;
+  where: string;
+  hostId: string;
+  /** People who said they're in. */
+  going: string[];
+  spots?: number;
+  note?: string;
+}
+
+/**
+ * "Let's buy together": a member gathers people for a better price. Nearhood only
+ * connects people; the money and the deal happen outside the app.
+ */
+export interface GroupBuy {
+  id: string;
+  title: string;
+  hostId: string;
+  note: string;
+  /** People needed for the better price. */
+  target: number;
+  joined: string[];
+  ends: string;
+}
+
+/** A club or group: neighbours, founders, cricket lovers, parents… created and run by people. */
 export interface Group {
   id: string;
   name: string;
@@ -218,6 +251,11 @@ export interface Group {
   rules: string[];
   admins: string[];
   privacy: 'public' | 'neighbours';
+  kind: ClubKind;
+  /** Neighbourhood it meets around, for the clubs map. */
+  areaId: string;
+  meetups?: Meetup[];
+  buys?: GroupBuy[];
 }
 
 export type NotificationKind = 'reply' | 'mention' | 'alert' | 'event' | 'deal' | 'report' | 'group' | 'system' | 'follow' | 'friend';
@@ -370,6 +408,8 @@ export interface CheckIn {
   ago: string;
   /** 0 today · 1 this week · 2 earlier */
   recency: 0 | 1 | 2;
+  /** Set when the check-in is in another city; friends see it there, city lists don't. */
+  city?: string;
   likes: number;
   comments: Array<{ id: string; authorId: string; text: string; ago: string }>;
 }

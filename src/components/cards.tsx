@@ -123,7 +123,7 @@ export function SourceChips({ sources, label }: { sources: SourceId[]; label?: s
   );
 }
 
-/* ---------- The neighbourhood says (merged answer) ---------- */
+/* ---------- Nearhood says (merged answer) ---------- */
 export function AnswerCard({
   text,
   sources,

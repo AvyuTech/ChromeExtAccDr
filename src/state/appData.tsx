@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { DEFAULT_FOLLOWING, MY_WANT_TO_TRY } from '../data/friends';
-import type { ChatMessage, CheckIn, CivicReport, Collection, Post, Reply, SpottedPlace, WantItem } from '../data/types';
+import type { ChatMessage, CheckIn, CivicReport, Collection, Group, GroupBuy, Meetup, Post, Reply, SpottedPlace, WantItem } from '../data/types';
 import { mergeDefaults, readJSON, removeKey, writeJSON } from './storage';
 
 /** What this person has done in the app. Sample content stays in src/data; this layers on top. */
@@ -42,6 +42,15 @@ export interface AppData {
   confirmedSpots: string[];
   /** Places this person added that are waiting for confirmations. */
   mySpots: SpottedPlace[];
+  /** Club meetups this person said they're in for. */
+  joinedMeetups: string[];
+  /** Group buys this person joined. */
+  joinedBuys: string[];
+  /** Clubs this person started. */
+  myClubs: Group[];
+  /** Meetups and group buys this person posted, keyed by club id. */
+  myMeetups: Record<string, Meetup[]>;
+  myBuys: Record<string, GroupBuy[]>;
 }
 
 export const DEFAULT_APP_DATA: AppData = {
@@ -76,6 +85,11 @@ export const DEFAULT_APP_DATA: AppData = {
   declinedFollowers: [],
   confirmedSpots: [],
   mySpots: [],
+  joinedMeetups: ['m-cricket'],
+  joinedBuys: [],
+  myClubs: [],
+  myMeetups: {},
+  myBuys: {},
 };
 
 type ListKey = {
@@ -111,6 +125,9 @@ interface AppDataContextValue {
   addCollection: (collection: Collection) => void;
   editCollection: (id: string, patch: Partial<Pick<Collection, 'title' | 'description' | 'placeIds'>>) => void;
   addSpot: (spot: SpottedPlace) => void;
+  addClub: (club: Group) => void;
+  addMeetup: (clubId: string, meetup: Meetup) => void;
+  addBuy: (clubId: string, buy: GroupBuy) => void;
   reset: () => void;
 }
 
@@ -196,6 +213,19 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     [],
   );
   const addSpot = useCallback((spot: SpottedPlace) => setData((d) => ({ ...d, mySpots: [spot, ...d.mySpots] })), []);
+  const addClub = useCallback(
+    (club: Group) => setData((d) => ({ ...d, myClubs: [club, ...d.myClubs], joinedGroups: [...d.joinedGroups, club.id] })),
+    [],
+  );
+  const addMeetup = useCallback(
+    (clubId: string, meetup: Meetup) =>
+      setData((d) => ({ ...d, myMeetups: { ...d.myMeetups, [clubId]: [meetup, ...(d.myMeetups[clubId] ?? [])] }, joinedMeetups: [...d.joinedMeetups, meetup.id] })),
+    [],
+  );
+  const addBuy = useCallback(
+    (clubId: string, buy: GroupBuy) => setData((d) => ({ ...d, myBuys: { ...d.myBuys, [clubId]: [buy, ...(d.myBuys[clubId] ?? [])] }, joinedBuys: [...d.joinedBuys, buy.id] })),
+    [],
+  );
   const reset = useCallback(() => {
     removeKey(KEY);
     setData(DEFAULT_APP_DATA);
@@ -223,9 +253,12 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       addCollection,
       editCollection,
       addSpot,
+      addClub,
+      addMeetup,
+      addBuy,
       reset,
     }),
-    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, editCollection, addSpot, reset],
+    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, editCollection, addSpot, addClub, addMeetup, addBuy, reset],
   );
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

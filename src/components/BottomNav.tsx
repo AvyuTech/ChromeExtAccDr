@@ -1,33 +1,33 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useT } from '../i18n';
-import { ChevronRightGlyph, CityGlyph, ExploreGlyph, HomeGlyph, MeGlyph, NamedGlyph, PlusGlyph, type GlyphName } from '../icons';
+import { ChevronRightGlyph, ExploreGlyph, GroupsGlyph, HomeGlyph, MeGlyph, NamedGlyph, PlusGlyph, type GlyphName } from '../icons';
 import type { Tone } from '../data/types';
 import { Sheet } from './ui';
-import { visibleAlerts } from '../lib/selectors';
-import { useAppData } from '../state/appData';
-import { useSettings } from '../state/settings';
 
 type Tab = { to: string; key: string; Glyph: typeof HomeGlyph; match: (p: string) => boolean };
 
 const TABS: Tab[] = [
-  { to: '/', key: 'nav.home', Glyph: HomeGlyph, match: (p) => p === '/' || ['/post', '/ask', '/checkin', '/friends', '/people'].some((x) => p.startsWith(x)) },
+  // City pulse (weather, traffic, alerts, reports) opens from Home's today card, so it lives under Home.
+  { to: '/', key: 'nav.home', Glyph: HomeGlyph, match: (p) => p === '/' || ['/post', '/ask', '/checkin', '/friends', '/people', '/city'].some((x) => p.startsWith(x)) },
   {
     to: '/explore',
     key: 'nav.explore',
     Glyph: ExploreGlyph,
-    match: (p) => ['/explore', '/place', '/event', '/deals', '/groups', '/lists'].some((x) => p.startsWith(x)),
+    match: (p) => ['/explore', '/place', '/event', '/lists'].some((x) => p.startsWith(x)),
   },
-  { to: '/city', key: 'nav.city', Glyph: CityGlyph, match: (p) => p.startsWith('/city') },
+  { to: '/clubs', key: 'nav.clubs', Glyph: GroupsGlyph, match: (p) => p.startsWith('/clubs') || p.startsWith('/groups') },
   { to: '/me', key: 'nav.me', Glyph: MeGlyph, match: (p) => p.startsWith('/me') || p.startsWith('/settings') || p.startsWith('/updates') || p.startsWith('/messages') },
 ];
 
 /** What the + button offers. Quick check-in comes first: posting should take seconds. */
 const CREATE: Array<{ to: string; glyph: GlyphName; tone: Tone; title: string; meta: string }> = [
   { to: '/compose?type=question', glyph: 'question', tone: 'violet', title: 'Ask friends & neighbours', meta: 'Where to go, what to order, who to call' },
-  { to: '/compose?type=recommendation', glyph: 'recommend', tone: 'mint', title: 'Recommend something', meta: 'A longer tip for your neighbourhood' },
+  { to: '/compose?type=recommendation', glyph: 'recommend', tone: 'mint', title: 'Recommend something', meta: 'A longer tip for people nearby' },
+  { to: '/clubs?create=meetup', glyph: 'calendar', tone: 'blue', title: 'Plan a meetup in a club', meta: 'Cricket on Sunday, a founders’ breakfast…' },
+  { to: '/clubs?create=buy', glyph: 'users', tone: 'teal', title: 'Buy something together', meta: 'Gather people for a better price, no payments here' },
   { to: '/city/report', glyph: 'report', tone: 'amber', title: 'Report a city issue', meta: 'Pothole, garbage, streetlight and more' },
-  { to: '/compose', glyph: 'events', tone: 'blue', title: 'Event, lost & found or give away', meta: 'All post types' },
+  { to: '/compose', glyph: 'lostfound', tone: 'peach', title: 'Lost & found or give away', meta: 'Help someone nearby' },
 ];
 
 export function BottomNav() {
@@ -35,9 +35,6 @@ export function BottomNav() {
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
   const t = useT();
-  const { settings } = useSettings();
-  const { data } = useAppData();
-  const cityAlerts = visibleAlerts(settings, data).filter((a) => a.severity !== 'info').length;
 
   const renderTab = (tab: Tab) => {
     const active = tab.match(pathname);
@@ -45,7 +42,6 @@ export function BottomNav() {
       <Link key={tab.to} to={tab.to} className="nav-item" aria-current={active ? 'page' : undefined}>
         <tab.Glyph size={24} active={active} />
         {t(tab.key)}
-        {tab.to === '/city' && cityAlerts > 0 && !active ? <span className="nav-dot" aria-label={`${cityAlerts} city alerts`} /> : null}
       </Link>
     );
   };

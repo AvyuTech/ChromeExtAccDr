@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { BottomNav } from './components/BottomNav';
 import { Splash, StageCaption, StatusBar } from './components/Device';
 import AlertDetail from './pages/AlertDetail';
@@ -16,6 +16,7 @@ import Deals from './pages/Deals';
 import EventDetail from './pages/EventDetail';
 import Explore from './pages/Explore';
 import Friends from './pages/Friends';
+import ClubNew from './pages/ClubNew';
 import GroupDetail from './pages/GroupDetail';
 import Glyphs from './pages/Glyphs';
 import Groups from './pages/Groups';
@@ -43,7 +44,13 @@ import { SettingsProvider, useSettings } from './state/settings';
 import { ToastProvider } from './state/toast';
 
 /** Full-screen flows hide the tab bar. */
-const NO_NAV = [/^\/onboarding/, /^\/compose/, /^\/messages\/.+/, /^\/city\/report$/, /^\/checkin$/];
+const NO_NAV = [/^\/onboarding/, /^\/compose/, /^\/messages\/.+/, /^\/city\/report$/, /^\/checkin$/, /^\/clubs\/new$/];
+
+/** Old /groups/:id links open the club. */
+function GroupRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/clubs/${id ?? ''}`} replace />;
+}
 
 function Shell() {
   const { pathname } = useLocation();
@@ -77,8 +84,11 @@ function Shell() {
                   <Route path="/deals/:id" element={<DealDetail />} />
                   <Route path="/place/:id" element={<PlaceDetail />} />
                   <Route path="/event/:id" element={<EventDetail />} />
-                  <Route path="/groups" element={<Groups />} />
-                  <Route path="/groups/:id" element={<GroupDetail />} />
+                  <Route path="/clubs" element={<Groups />} />
+                  <Route path="/clubs/new" element={<ClubNew />} />
+                  <Route path="/clubs/:id" element={<GroupDetail />} />
+                  <Route path="/groups" element={<Navigate to="/clubs" replace />} />
+                  <Route path="/groups/:id" element={<GroupRedirect />} />
                   <Route path="/post/:id" element={<PostDetail />} />
                   <Route path="/compose" element={<Compose />} />
                   <Route path="/checkin" element={<CheckIn />} />

@@ -4,6 +4,7 @@ export const common: Dict = {
   'nav.home': { en: 'Home', gu: 'હોમ', hi: 'होम' },
   'nav.explore': { en: 'Explore', gu: 'શોધો', hi: 'खोजें' },
   'nav.city': { en: 'City', gu: 'શહેર', hi: 'शहर' },
+  'nav.clubs': { en: 'Clubs', gu: 'ક્લબ', hi: 'क्लब' },
   'nav.me': { en: 'Me', gu: 'હું', hi: 'मैं' },
   'nav.post': { en: 'New post', gu: 'નવી પોસ્ટ', hi: 'नई पोस्ट' },
   'nav.updates': { en: 'Updates', gu: 'અપડેટ્સ', hi: 'अपडेट' },
@@ -75,7 +76,7 @@ export const common: Dict = {
   'chip.deals': { en: 'Deals', gu: 'ડીલ્સ', hi: 'डील' },
   'chip.alerts': { en: 'City alerts', gu: 'શહેર ચેતવણીઓ', hi: 'शहर अलर्ट' },
 
-  'answer.label': { en: 'The neighbourhood says', gu: 'પડોશ કહે છે', hi: 'पड़ोस कहता है' },
+  'answer.label': { en: 'Nearhood says', gu: 'Nearhood કહે છે', hi: 'Nearhood कहता है' },
   'answer.mergedFrom': { en: 'Merged from', gu: 'આમાંથી મેળવ્યું', hi: 'इनसे मिलाकर' },
   'answer.sourcesAgree': { en: '{n} sources agree', gu: '{n} સ્રોતો સહમત', hi: '{n} स्रोत सहमत' },
 };

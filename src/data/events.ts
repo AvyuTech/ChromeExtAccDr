@@ -21,6 +21,7 @@ export const EVENTS: CityEvent[] = [
     tone: 'night',
     glyph: 'music',
     fillingFast: true,
+    link: { label: 'Tickets on BookMyShow', url: 'https://in.bookmyshow.com/' },
   },
   {
     id: 'flea-market',
@@ -41,6 +42,7 @@ export const EVENTS: CityEvent[] = [
     organiser: 'Vastrapur residents’ association',
     tone: 'green',
     glyph: 'market',
+    link: { label: 'Details on the organiser’s Instagram', url: 'https://www.instagram.com/' },
   },
   {
     id: 'open-mic',
@@ -60,6 +62,7 @@ export const EVENTS: CityEvent[] = [
     organiser: '[Organiser name]',
     tone: 'violet',
     glyph: 'mic',
+    link: { label: 'Tickets on BookMyShow', url: 'https://in.bookmyshow.com/' },
   },
   {
     id: 'heritage-walk',
@@ -80,6 +83,7 @@ export const EVENTS: CityEvent[] = [
     organiser: 'Heritage cell (city corporation)',
     tone: 'clay',
     glyph: 'heritage',
+    link: { label: 'Register with the walk organisers', url: 'https://ahmedabadcity.gov.in/' },
   },
   {
     id: 'food-trucks',
@@ -101,6 +105,7 @@ export const EVENTS: CityEvent[] = [
     tone: 'amber',
     glyph: 'food',
     unconfirmedNote: 'Unconfirmed · only seen in 1 reel',
+    link: { label: 'Details on Instagram', url: 'https://www.instagram.com/' },
   },
   {
     id: 'pottery',
@@ -121,6 +126,7 @@ export const EVENTS: CityEvent[] = [
     organiser: 'Mitti Clay Studio',
     tone: 'clay',
     glyph: 'pottery',
+    link: { label: 'Book on the studio’s page', url: 'https://www.instagram.com/' },
   },
   {
     id: 'kite-workshop',
@@ -141,6 +147,7 @@ export const EVENTS: CityEvent[] = [
     organiser: 'Thaltej Neighbours group',
     tone: 'yellow',
     glyph: 'kids',
+    link: { label: 'Details from the city', url: 'https://ahmedabadcity.gov.in/' },
   },
   {
     id: 'rooftop-acoustic',
@@ -162,6 +169,7 @@ export const EVENTS: CityEvent[] = [
     organiser: '[Organiser name]',
     tone: 'night',
     glyph: 'music',
+    link: { label: 'Tickets on BookMyShow', url: 'https://in.bookmyshow.com/' },
   },
   {
     id: 'pickleball-social',
@@ -182,6 +190,7 @@ export const EVENTS: CityEvent[] = [
     organiser: 'Pickle & Play',
     tone: 'green',
     glyph: 'sports',
+    link: { label: 'Details on Instagram', url: 'https://www.instagram.com/' },
   },
   {
     id: 'sunrise-yoga',
@@ -201,6 +210,7 @@ export const EVENTS: CityEvent[] = [
     organiser: 'Vastrapur Morning Club',
     tone: 'teal',
     glyph: 'nature',
+    link: { label: 'Details on Instagram', url: 'https://www.instagram.com/' },
   },
 ];
 
