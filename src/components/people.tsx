@@ -8,12 +8,13 @@ import { GROUPS } from '../data/social';
 import type { AppData } from '../state/appData';
 import type { Collection, Group, Person, Tone, WantItem } from '../data/types';
 import { useT } from '../i18n';
-import { CheckGlyph, ChevronRightGlyph, PinGlyph, ShieldGlyph, StarGlyph, TrashGlyph, type GlyphName } from '../icons';
+import { CheckGlyph, StarGlyph, TrashGlyph, type GlyphName } from '../icons';
 import { useAppData } from '../state/appData';
 import { Avatar, Cover } from './cards';
 import { AvatarStack, TasteMatchPill, WantButton } from './friends';
-import { HelpfulLine, levelTitle, useBoardContext, useLevel } from './helpful';
-import { IdentityRows, useIdentity, WorkLine } from './identity';
+import { levelTitle, useBoardContext, useLevel } from './helpful';
+import { EntityMark } from './entity';
+import { IdentityRows, useIdentity } from './identity';
 import { Sheet } from './ui';
 import { isFullyVerified } from '../data/identity';
 import { compact } from '../lib/format';
@@ -86,41 +87,98 @@ export const TASTE_LABEL: Record<string, string> = {
   family: 'Family outings',
 };
 
+/** A stat under the follower count, or the follower count itself: a link, a button or plain text. */
+export interface HeroStat {
+  label: string;
+  value: ReactNode;
+  to?: string;
+  onClick?: () => void;
+}
+
+function StatTarget({ stat, className, children }: { stat: HeroStat; className: string; children: ReactNode }) {
+  if (stat.to)
+    return (
+      <Link to={stat.to} className={className}>
+        {children}
+      </Link>
+    );
+  if (stat.onClick)
+    return (
+      <button type="button" className={className} onClick={stat.onClick}>
+        {children}
+      </button>
+    );
+  return <span className={className}>{children}</span>;
+}
+
+/** The small round tick after a name: phone, ID and home all checked. */
+export function VerifiedTick({ personId }: { personId: string }) {
+  const identity = useIdentity(personId);
+  if (!isFullyVerified(identity)) return null;
+  return (
+    <span className="verified-tick" role="img" aria-label="Verified: phone, ID and home" title="Verified: phone, ID and home">
+      <CheckGlyph size={10} />
+    </span>
+  );
+}
+
+/** Where someone stands, as a small neutral pill: "★ City hero", "Regular". */
+export function LevelPill({ personId, to, onClick }: { personId: string; to?: string; onClick?: () => void }) {
+  const info = useLevel(personId);
+  const inner = (
+    <>
+      {info.level.id === 'hero' ? <StarGlyph size={11} /> : null}
+      {info.level.name}
+    </>
+  );
+  return to ? (
+    <Link to={to} className="level-pill" aria-label={`${info.level.name}: see your impact`}>
+      {inner}
+    </Link>
+  ) : (
+    <button type="button" className="level-pill" onClick={onClick} aria-haspopup="dialog" aria-label={`${info.level.name}: about`}>
+      {inner}
+    </button>
+  );
+}
+
 /**
- * Profile top, Instagram style: a full-bleed cover, the avatar overlapping it with
- * three stats beside it, then only what tells you who someone is: name, work, the
- * pages they run, where they stand, bio. Everything else lives in About.
+ * Profile top, kept short: cover, avatar, the follower count as the one big number
+ * (with following and check-ins small beside it), then name with tick and level,
+ * one line for work and area, the pages they run, bio, and one row of actions.
+ * Everything else lives in About.
  */
 export function ProfileHero({
   who,
   label,
   name,
-  sub,
   bio,
+  area,
+  followsMe,
   actions,
-  buttons,
-  stats,
+  followers,
+  minor,
   online,
-  mine,
-  onAbout,
+  level,
 }: {
   who: Person;
   label: string;
   name: string;
-  sub: ReactNode;
   bio?: string;
+  area: string;
+  followsMe?: boolean;
+  /** An ActionBar: one main action, then small icons. */
   actions: ReactNode;
-  /** Actions are side-by-side buttons (your own profile) rather than round icons. */
-  buttons?: boolean;
-  stats: Array<{ label: string; value: ReactNode }>;
+  followers: HeroStat;
+  /** Following and check-ins, small, under the follower count. */
+  minor: HeroStat[];
   online?: boolean;
-  /** Your own profile: the standing line shows your progress and opens Your impact. */
-  mine?: boolean;
-  /** Opens the About sheet from the standing line. */
-  onAbout?: () => void;
+  /** Where the level pill goes: About for others, Your impact for you. */
+  level: { to?: string; onClick?: () => void };
 }) {
   const identity = useIdentity(who.id);
   const runs = pagesRunBy(who.id);
+  const meta = [identity.work?.title, area, followsMe ? 'Follows you' : undefined].filter(Boolean).join(' · ');
   return (
     <section className="profile-hero" aria-label={label}>
       <div className="profile-hero__cover">
@@ -131,23 +189,34 @@ export function ProfileHero({
           <Avatar who={{ ...who, verified: false }} size={76} />
           {online ? <span className="profile-hero__online" aria-hidden="true" /> : null}
         </span>
-        <dl className="profile-hero__stats">
-          {stats.map((st) => (
-            <div key={st.label} className="profile-hero__stat">
-              <dt>{st.label}</dt>
-              <dd className="num">{st.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <div className="profile-hero__reach">
+          <StatTarget stat={followers} className="profile-hero__followers">
+            <b className="num">{followers.value}</b>
+            <span>{followers.label}</span>
+          </StatTarget>
+          <span className="profile-hero__minor">
+            {minor.map((st, i) => (
+              <span key={st.label}>
+                {i ? <span aria-hidden="true"> · </span> : null}
+                <StatTarget stat={st} className="profile-hero__minor-stat">
+                  <b className="num">{st.value}</b> {st.label}
+                </StatTarget>
+              </span>
+            ))}
+          </span>
+        </div>
       </div>
       <div className="profile-hero__body">
-        <h2 className="profile-hero__name">{name}</h2>
-        <span className="profile-hero__sub">{sub}</span>
-        <WorkLine identity={identity} />
+        <h2 className="profile-hero__name">
+          <span>{name}</span>
+          <VerifiedTick personId={who.id} />
+          <LevelPill personId={who.id} {...level} />
+        </h2>
+        {meta ? <span className="profile-hero__meta">{meta}</span> : null}
         {runs.length ? (
           // Said plainly, so people know when someone recommending a café runs one.
-          <span className="id-work runs-line">
-            <PinGlyph size={14} />
+          <span className="profile-hero__runs">
+            <EntityMark kind="page" size={13} />
             <span className="grow">
               Runs{' '}
               {runs.map((p, i) => (
@@ -159,34 +228,10 @@ export function ProfileHero({
             </span>
           </span>
         ) : null}
-        {mine ? <HelpfulLine personId={who.id} /> : <StandingLine personId={who.id} onOpen={onAbout} />}
         {bio ? <p className="profile-hero__bio">{bio}</p> : null}
       </div>
-      <div className={`profile-hero__actions${buttons ? ' profile-hero__actions--buttons' : ''}`}>{actions}</div>
+      <div className="profile-hero__actions">{actions}</div>
     </section>
-  );
-}
-
-/** "★ City hero · 4,820 helpful · Verified": where someone stands, in one line. Opens About. */
-export function StandingLine({ personId, onOpen }: { personId: string; onOpen?: () => void }) {
-  const identity = useIdentity(personId);
-  const info = useLevel(personId);
-  const full = isFullyVerified(identity);
-  return (
-    <button type="button" className="standing-line" onClick={onOpen} aria-haspopup="dialog">
-      <span className="standing-line__level">
-        {info.level.id === 'hero' ? <StarGlyph size={12} /> : null}
-        {levelTitle(personId, info)}
-      </span>
-      <span className="grow">
-        · {info.points.toLocaleString('en-IN')} helpful ·{' '}
-        <span className={`standing-line__check${full ? ' is-full' : ''}`}>
-          <ShieldGlyph size={12} />
-          {full ? 'Verified' : 'Partly verified'}
-        </span>
-      </span>
-      <ChevronRightGlyph size={14} />
-    </button>
   );
 }
 
@@ -310,45 +355,11 @@ export function ProfileAbout({
         <p className="meta about-foot">
           On Nearhood since {since}
           {followsMe ? ' · Follows you' : ''}
+          <br />
+          Only verified people count as followers. Followers can’t be bought.
         </p>
       </div>
     </Sheet>
-  );
-}
-
-/** One round outline icon with a small label under it, for the profile action row. */
-export function ProfileAction({
-  label,
-  children,
-  to,
-  onClick,
-  pressed,
-  primary,
-  ariaLabel,
-}: {
-  label: string;
-  children: ReactNode;
-  to?: string;
-  onClick?: () => void;
-  pressed?: boolean;
-  primary?: boolean;
-  ariaLabel?: string;
-}) {
-  const cls = `profile-action${primary ? ' profile-action--primary' : ''}`;
-  const inner = (
-    <>
-      <span className="profile-action__icon">{children}</span>
-      <span className="profile-action__label">{label}</span>
-    </>
-  );
-  return to ? (
-    <Link to={to} className={cls} aria-label={ariaLabel}>
-      {inner}
-    </Link>
-  ) : (
-    <button type="button" className={cls} onClick={onClick} aria-pressed={pressed} aria-label={ariaLabel}>
-      {inner}
-    </button>
   );
 }
 

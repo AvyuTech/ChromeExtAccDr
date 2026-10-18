@@ -4,6 +4,7 @@ import { placePhoto } from '../assets/photos';
 import { Cover } from '../components/cards';
 import { CheckInCard, CheckInGrid, CollectionCard } from '../components/friends';
 import { DoneRing, myClubs, ProfileAbout, ProfileHero, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
+import { ActionBar, IconButton, MainAction } from '../components/entity';
 import { ShareSheet } from '../components/share';
 import { EmptyState, Sheet } from '../components/ui';
 import { REPORTS } from '../data/city';
@@ -18,6 +19,7 @@ import {
   ChatGlyph,
   CheckGlyph,
   ChevronRightGlyph,
+  EditGlyph,
   FriendsGlyph,
   GroupsGlyph,
   HelpGlyph,
@@ -28,11 +30,13 @@ import {
   PlusGlyph,
   ReportGlyph,
   SaveGlyph,
+  ShareGlyph,
   ShieldGlyph,
   SlidersGlyph,
   StarGlyph,
   UpvoteGlyph,
 } from '../icons';
+import { compact } from '../lib/format';
 import { collectionFor, collectionsFor, isWanted, profileInfo } from '../lib/friends';
 import { unreadMessageCount, unreadNotificationCount } from '../lib/selectors';
 import { useAppData } from '../state/appData';
@@ -89,12 +93,8 @@ export default function Me() {
   const myLists = collectionsFor(data, 'me').map(apply);
   const followedLists = data.followedCollections.map((id) => collectionFor(data, id)).filter((c): c is NonNullable<typeof c> => !!c);
 
-  // Your check-ins are the ones on this device, so the stat, the grid and the empty state agree.
-  const stats = [
-    { label: t('people.checkins'), value: data.myCheckIns.length, to: undefined as string | undefined },
-    { label: t('people.followers'), value: info.followers, to: '/friends' },
-    { label: t('people.following'), value: data.following.length, to: '/friends?tab=following' },
-  ];
+  // Your check-ins are the ones on this device, so the count, the grid and the empty state agree.
+  const checkIns = data.myCheckIns.length;
 
   const addItem = (e: FormEvent) => {
     e.preventDefault();
@@ -146,9 +146,12 @@ export default function Me() {
     <>
       <main className="page">
         <header className="row row--between" style={{ minHeight: 40, marginBottom: -4 }}>
-          <h1 className="page-title" style={{ fontSize: '1.375rem' }}>
-            {t('nav.me')}
-          </h1>
+          <span className="me-title">
+            <h1 className="page-title" style={{ fontSize: '1.375rem' }}>
+              {t('nav.me')}
+            </h1>
+            <span className="meta">@{profile.handle}</span>
+          </span>
           <div className="row" style={{ gap: 0, marginRight: -8 }}>
             <Link to="/friends" className="icon-btn icon-btn--ghost" aria-label={t('people.friends')}>
               <FriendsGlyph size={21} />
@@ -167,31 +170,21 @@ export default function Me() {
           who={me}
           label={profile.name}
           name={profile.name}
-          sub={`@${profile.handle} · ${area}`}
+          area={area}
           online
-          mine
-          buttons
           bio={profile.bio || undefined}
+          followers={{ label: t('people.followers').toLowerCase(), value: compact(info.followers), to: '/friends' }}
+          minor={[
+            { label: t('people.following').toLowerCase(), value: compact(data.following.length), to: '/friends?tab=following' },
+            { label: checkIns === 1 ? 'check-in' : t('people.checkins').toLowerCase(), value: checkIns },
+          ]}
+          level={{ to: '/me/impact' }}
           actions={
-            <>
-              <Link to="/settings/account" className="btn btn--soft btn--sm profile-btn">
-                {t('me.editProfile')}
-              </Link>
-              <button type="button" className="btn btn--soft btn--sm profile-btn" onClick={() => setSharing(true)}>
-                Share profile
-              </button>
-            </>
+            <ActionBar label="Your profile">
+              <MainAction to="/settings/account" label={t('me.editProfile')} icon={<EditGlyph size={15} />} pressed />
+              <IconButton onClick={() => setSharing(true)} label="Share profile" icon={<ShareGlyph size={17} />} />
+            </ActionBar>
           }
-          stats={stats.map((st) => ({
-            label: st.label,
-            value: st.to ? (
-              <Link to={st.to} className="me-stat__link">
-                {st.value}
-              </Link>
-            ) : (
-              st.value
-            ),
-          }))}
         />
 
         <TabStrip

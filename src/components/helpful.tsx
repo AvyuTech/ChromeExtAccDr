@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { neighbourhoodName, person } from '../data/core';
 import { helpfulOf, REQUIREMENT_LABEL, type LevelId } from '../data/helpful';
-import { CheckGlyph, ChevronRightGlyph, StarGlyph } from '../icons';
+import { CheckGlyph, StarGlyph } from '../icons';
 import { compact } from '../lib/format';
-import { expertTopic, levelFor, metricUnit, rankOf, topStrengths, type BoardContext, type BoardRow, type BoardSort, type LevelInfo } from '../lib/helpful';
+import { expertTopic, levelFor, metricUnit, topStrengths, type BoardContext, type BoardRow, type BoardSort, type LevelInfo } from '../lib/helpful';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 import { Avatar } from './cards';
@@ -153,43 +153,6 @@ export function KnownFor({ personId, n = 3 }: { personId: string; n?: number }) 
         </Link>
       ))}
     </div>
-  );
-}
-
-/**
- * One line on a profile: level, helpful points and where they stand this month.
- * Yours opens your impact; anyone else's opens the board.
- */
-export function HelpfulLine({ personId }: { personId: string }) {
-  const info = useLevel(personId);
-  const ctx = useBoardContext();
-  const area = personId === 'me' ? ctx.meArea : person(personId).area;
-  const rank = rankOf(personId, { scope: 'area', area, period: 'month', sortBy: 'points' }, ctx);
-  const mine = personId === 'me';
-  return (
-    <Link to={mine ? '/me/impact' : '/heroes'} className={`helpful-line level-line--${info.level.id}`}>
-      <span className="helpful-line__row">
-        <span className="helpful-line__level">
-          <LevelMark id={info.level.id} size={12} />
-          {levelTitle(personId, info)}
-        </span>
-        <span className="grow">
-          · {info.points.toLocaleString('en-IN')} helpful
-          {rank ? ` · #${rank.rank} in ${area} this month` : ''}
-        </span>
-        <ChevronRightGlyph size={14} />
-      </span>
-      {mine && info.next ? (
-        <span className="helpful-line__next">
-          <span className="helpful-line__bar" aria-hidden="true">
-            <span style={{ width: `${Math.round(info.progress * 100)}%` }} />
-          </span>
-          <span className="meta">
-            {info.toNext > 0 ? `${info.toNext} to ${info.next.name}` : `Needs: ${info.missing.length ? REQUIREMENT_LABEL[info.missing[0]] : 'one more check'}`}
-          </span>
-        </span>
-      ) : null}
-    </Link>
   );
 }
 

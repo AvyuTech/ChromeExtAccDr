@@ -1,12 +1,13 @@
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import { CheckInCard, CheckInGrid, CollectionCard, FollowButton, useFollow } from '../components/friends';
-import { chatLink, clubsOf, DoneRing, PlanCard, ProfileAbout, ProfileAction, ProfileHero, TabStrip, ViewToggle, WantRow } from '../components/people';
+import { ActionBar, IconButton, MainAction } from '../components/entity';
+import { chatLink, clubsOf, DoneRing, PlanCard, ProfileAbout, ProfileHero, TabStrip, ViewToggle, WantRow } from '../components/people';
 import { ShareSheet } from '../components/share';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { PEOPLE } from '../data/core';
 import { useT } from '../i18n';
-import { ChatGlyph, CheckGlyph, FlagGlyph, InfoGlyph, LockGlyph, MoreGlyph, PlusGlyph, ShareGlyph, SkipGlyph, UserGlyph } from '../icons';
+import { ChatGlyph, CheckGlyph, FlagGlyph, InfoGlyph, LockGlyph, MoreGlyph, PlusGlyph, ShareGlyph, SkipGlyph } from '../icons';
 import { compact } from '../lib/format';
 import { allCheckIns, canSee, collectionsFor, isFollowing, profileInfo, sharedWants } from '../lib/friends';
 import { useAppData } from '../state/appData';
@@ -15,17 +16,10 @@ import { useToast } from '../state/toast';
 type Tab = 'checkins' | 'want' | 'lists';
 const TABS: Tab[] = ['checkins', 'want', 'lists'];
 
-/** Follow as a round icon: a person with a plus, or a tick once you follow. */
+/** Follow is the one main action; once you follow, it turns quiet and says so. */
 function FollowAction({ personId }: { personId: string }) {
   const { following, label, flip } = useFollow(personId);
-  return (
-    <ProfileAction label={label} onClick={flip} pressed={following} primary={!following}>
-      <UserGlyph size={18} />
-      <span className="profile-action__badge" aria-hidden="true">
-        {following ? <CheckGlyph size={9} /> : <PlusGlyph size={9} />}
-      </span>
-    </ProfileAction>
-  );
+  return <MainAction label={label} onClick={flip} pressed={following} icon={following ? <CheckGlyph size={15} /> : <PlusGlyph size={15} />} />;
 }
 
 export default function Profile() {
@@ -77,11 +71,6 @@ export default function Profile() {
   const lists = collectionsFor(data, id);
   const clubs = clubsOf(id);
 
-  const stats = [
-    { label: t('people.checkins'), value: info.checkIns },
-    { label: t('people.followers'), value: info.followers + (following ? 1 : 0) },
-    { label: t('people.following'), value: info.following },
-  ];
 
   return (
     <>
@@ -91,21 +80,22 @@ export default function Profile() {
           who={p}
           label={p.name}
           name={p.name}
-          sub={`@${info.handle} · ${p.area}${info.followsMe ? ` · ${t('people.followsYou')}` : ''}`}
+          area={p.area}
+          followsMe={info.followsMe}
           bio={info.bio}
-          onAbout={() => setAbout(true)}
+          followers={{ label: t('people.followers').toLowerCase(), value: compact(info.followers + (following ? 1 : 0)), onClick: () => setAbout(true) }}
+          minor={[
+            { label: t('people.following').toLowerCase(), value: compact(info.following) },
+            { label: t('people.checkins').toLowerCase(), value: compact(info.checkIns) },
+          ]}
+          level={{ onClick: () => setAbout(true) }}
           actions={
-            <>
+            <ActionBar label={`Actions for ${p.name}`}>
               <FollowAction personId={id} />
-              <ProfileAction to={chatLink(id)} label={t('people.message')}>
-                <ChatGlyph size={18} />
-              </ProfileAction>
-              <ProfileAction label="More" ariaLabel={`More about ${first}`} onClick={() => setMore(true)}>
-                <MoreGlyph size={18} />
-              </ProfileAction>
-            </>
+              <IconButton to={chatLink(id)} label={t('people.message')} icon={<ChatGlyph size={18} />} />
+              <IconButton onClick={() => setMore(true)} label={`More about ${first}`} icon={<MoreGlyph size={18} />} />
+            </ActionBar>
           }
-          stats={stats.map((st) => ({ label: st.label, value: compact(st.value) }))}
         />
 
         <TabStrip
