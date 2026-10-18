@@ -1,6 +1,8 @@
 import { ALERTS, EMERGENCY, FACILITIES, REPORTS, SERVICES } from '../data/city';
 import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
+import { CHECKINS } from '../data/friends';
+import { PEOPLE } from '../data/core';
 import { DEALS, GROUPS, POSTS } from '../data/social';
 import type { CityEvent, CityPulse, Place, SourceId } from '../data/types';
 import { aqiBand, TRAFFIC_LABEL } from '../icons/live';
@@ -31,6 +33,7 @@ export type Intent =
   | 'groups'
   | 'safety'
   | 'services'
+  | 'friends'
   | 'general';
 
 export type ResultRef =
@@ -45,7 +48,8 @@ export type ResultRef =
   | { type: 'emergency'; id: string }
   | { type: 'facility'; id: string }
   | { type: 'report'; id: string }
-  | { type: 'post'; id: string };
+  | { type: 'post'; id: string }
+  | { type: 'checkin'; id: string };
 
 export interface FollowUp {
   label: string;
@@ -59,6 +63,8 @@ export interface AskOptions {
   length: 'brief' | 'balanced' | 'detailed';
   pulse: CityPulse;
   homeArea?: string;
+  /** People this person follows; enables "what are my friends eating" and friends' verdicts. */
+  following?: string[];
 }
 
 export interface AskResult {
@@ -90,6 +96,7 @@ interface Modifiers {
 const has = (q: string, words: string[]) => words.some((w) => new RegExp(`\\b${w}`, 'i').test(q));
 
 export function detectIntent(q: string): Intent {
+  if (has(q, ['friend', 'friends', 'people i follow'])) return 'friends';
   if (has(q, ['emergenc', 'hospital', 'ambulance', 'police', 'sos', 'fire brigade', 'helpline', 'unsafe', 'safe'])) return 'safety';
   if (has(q, ['traffic', 'commute', 'road', 'highway', 'jam', 'signal', 'drive'])) return 'traffic';
   if (has(q, ['metro', 'brts', 'bus', 'train', 'transit', 'station'])) return 'transit';
@@ -251,10 +258,12 @@ export function ask(query: string, o: AskOptions): AskResult {
       const list = named.length > 1 ? `${named.slice(0, -1).join(', ')} and ${named[named.length - 1]}` : named[0];
       const lead = places.length === 1 ? `Locals recommend ${list}.` : `Locals mention ${list}.`;
       const watch = places[0].watchOuts[0] ? `Heads-up for ${places[0].name}: ${lowerFirst(places[0].watchOuts[0])}.` : '';
+      const friendSays = CHECKINS.find((c) => c.placeId === places[0].id && c.verdict === 'must' && o.following?.includes(c.authorId));
+      const friendLine = friendSays ? `Your friend ${PEOPLE[friendSays.authorId]?.name.split(' ')[0]} says **must try** (${friendSays.items.join(', ').toLowerCase()}).` : '';
       return {
         ...base,
         heading: intent === 'places' ? 'Places locals love' : 'What locals recommend',
-        answer: finish([lead, places[0].summary, watch].filter(Boolean), o.length),
+        answer: finish([lead, friendLine || places[0].summary, watch].filter(Boolean), o.length),
         sources,
         results: places.map((p) => ({ type: 'place', id: p.id })),
         followUps:
@@ -504,6 +513,45 @@ export function ask(query: string, o: AskOptions): AskResult {
       };
     }
 
+    case 'friends': {
+      const following = o.following ?? [];
+      const recent = CHECKINS.filter((c) => following.includes(c.authorId) && c.recency <= 1).sort((a, b) => a.recency - b.recency);
+      const musts = recent.filter((c) => c.verdict === 'must');
+      if (recent.length === 0) {
+        return {
+          ...base,
+          heading: 'Your friends',
+          answer: 'Your friends haven’t checked in anywhere this week. Follow a few people to see what they eat and do.',
+          sources: [],
+          results: [],
+          followUps: [{ label: 'Find friends', query: 'Groups near me' }],
+          confidence: 'low',
+        };
+      }
+      const name = (id: string) => PEOPLE[id]?.name.split(' ')[0] ?? 'A friend';
+      const picks = musts.slice(0, 2).map((c) => `**${name(c.authorId)}** says the **${c.items[0].toLowerCase()} at ${c.placeName}** is a must try`);
+      const skips = recent.filter((c) => c.verdict === 'skip');
+      return {
+        ...base,
+        heading: 'What your friends are into',
+        answer: finish(
+          [
+            picks.length ? `${picks.join('; ')}.` : `${recent.length} check-ins from friends this week.`,
+            `${new Set(recent.map((c) => c.authorId)).size} friends checked in ${recent.length} times this week.`,
+            skips.length ? `Skip: ${skips.map((c) => `${c.items[0].toLowerCase()} at ${c.placeName} (${name(c.authorId)})`).join(', ')}.` : '',
+          ].filter(Boolean),
+          o.length,
+        ),
+        sources: ['neighbours'],
+        results: recent.map((c) => ({ type: 'checkin' as const, id: c.id })),
+        followUps: [
+          { label: 'Cafés friends love', query: 'Quiet café with good wifi' },
+          { label: 'Plans this weekend', query: "What's happening this weekend?" },
+        ],
+        confidence: 'high',
+      };
+    }
+
     default: {
       const words = q
         .toLowerCase()
@@ -554,6 +602,7 @@ export function eventLine(e: CityEvent) {
 export { TRAFFIC_LABEL };
 
 export const SUGGESTED_QUESTIONS = [
+  'What are my friends eating this week?',
   "What's happening this weekend?",
   'Quiet café with good Wi-Fi',
   'How is traffic on SG Highway?',

@@ -43,7 +43,7 @@ export interface Settings {
     push: boolean;
     email: boolean;
     digest: 'off' | 'daily' | 'weekly';
-    categories: Record<'replies' | 'mentions' | 'events' | 'deals' | 'groups' | 'reports' | 'alerts', boolean>;
+    categories: Record<'replies' | 'mentions' | 'events' | 'deals' | 'groups' | 'reports' | 'alerts' | 'friends', boolean>;
     quietHours: boolean;
     quietFrom: string;
     quietTo: string;
@@ -63,6 +63,12 @@ export interface Settings {
     locationPrecision: 'exact' | 'neighbourhood' | 'city';
     personalisedSuggestions: boolean;
     usageAnalytics: boolean;
+    /** Default audience for new check-ins. */
+    checkInAudience: 'friends' | 'everyone';
+    /** Who can see the Want to try list on your profile. */
+    listVisibility: 'everyone' | 'friends' | 'only-me';
+    /** New followers need approval. */
+    approveFollowers: boolean;
   };
   sources: {
     enabled: Record<'tickets' | 'instagram' | 'maps' | 'news' | 'neighbours', boolean>;
@@ -117,7 +123,7 @@ export const DEFAULT_SETTINGS: Settings = {
     push: true,
     email: false,
     digest: 'weekly',
-    categories: { replies: true, mentions: true, events: true, deals: true, groups: true, reports: true, alerts: true },
+    categories: { replies: true, mentions: true, events: true, deals: true, groups: true, reports: true, alerts: true, friends: true },
     quietHours: true,
     quietFrom: '22:30',
     quietTo: '07:00',
@@ -137,6 +143,9 @@ export const DEFAULT_SETTINGS: Settings = {
     locationPrecision: 'neighbourhood',
     personalisedSuggestions: true,
     usageAnalytics: false,
+    checkInAudience: 'friends',
+    listVisibility: 'friends',
+    approveFollowers: false,
   },
   sources: {
     enabled: { tickets: true, instagram: true, maps: true, news: true, neighbours: true },

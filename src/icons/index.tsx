@@ -1,12 +1,14 @@
 import type { ComponentType } from 'react';
 import type { GlyphProps } from './Glyph';
 import * as cat from './category';
+import * as fr from './friends';
 import * as nav from './nav';
 import * as ui from './ui';
 
 export * from './Glyph';
 export * from './nav';
 export * from './category';
+export * from './friends';
 export * from './live';
 export * from './ui';
 
@@ -82,6 +84,14 @@ export const GLYPHS = {
   news: ui.NewsGlyph,
   cloud: ui.CloudGlyph,
   air: ui.AirGlyph,
+  checkin: fr.CheckInGlyph,
+  must: fr.MustGlyph,
+  good: fr.GoodGlyph,
+  skip: fr.SkipGlyph,
+  todo: fr.TodoGlyph,
+  friends: fr.FriendsGlyph,
+  lists: fr.ListsGlyph,
+  want: fr.WantGlyph,
 } satisfies Record<string, ComponentType<GlyphProps>>;
 
 export type GlyphName = keyof typeof GLYPHS;

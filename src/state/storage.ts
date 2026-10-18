@@ -26,17 +26,16 @@ export function removeKey(key: string) {
   }
 }
 
-/** Fill in keys added since the value was stored (one level of nesting is enough here). */
+const isPlainObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+
+/** Fill in keys added since the value was stored, at any depth. Arrays are replaced, never merged. */
 export function mergeDefaults<T extends object>(defaults: T, stored: Partial<T> | undefined): T {
   if (!stored) return defaults;
   const out: Record<string, unknown> = { ...(defaults as Record<string, unknown>) };
   for (const [k, v] of Object.entries(stored)) {
     const d = (defaults as Record<string, unknown>)[k];
-    if (d && typeof d === 'object' && !Array.isArray(d) && v && typeof v === 'object' && !Array.isArray(v)) {
-      out[k] = { ...(d as object), ...(v as object) };
-    } else if (v !== undefined) {
-      out[k] = v;
-    }
+    if (isPlainObject(d) && isPlainObject(v)) out[k] = mergeDefaults(d, v);
+    else if (v !== undefined) out[k] = v;
   }
   return out as T;
 }

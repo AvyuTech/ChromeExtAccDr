@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import type { ChatMessage, CivicReport, Post, Reply } from '../data/types';
+import { DEFAULT_FOLLOWING, MY_WANT_TO_TRY } from '../data/friends';
+import type { ChatMessage, CheckIn, CivicReport, Collection, Post, Reply, WantItem } from '../data/types';
 import { mergeDefaults, readJSON, removeKey, writeJSON } from './storage';
 
 /** What this person has done in the app. Sample content stays in src/data; this layers on top. */
@@ -22,6 +23,16 @@ export interface AppData {
   myReplies: Record<string, Reply[]>;
   sentMessages: Record<string, ChatMessage[]>;
   recentSearches: string[];
+  /** People this person follows. */
+  following: string[];
+  myCheckIns: CheckIn[];
+  wantToTry: WantItem[];
+  likedCheckIns: string[];
+  checkInComments: Record<string, Array<{ id: string; authorId: string; text: string; ago: string }>>;
+  /** Friends whose latest check-ins were already viewed from the Home strip. */
+  seenStories: string[];
+  myCollections: Collection[];
+  followedCollections: string[];
 }
 
 export const DEFAULT_APP_DATA: AppData = {
@@ -43,6 +54,14 @@ export const DEFAULT_APP_DATA: AppData = {
   myReplies: {},
   sentMessages: {},
   recentSearches: ['quiet café with wifi', 'free events this weekend', 'metro timings'],
+  following: DEFAULT_FOLLOWING,
+  myCheckIns: [],
+  wantToTry: MY_WANT_TO_TRY,
+  likedCheckIns: ['ci-aditi-seoul'],
+  checkInComments: {},
+  seenStories: [],
+  myCollections: [],
+  followedCollections: ['work-cafes'],
 };
 
 type ListKey = {
@@ -50,6 +69,11 @@ type ListKey = {
 }[keyof AppData];
 
 const KEY = 'nearhood.data.v1';
+
+/** Two list entries are the same thing when they point at the same place/event and have the same title. */
+export function sameWant(a: Pick<WantItem, 'refId' | 'title'>, b: Pick<WantItem, 'refId' | 'title'>) {
+  return (a.refId ?? '') === (b.refId ?? '') && a.title.toLowerCase() === b.title.toLowerCase();
+}
 
 interface AppDataContextValue {
   data: AppData;
@@ -64,6 +88,13 @@ interface AppDataContextValue {
   rememberSearch: (q: string) => void;
   clearSearches: () => void;
   markAllRead: (ids: string[]) => void;
+  addCheckIn: (checkIn: CheckIn) => void;
+  addCheckInComment: (checkInId: string, comment: { id: string; authorId: string; text: string; ago: string }) => void;
+  /** Add to (or remove from) the Want to try list; matched by refId + title. Returns true when added. */
+  toggleWant: (item: WantItem) => boolean;
+  setWantDone: (id: string, done: boolean) => void;
+  removeWant: (id: string) => void;
+  addCollection: (collection: Collection) => void;
   reset: () => void;
 }
 
@@ -120,14 +151,58 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     (ids: string[]) => setData((d) => ({ ...d, readNotifications: Array.from(new Set([...d.readNotifications, ...ids])) })),
     [],
   );
+  const addCheckIn = useCallback((checkIn: CheckIn) => setData((d) => ({ ...d, myCheckIns: [checkIn, ...d.myCheckIns] })), []);
+  const addCheckInComment = useCallback<AppDataContextValue['addCheckInComment']>(
+    (checkInId, comment) =>
+      setData((d) => ({ ...d, checkInComments: { ...d.checkInComments, [checkInId]: [...(d.checkInComments[checkInId] ?? []), comment] } })),
+    [],
+  );
+  const toggleWant = useCallback(
+    (item: WantItem) => {
+      const existing = data.wantToTry.find((w) => sameWant(w, item));
+      setData((d) => ({
+        ...d,
+        wantToTry: existing ? d.wantToTry.filter((w) => !sameWant(w, item)) : [{ ...item, done: false }, ...d.wantToTry],
+      }));
+      return !existing;
+    },
+    [data.wantToTry],
+  );
+  const setWantDone = useCallback(
+    (id: string, done: boolean) =>
+      setData((d) => ({ ...d, wantToTry: d.wantToTry.map((w) => (w.id === id ? { ...w, done, doneAgo: done ? 'Just now' : undefined } : w)) })),
+    [],
+  );
+  const removeWant = useCallback((id: string) => setData((d) => ({ ...d, wantToTry: d.wantToTry.filter((w) => w.id !== id) })), []);
+  const addCollection = useCallback((c: Collection) => setData((d) => ({ ...d, myCollections: [c, ...d.myCollections] })), []);
   const reset = useCallback(() => {
     removeKey(KEY);
     setData(DEFAULT_APP_DATA);
   }, []);
 
   const value = useMemo(
-    () => ({ data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, reset }),
-    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, reset],
+    () => ({
+      data,
+      has,
+      toggle,
+      add,
+      remove,
+      addPost,
+      addReport,
+      addReply,
+      sendMessage,
+      rememberSearch,
+      clearSearches,
+      markAllRead,
+      addCheckIn,
+      addCheckInComment,
+      toggleWant,
+      setWantDone,
+      removeWant,
+      addCollection,
+      reset,
+    }),
+    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, reset],
   );
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

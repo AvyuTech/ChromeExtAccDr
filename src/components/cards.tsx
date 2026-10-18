@@ -18,6 +18,7 @@ import {
   type GlyphName,
 } from '../icons';
 import { compact, km, price, priceLevel } from '../lib/format';
+import { placeCommunity } from '../lib/friends';
 import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
@@ -396,6 +397,11 @@ export function DealCard({ deal }: { deal: Deal }) {
 
 /* ---------- Place row ---------- */
 export function PlaceRow({ place, last }: { place: Place; last?: boolean }) {
+  const { data } = useAppData();
+  const { settings } = useSettings();
+  // Community verdicts from local check-ins replace star ratings.
+  const community = placeCommunity(place.id, data, settings);
+  const friends = community.friendIds.length;
   return (
     <Link to={`/place/${place.id}`} className="list-row glyph-host" style={last ? { borderBottom: 'none' } : undefined}>
       <Tile glyph={place.glyph} tone={place.tone} size="lg" />
@@ -404,13 +410,19 @@ export function PlaceRow({ place, last }: { place: Place; last?: boolean }) {
         <span className="list-row__meta">
           {place.kind} · {place.area} · {priceLevel(place.price)}
         </span>
+        {friends ? (
+          <span className="list-row__meta" style={{ color: 'var(--accent)', fontWeight: 600 }}>
+            {friends === 1 ? '1 friend has been' : `${friends} friends have been`}
+          </span>
+        ) : null}
       </span>
       <span className="stack" style={{ gap: 4, alignItems: 'flex-end', flexShrink: 0 }}>
-        {place.isNew && place.reviews < 30 ? (
+        {community.total === 0 ? (
           <span className="badge">New</span>
         ) : (
-          <span className="badge tone-mint">
-            {place.rating.toFixed(1)} · {compact(place.reviews)}
+          <span className="badge tone-mint" style={{ gap: 4 }} aria-label={`${community.mustPct}% of ${community.total} locals say must try`}>
+            <NamedGlyph name="must" size={13} duo />
+            {community.mustPct}% · {compact(community.total)}
           </span>
         )}
         <span className="meta">{km(place.distanceKm)}</span>

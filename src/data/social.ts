@@ -301,6 +301,9 @@ export const POSTS: Post[] = [
 export const postById = (id: string) => POSTS.find((p) => p.id === id);
 
 export const NOTIFICATIONS: AppNotification[] = [
+  { id: 'nf1', kind: 'friend', title: 'Aditi had Kimchi pancake at Seoul Bowl', body: 'Must try. It’s on your Want to try list.', ago: '5m', day: 'today', link: '/checkin/ci-aditi-seoul', actorId: 'aditi' },
+  { id: 'nf2', kind: 'follow', title: 'Meera started following you', body: 'Gujarati food purist · 88 check-ins. Follow back?', ago: '50m', day: 'today', link: '/people/meera', actorId: 'meera' },
+  { id: 'nf3', kind: 'friend', title: 'You and Riya both want to try Polo Forest', body: 'Plan it together this weekend?', ago: '3h', day: 'today', link: '/people/riya', actorId: 'riya' },
   { id: 'n1', kind: 'alert', title: 'Lane closure near Iscon tonight', body: 'One lane closed on SG Highway, 11 pm to 5 am. Your evening commute is not affected.', ago: '25m', day: 'today', link: '/city/alerts/sg-lane' },
   { id: 'n2', kind: 'reply', title: 'Aditi replied to your question', body: '"Go before 7 pm, the queue gets long after that."', ago: '40m', day: 'today', link: '/post/korean-spot', actorId: 'aditi' },
   { id: 'n3', kind: 'report', title: 'Your pothole report is in progress', body: 'AMC-WZ-48213 · A repair crew is scheduled for Tuesday.', ago: '1h', day: 'today', link: '/city/reports/rep-pothole' },

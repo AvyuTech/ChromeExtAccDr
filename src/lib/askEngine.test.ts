@@ -24,6 +24,7 @@ describe('detectIntent', () => {
     ['report a pothole', 'civic'],
     ['nearest hospital', 'safety'],
     ['any food deals', 'deals'],
+    ['what are my friends eating', 'friends'],
     ['zzzz', 'general'],
   ])('%s → %s', (q, intent) => {
     expect(detectIntent(q)).toBe(intent);
@@ -91,5 +92,20 @@ describe('answer wording', () => {
 
   it('matches groups by topic', () => {
     expect(ask('pickleball groups', base).answer).toMatch(/Pickleball Ahmedabad/);
+  });
+});
+
+describe('friends', () => {
+  const withFriends = { ...base, following: ['riya', 'aditi', 'karan'] };
+
+  it('summarises what friends checked in', () => {
+    const r = ask('what are my friends eating this week', withFriends);
+    expect(r.intent).toBe('friends');
+    expect(r.results.every((x) => x.type === 'checkin')).toBe(true);
+    expect(r.answer).toMatch(/Riya|Aditi|Karan/);
+  });
+
+  it('mentions a friend’s verdict in place answers', () => {
+    expect(ask('quiet café with wifi', withFriends).answer).toMatch(/Your friend Riya says \*\*must try\*\*/);
   });
 });

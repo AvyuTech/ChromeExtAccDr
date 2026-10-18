@@ -882,3 +882,115 @@
 .is-live .water-tap__drop {
   animation: drop-fall 1.4s ease-in infinite;
 }
+
+/* ===== Friends layer ===== */
+.checkin__plate {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph--checkin.is-active .checkin__plate,
+.glyph-host:hover .checkin__plate {
+  animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.is-live .checkin__dot {
+  animation: blink 1.6s steps(1) infinite;
+}
+
+.must__heart,
+.must__spark {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph--must.is-active .g-tint {
+  opacity: 1;
+}
+.glyph--must.is-active .must__heart {
+  animation: heart-beat 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.glyph--must.is-active .must__spark,
+.glyph--must.is-live .must__spark {
+  animation: twinkle 1.4s ease-in-out infinite;
+}
+@keyframes heart-beat {
+  25% {
+    transform: scale(1.22);
+  }
+  50% {
+    transform: scale(0.94);
+  }
+  70% {
+    transform: scale(1.08);
+  }
+}
+
+.good__tick {
+  stroke-dasharray: 1;
+}
+.glyph--good.is-active .good__tick {
+  animation: tick-draw 0.45s ease-out both;
+}
+@keyframes tick-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.skip__sign {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph--skip.is-active .skip__sign {
+  animation: head-shake 0.5s ease-in-out;
+}
+@keyframes head-shake {
+  20% {
+    transform: rotate(-12deg);
+  }
+  45% {
+    transform: rotate(10deg);
+  }
+  70% {
+    transform: rotate(-5deg);
+  }
+}
+
+.todo__tick {
+  stroke-dasharray: 1;
+}
+.glyph--todo.is-active .todo__tick,
+.glyph-host:hover .todo__tick {
+  animation: tick-draw 0.5s ease-out both;
+}
+
+.friends__heart {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph--friends.is-active .friends__heart,
+.glyph--friends.is-live .friends__heart,
+.glyph-host:hover .friends__heart {
+  animation: heart-beat 1.2s ease-in-out infinite;
+}
+
+.glyph--want.is-active .g-tint {
+  opacity: 1;
+}
+.glyph--want .want__mark {
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+.glyph--want.is-active .want__mark {
+  animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.want__tick {
+  stroke-dasharray: 12;
+  animation: want-tick 0.4s ease-out both;
+}
+@keyframes want-tick {
+  from {
+    stroke-dashoffset: 12;
+  }
+}

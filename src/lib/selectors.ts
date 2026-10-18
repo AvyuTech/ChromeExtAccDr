@@ -29,6 +29,8 @@ const CATEGORY_FOR: Record<AppNotification['kind'], keyof Settings['notification
   report: 'reports',
   group: 'groups',
   system: null,
+  follow: 'friends',
+  friend: 'friends',
 };
 
 /** Notifications for the categories the person kept on. */

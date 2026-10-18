@@ -53,6 +53,10 @@ export const PEOPLE: Record<string, Person> = {
   harsh: { id: 'harsh', name: 'Harsh V.', initials: 'H', area: 'Bodakdev', tone: 'clay' },
   sana: { id: 'sana', name: 'Sana Q.', initials: 'S', area: 'Thaltej', tone: 'mint' },
   dev: { id: 'dev', name: 'Dev A.', initials: 'D', area: 'Paldi', tone: 'yellow' },
+  kavya: { id: 'kavya', name: 'Kavya R.', initials: 'K', area: 'Satellite', tone: 'teal' },
+  arjun: { id: 'arjun', name: 'Arjun T.', initials: 'A', area: 'Navrangpura', tone: 'blue' },
+  zoya: { id: 'zoya', name: 'Zoya H.', initials: 'Z', area: 'Vastrapur', tone: 'peach', verified: true, badge: 'Food explorer' },
+  priyank: { id: 'priyank', name: 'Priyank S.', initials: 'P', area: 'Prahlad Nagar', tone: 'green' },
   ward: { id: 'ward', name: 'Bodakdev ward desk', initials: 'W', area: 'Bodakdev', tone: 'blue', verified: true, badge: 'Official' },
 };
 

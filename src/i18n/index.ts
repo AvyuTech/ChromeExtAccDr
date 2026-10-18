@@ -3,13 +3,16 @@ import { useSettings } from '../state/settings';
 import { city } from './strings/city';
 import { common } from './strings/common';
 import { discover } from './strings/discover';
+import { friendsCreate } from './strings/friendsCreate';
+import { friendsFeed } from './strings/friendsFeed';
+import { friendsPeople } from './strings/friendsPeople';
 import { settings } from './strings/settings';
 import { social } from './strings/social';
 import type { Dict, Lang } from './types';
 
 export type { Dict, Lang };
 
-const DICT: Dict = { ...common, ...discover, ...city, ...settings, ...social };
+const DICT: Dict = { ...common, ...discover, ...city, ...settings, ...social, ...friendsCreate, ...friendsPeople, ...friendsFeed };
 
 export function translate(lang: Lang, key: string, vars?: Record<string, string | number>) {
   // Singular forms live under `<key>.one` and apply when n is 1.

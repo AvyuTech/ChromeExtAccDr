@@ -11,6 +11,8 @@ import { TRAFFIC_LABEL } from '../icons/live';
 import type { ResultRef } from '../lib/askEngine';
 import { km, rupees } from '../lib/format';
 import { AlertCard, DealCard, EventRow, GroupRow, PlaceRow, PostCard } from './cards';
+import { CheckInCard } from './friends';
+import { checkInById } from '../data/friends';
 import { useToast } from '../state/toast';
 import { LinkRow, Tile } from './ui';
 
@@ -166,6 +168,10 @@ function renderCard(ref: ResultRef): ReactNode {
     case 'post': {
       const p = postById(ref.id);
       return p ? <PostCard key={ref.id} post={p} /> : null;
+    }
+    case 'checkin': {
+      const c = checkInById(ref.id);
+      return c ? <CheckInCard key={ref.id} c={c} /> : null;
     }
     default:
       return null;

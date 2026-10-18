@@ -101,8 +101,9 @@ export default function Ask() {
       length: settings.ai.length,
       pulse,
       homeArea: neighbourhoodName(settings.location.home),
+      following: data.following,
     });
-  }, [q, settings, pulse]);
+  }, [q, settings, pulse, data.following]);
 
   const visible = useMemo(() => (result ? result.results.filter((r) => passes(r, filter, radiusKm)) : []), [result, filter, radiusKm]);
 

@@ -21,4 +21,6 @@ export const NOTIFICATION_META: Record<AppNotification['kind'], { tone: Tone; gl
   report: { tone: 'clay', glyph: 'report' },
   group: { tone: 'teal', glyph: 'groups' },
   system: { tone: 'violet', glyph: 'city' },
+  follow: { tone: 'violet', glyph: 'friends' },
+  friend: { tone: 'mint', glyph: 'checkin' },
 };

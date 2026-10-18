@@ -5,6 +5,8 @@ import AlertDetail from './pages/AlertDetail';
 import Alerts from './pages/Alerts';
 import Ask from './pages/Ask';
 import Category from './pages/Category';
+import CheckIn from './pages/CheckIn';
+import CheckInDetail from './pages/CheckInDetail';
 import Chat from './pages/Chat';
 import City from './pages/City';
 import Compose from './pages/Compose';
@@ -12,16 +14,19 @@ import DealDetail from './pages/DealDetail';
 import Deals from './pages/Deals';
 import EventDetail from './pages/EventDetail';
 import Explore from './pages/Explore';
+import Friends from './pages/Friends';
 import GroupDetail from './pages/GroupDetail';
 import Glyphs from './pages/Glyphs';
 import Groups from './pages/Groups';
 import Home from './pages/Home';
+import ListDetail from './pages/ListDetail';
 import Me from './pages/Me';
 import Messages from './pages/Messages';
 import NotFound from './pages/NotFound';
 import Onboarding from './pages/Onboarding';
 import PlaceDetail from './pages/PlaceDetail';
 import PostDetail from './pages/PostDetail';
+import Profile from './pages/Profile';
 import Report from './pages/Report';
 import ReportDetail from './pages/ReportDetail';
 import Reports from './pages/Reports';
@@ -37,7 +42,7 @@ import { SettingsProvider, useSettings } from './state/settings';
 import { ToastProvider } from './state/toast';
 
 /** Full-screen flows hide the tab bar. */
-const NO_NAV = [/^\/onboarding/, /^\/compose/, /^\/messages\/.+/, /^\/city\/report$/];
+const NO_NAV = [/^\/onboarding/, /^\/compose/, /^\/messages\/.+/, /^\/city\/report$/, /^\/checkin$/];
 
 function Shell() {
   const { pathname } = useLocation();
@@ -67,6 +72,11 @@ function Shell() {
           <Route path="/groups/:id" element={<GroupDetail />} />
           <Route path="/post/:id" element={<PostDetail />} />
           <Route path="/compose" element={<Compose />} />
+          <Route path="/checkin" element={<CheckIn />} />
+          <Route path="/checkin/:id" element={<CheckInDetail />} />
+          <Route path="/friends" element={<Friends />} />
+          <Route path="/people/:id" element={<Profile />} />
+          <Route path="/lists/:id" element={<ListDetail />} />
           <Route path="/updates" element={<Updates />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/messages/:id" element={<Chat />} />

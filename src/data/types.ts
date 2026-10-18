@@ -178,7 +178,7 @@ export interface Group {
   privacy: 'public' | 'neighbours';
 }
 
-export type NotificationKind = 'reply' | 'mention' | 'alert' | 'event' | 'deal' | 'report' | 'group' | 'system';
+export type NotificationKind = 'reply' | 'mention' | 'alert' | 'event' | 'deal' | 'report' | 'group' | 'system' | 'follow' | 'friend';
 
 export interface AppNotification {
   id: string;
@@ -308,4 +308,89 @@ export interface Facility {
   distanceKm: number;
   open24h: boolean;
   glyph: GlyphName;
+}
+
+/* ---------- Friends, check-ins and community reviews ---------- */
+
+/** A one-tap verdict instead of stars: harder to game, faster to give. */
+export type Verdict = 'must' | 'good' | 'skip';
+export type CheckInKind = 'ate' | 'did';
+
+/** A quick "what I had / what I did" post. Check-ins are the community reviews. */
+export interface CheckIn {
+  id: string;
+  authorId: string;
+  kind: CheckInKind;
+  placeId?: string;
+  eventId?: string;
+  /** Display name; also used when the place is not in the directory yet. */
+  placeName: string;
+  area: string;
+  items: string[];
+  verdict: Verdict;
+  note?: string;
+  /** Approximate spend per person in rupees. */
+  spend?: number;
+  tags: string[];
+  withIds?: string[];
+  audience: 'friends' | 'everyone';
+  /** Confirmed by location at the venue or a bill photo. */
+  verifiedVisit: boolean;
+  /** Free or invited visits are labelled and left out of the score. */
+  invited?: boolean;
+  ago: string;
+  /** 0 today · 1 this week · 2 earlier */
+  recency: 0 | 1 | 2;
+  likes: number;
+  comments: Array<{ id: string; authorId: string; text: string; ago: string }>;
+}
+
+/** An entry on someone's "Want to try" list (their to-do list for the city). */
+export interface WantItem {
+  id: string;
+  kind: 'place' | 'event' | 'dish' | 'activity';
+  refId?: string;
+  title: string;
+  sub?: string;
+  note?: string;
+  done?: boolean;
+  doneAgo?: string;
+  /** Who recommended it. */
+  fromId?: string;
+}
+
+/** A curated list someone made, e.g. "Cafés I can work from". */
+export interface Collection {
+  id: string;
+  ownerId: string;
+  title: string;
+  description: string;
+  placeIds: string[];
+  notes?: Record<string, string>;
+  followers: number;
+  tone: Tone;
+  glyph: GlyphName;
+}
+
+export interface ProfileInfo {
+  handle: string;
+  bio: string;
+  followers: number;
+  following: number;
+  checkIns: number;
+  places: number;
+  since: string;
+  tasteTags: string[];
+  followsMe: boolean;
+  wantToTry: WantItem[];
+  collections: string[];
+}
+
+/** Aggregated community verdicts for a place. */
+export interface CommunityBase {
+  must: number;
+  good: number;
+  skip: number;
+  verifiedPct: number;
+  items: Array<{ name: string; count: number; mustPct: number }>;
 }
