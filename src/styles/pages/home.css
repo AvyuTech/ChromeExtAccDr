@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: -14px;
+  margin-bottom: -6px;
 }
 .home-brand {
   display: inline-flex;
@@ -39,9 +39,44 @@
 .home-location .glyph {
   color: var(--accent);
 }
-.home .hero-title {
-  margin: -4px 0 0;
-  font-size: 1.4375rem;
+/* "Good evening, Jay" with your neighbourhood beside it, on one line */
+.home-hello {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+.home-hello__title {
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.3125rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-hello .home-location {
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+.home .ask-field {
+  height: 44px;
+  border-radius: 14px;
+}
+.home .ask-field .icon-btn--accent {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
 }
 
 /* "Sunday, 18 Oct · Sunny · 31°" with the plans-tonight pill */

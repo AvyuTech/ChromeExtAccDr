@@ -23,7 +23,6 @@ import {
   PinGlyph,
   SlidersGlyph,
   SparkGlyph,
-  SparkleMark,
   WeatherGlyph,
   Wordmark,
 } from '../icons';
@@ -56,6 +55,12 @@ const TABS: Array<{ id: FeedTab; key: string }> = [
 
 const FOOD_TOPICS = ['Food', 'New place'];
 
+/** Morning until noon, afternoon until five, evening after that. */
+function partOfDay(): 'morning' | 'afternoon' | 'evening' {
+  const h = new Date().getHours();
+  return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+}
+
 function todayLabel() {
   const d = new Date();
   return `${d.toLocaleDateString('en-GB', { weekday: 'long' })}, ${d.getDate()} ${d.toLocaleDateString('en-GB', { month: 'short' })}`;
@@ -75,6 +80,7 @@ export default function Home() {
   const [filterSheet, setFilterSheet] = useState(false);
 
   const homeName = neighbourhoodName(settings.location.home);
+  const firstName = settings.profile.name.trim().split(/\s+/)[0] || 'there';
   const alerts = visibleAlerts(settings, data);
   const unread = unreadNotificationCount(settings, data);
   const unreadChats = unreadMessageCount(data);
@@ -270,16 +276,15 @@ export default function Home() {
             <ChatGlyph size={19} typing={unreadChats > 0} />
           </Link>
         </header>
-        <button type="button" className="home-location" onClick={() => setPlaceSheet(true)} aria-label={`Neighbourhood: ${homeName}, ${settings.location.city}. Change`}>
-          <PinGlyph size={15} />
-          {homeName}, {settings.location.city}
-          <ChevronDownGlyph size={14} />
-        </button>
-
-        <h1 className="hero-title">
-          {t('home.hero')}
-          <SparkleMark size={22} className="hero-title__spark" />
-        </h1>
+        {/* One line: hello on the left, your neighbourhood on the right. */}
+        <div className="home-hello">
+          <h1 className="home-hello__title">{t(`home.greet.${partOfDay()}`, { name: firstName })}</h1>
+          <button type="button" className="home-location" onClick={() => setPlaceSheet(true)} aria-label={`Neighbourhood: ${homeName}, ${settings.location.city}. Change`}>
+            <PinGlyph size={14} />
+            {homeName}
+            <ChevronDownGlyph size={13} />
+          </button>
+        </div>
 
         <form onSubmit={onAsk} role="search">
           <label className="ask-field" htmlFor="ask">

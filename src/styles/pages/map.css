@@ -466,3 +466,77 @@
 .xmap-card .btn {
   flex-shrink: 0;
 }
+
+/* Swiping between nearby spots */
+.xmap-card {
+  touch-action: pan-y;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+.xmap-card.is-dragging {
+  transition: none;
+}
+.xmap-card.from-right {
+  animation: xmap-card-from-right 0.22s ease-out;
+}
+.xmap-card.from-left {
+  animation: xmap-card-from-left 0.22s ease-out;
+}
+@keyframes xmap-card-from-right {
+  from {
+    transform: translateX(48px);
+    opacity: 0;
+  }
+}
+@keyframes xmap-card-from-left {
+  from {
+    transform: translateX(-48px);
+    opacity: 0;
+  }
+}
+.xmap-card__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 6px 6px;
+  margin-top: -4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.xmap-card__nav button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 26px;
+  border: none;
+  border-radius: 8px;
+  background: var(--surface-3);
+  color: var(--ink);
+  cursor: pointer;
+}
+.xmap-card__nav button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+/* Links and photos in the card mustn't start a browser drag: the swipe needs the pointer. */
+.xmap-card a,
+.xmap-card img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.xmap-card .entity-line {
+  flex-wrap: nowrap;
+  max-width: 100%;
+}
+.xmap-card .entity-line b {
+  flex-shrink: 0;
+}
+.xmap-card .entity-line__rest {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

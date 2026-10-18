@@ -307,7 +307,28 @@ function spreadOut(pins: Pin[], gap = 40): Pin[] {
   return pts.map((p) => ({ ...p, x: Math.round(Math.min(WORLD_W - 20, Math.max(20, p.x))), y: Math.round(Math.min(WORLD_H - 20, Math.max(20, p.y))) }));
 }
 
-function PinCard({ pin, onClose }: { pin: Pin; onClose: () => void }) {
+function PinCard({
+  pin,
+  onClose,
+  onStep,
+  index,
+  total,
+  dir,
+}: {
+  pin: Pin;
+  onClose: () => void;
+  /** Next (1) or previous (-1) spot, nearest first from where you started. */
+  onStep: (d: 1 | -1) => void;
+  index: number;
+  total: number;
+  /** Which way the card arrived from, for the slide. */
+  dir: 1 | -1 | 0;
+}) {
+  const [dx, setDx] = useState(0);
+  const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
+  const swiped = useRef(false);
+  const hasPrev = index > 0;
+  const hasNext = index >= 0 && index < total - 1;
   const { data, toggle } = useAppData();
   const { settings } = useSettings();
   let body;
@@ -315,7 +336,7 @@ function PinCard({ pin, onClose }: { pin: Pin; onClose: () => void }) {
     const club = allClubs(data).find((c) => c.id === pin.id) as Group;
     const next = meetupsOf(club, data)[0];
     body = (
-      <Link to={`/clubs/${club.id}`} className="xmap-card__link">
+      <Link to={`/clubs/${club.id}`} className="xmap-card__link" draggable={false}>
         <EntityPic kind="club" src={clubPhoto(club)} size={52} />
         <span className="xmap-card__body">
           <span className="xmap-card__name">{club.name}</span>
@@ -338,7 +359,7 @@ function PinCard({ pin, onClose }: { pin: Pin; onClose: () => void }) {
   } else if (pin.spotted) {
     const s = spottedPlaces(data).find((x) => x.id === pin.id)!;
     body = (
-      <div className="xmap-card__link">
+      <div className="xmap-card__link" draggable={false}>
         <EntityPic kind="page" src={spotPhoto(s)} size={52} fallback={<NamedGlyph name={s.glyph} size={22} />} />
         <span className="xmap-card__body">
           <span className="xmap-card__name">{s.name}</span>
@@ -360,7 +381,7 @@ function PinCard({ pin, onClose }: { pin: Pin; onClose: () => void }) {
     const c = placeCommunity(place.id, data, settings);
     const closes = place.hours.split('–')[1]?.trim();
     body = (
-      <Link to={`/place/${place.id}`} className="xmap-card__link">
+      <Link to={`/place/${place.id}`} className="xmap-card__link" draggable={false}>
         <EntityPic kind={pin.kind} src={placePhoto(place.id)} size={52} fallback={<NamedGlyph name={place.glyph} size={22} />} />
         <span className="xmap-card__body">
           <span className="xmap-card__name">{place.name}</span>
@@ -384,9 +405,75 @@ function PinCard({ pin, onClose }: { pin: Pin; onClose: () => void }) {
       </Link>
     );
   }
+  // Swipe the card sideways to walk to the next nearest spot; the card follows your finger.
+  const onPointerDown = (e: ReactPointerEvent) => {
+    drag.current = { x: e.clientX, y: e.clientY, moved: false };
+    swiped.current = false;
+  };
+  const onPointerMove = (e: ReactPointerEvent) => {
+    const d = drag.current;
+    if (!d) return;
+    const mx = e.clientX - d.x;
+    if (!d.moved) {
+      if (Math.abs(mx) < 8 || Math.abs(mx) < Math.abs(e.clientY - d.y)) return;
+      d.moved = true;
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    }
+    // Resist at the ends of the list.
+    setDx((mx < 0 && !hasNext) || (mx > 0 && !hasPrev) ? mx / 4 : mx);
+  };
+  const onPointerUp = () => {
+    const d = drag.current;
+    drag.current = null;
+    if (!d?.moved) return;
+    swiped.current = true;
+    if (dx < -60 && hasNext) onStep(1);
+    else if (dx > 60 && hasPrev) onStep(-1);
+    setDx(0);
+  };
+
   return (
-    <div className="xmap-card" role="dialog" aria-label={pin.name}>
+    <div
+      className={`xmap-card${dx ? ' is-dragging' : ''}${dir === 1 ? ' from-right' : dir === -1 ? ' from-left' : ''}`}
+      role="dialog"
+      aria-label={pin.name}
+      tabIndex={-1}
+      style={dx ? { transform: `translateX(${dx}px)`, opacity: 1 - Math.min(0.4, Math.abs(dx) / 400) } : undefined}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={() => {
+        drag.current = null;
+        setDx(0);
+      }}
+      onClickCapture={(e) => {
+        // A swipe isn't a tap: don't open the page at the end of one.
+        if (swiped.current) {
+          e.preventDefault();
+          e.stopPropagation();
+          swiped.current = false;
+        }
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowRight' && hasNext) onStep(1);
+        if (e.key === 'ArrowLeft' && hasPrev) onStep(-1);
+        if (e.key === 'Escape') onClose();
+      }}
+    >
       {body}
+      {total > 1 ? (
+        <div className="xmap-card__nav">
+          <button type="button" aria-label="Previous spot" disabled={!hasPrev} onClick={() => onStep(-1)}>
+            <ChevronRightGlyph size={15} style={{ transform: 'rotate(180deg)' }} />
+          </button>
+          <span>
+            {index + 1} of {total} nearby · swipe for the next
+          </span>
+          <button type="button" aria-label="Next spot" disabled={!hasNext} onClick={() => onStep(1)}>
+            <ChevronRightGlyph size={15} />
+          </button>
+        </div>
+      ) : null}
       <button type="button" className="xmap-card__close" aria-label="Close" onClick={onClose}>
         <CloseGlyph size={14} />
       </button>
@@ -404,6 +491,9 @@ export function ExploreMap({ category, height, full }: { category?: (p: { catego
   const [view, setView] = useState<{ s: number; tx: number; ty: number } | null>(null);
   const [layers, setLayers] = useState<MapLayer[]>(['business', 'public', 'club']);
   const [selected, setSelected] = useState<string | null>(null);
+  // The spot you tapped first; swiping walks outwards from it, nearest first.
+  const [anchor, setAnchor] = useState<string | null>(null);
+  const [dir, setDir] = useState<1 | -1 | 0>(0);
   const [legend, setLegend] = useState(false);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<{ kind: 'pan' | 'pinch'; x: number; y: number; tx: number; ty: number; s: number; dist: number; moved: boolean; vx: number; vy: number; t: number } | null>(null);
@@ -412,8 +502,13 @@ export function ExploreMap({ category, height, full }: { category?: (p: { catego
 
   const home = homeWorldPos(settings.location.home);
   const pins = usePins(category);
-  const shown = pins.filter((p) => layers.includes(p.layer));
+  const shown = useMemo(() => pins.filter((p) => layers.includes(p.layer)), [pins, layers]);
   const sel = shown.find((p) => p.id === selected);
+  const nearby = useMemo(() => {
+    const a = shown.find((p) => p.id === anchor);
+    if (!a) return [];
+    return [...shown].sort((p, q) => Math.hypot(p.x - a.x, p.y - a.y) - Math.hypot(q.x - a.x, q.y - a.y)).map((p) => p.id);
+  }, [shown, anchor]);
 
   useLayoutEffect(() => {
     const el = viewport.current;
@@ -490,7 +585,7 @@ export function ExploreMap({ category, height, full }: { category?: (p: { catego
   };
 
   const onPointerDown = (e: ReactPointerEvent) => {
-    if ((e.target as HTMLElement).closest('button, a')) return;
+    if ((e.target as HTMLElement).closest('button, a, .xmap-card')) return;
     stopAnim();
     pointers.current.set(e.pointerId, local(e));
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -573,8 +668,20 @@ export function ExploreMap({ category, height, full }: { category?: (p: { catego
       setSelected(null);
       return;
     }
+    setAnchor(pin.id);
+    setDir(0);
     setSelected(pin.id);
     // Bring it into view above the card.
+    flyTo(centred(pin.x, pin.y, Math.max(v.s, 1), -60));
+  };
+
+  /** Walk to the next or previous spot, nearest first from where you started. */
+  const step = (d: 1 | -1) => {
+    const id = nearby[nearby.indexOf(selected ?? '') + d];
+    const pin = shown.find((p) => p.id === id);
+    if (!pin) return;
+    setDir(d);
+    setSelected(pin.id);
     flyTo(centred(pin.x, pin.y, Math.max(v.s, 1), -60));
   };
 
@@ -709,7 +816,9 @@ export function ExploreMap({ category, height, full }: { category?: (p: { catego
           </div>
         ) : null}
 
-        {sel ? <PinCard pin={sel} onClose={() => setSelected(null)} /> : null}
+        {sel ? (
+          <PinCard key={sel.id} pin={sel} onClose={() => setSelected(null)} onStep={step} index={nearby.indexOf(sel.id)} total={nearby.length} dir={dir} />
+        ) : null}
       </div>
     </div>
   );
