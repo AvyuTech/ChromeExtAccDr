@@ -23,6 +23,7 @@ import Heroes from './pages/Heroes';
 import Home from './pages/Home';
 import Impact from './pages/Impact';
 import ListDetail from './pages/ListDetail';
+import MapPage from './pages/MapPage';
 import Me from './pages/Me';
 import Messages from './pages/Messages';
 import NotFound from './pages/NotFound';
@@ -81,6 +82,7 @@ function Shell() {
                   <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/ask" element={<Ask />} />
                   <Route path="/explore" element={<Explore />} />
+                  <Route path="/explore/map" element={<MapPage />} />
                   <Route path="/explore/:category" element={<Category />} />
                   <Route path="/deals/*" element={<Navigate to="/explore" replace />} />
                   <Route path="/place/:id" element={<PlaceDetail />} />

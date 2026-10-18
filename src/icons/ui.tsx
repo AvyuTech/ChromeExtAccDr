@@ -648,3 +648,6 @@ export function SquiggleMark({ width = 34, className }: { width?: number; classN
 export const PushPinGlyph = g('pushpin', <path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6zM12 14v7" />);
 /** A shop front: marks a business page. */
 export const StoreGlyph = g('store', <path d="M4.5 10v10h15V10M3.5 4.5h17l-1 4a2.6 2.6 0 0 1-5 .3 2.6 2.6 0 0 1-5 0 2.6 2.6 0 0 1-5-.3zM10 20v-5h4v5" />);
+export const MinusGlyph = g('minus', <path d="M5 12h14" />);
+/** Four corners pointing out: open full screen. */
+export const ExpandGlyph = g('expand', <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />);

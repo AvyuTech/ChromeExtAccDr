@@ -17,6 +17,7 @@ import './styles/pages/people.css';
 import './styles/pages/clubs.css';
 import './styles/pages/helpful.css';
 import './styles/pages/pages.css';
+import './styles/pages/map.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

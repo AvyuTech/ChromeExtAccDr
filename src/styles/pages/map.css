@@ -1,0 +1,468 @@
+/* Explore map: a city to roam. Shape = what it is, colour = how good it is. */
+
+:root {
+  --ins-loved: #1f9d55;
+  --ins-liked: #6c52ee;
+  --ins-mixed: #df8a1c;
+  --ins-new: #8a8f99;
+  --ins-active: #2f7de1;
+  --ins-quiet: #9aa0a8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ins-loved: #3cc477;
+    --ins-liked: #9d8cff;
+    --ins-mixed: #f0a443;
+    --ins-new: #7d828b;
+    --ins-active: #5b9cf0;
+    --ins-quiet: #6f747c;
+  }
+}
+:root[data-theme='dark'] {
+  --ins-loved: #3cc477;
+  --ins-liked: #9d8cff;
+  --ins-mixed: #f0a443;
+  --ins-new: #7d828b;
+  --ins-active: #5b9cf0;
+  --ins-quiet: #6f747c;
+}
+
+.xmap {
+  position: relative;
+  height: 440px;
+  margin: 0 calc(var(--gutter) * -1);
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+  overflow: hidden;
+  background: var(--map-land);
+}
+.xmap--full {
+  border: none;
+}
+.xmap__viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.xmap__viewport:active {
+  cursor: grabbing;
+}
+.xmap__world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.xmap__art {
+  display: block;
+}
+
+/* Names of places on the map */
+.xmap__label {
+  position: absolute;
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--map-label);
+  text-shadow:
+    0 0 3px var(--map-land),
+    0 0 3px var(--map-land),
+    0 0 6px var(--map-land);
+}
+.xmap__label--minor {
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+.xmap__label--road {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.xmap__label--water {
+  font-style: italic;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--map-label) 60%, #3b82f6);
+}
+
+/* You and your radius */
+.xmap__radius {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1.5px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  pointer-events: none;
+}
+.xmap__you {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #1d2330;
+  border: 4px solid var(--lime);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--lime) 28%, transparent);
+  pointer-events: none;
+}
+
+/* ---------- Pins ---------- */
+.xmap-pin {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: none;
+  transform: translate(-50%, -100%);
+  cursor: pointer;
+  --pin: var(--ins-new);
+}
+.xmap-pin.is-loved {
+  --pin: var(--ins-loved);
+}
+.xmap-pin.is-liked {
+  --pin: var(--ins-liked);
+}
+.xmap-pin.is-mixed {
+  --pin: var(--ins-mixed);
+}
+.xmap-pin.is-new {
+  --pin: var(--ins-new);
+}
+.xmap-pin.is-active {
+  --pin: var(--ins-active);
+}
+.xmap-pin.is-quiet {
+  --pin: var(--ins-quiet);
+}
+.xmap-pin__shape {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: var(--pin);
+  color: #fff;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 8px rgba(17, 20, 28, 0.28);
+  transition: transform 0.15s ease;
+}
+/* The little tail that points at the spot */
+.xmap-pin__shape::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--pin);
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  z-index: -1;
+}
+.xmap-pin--page .xmap-pin__shape {
+  border-radius: 9px;
+}
+.xmap-pin--public .xmap-pin__shape {
+  border-radius: 50%;
+}
+.xmap-pin--club .xmap-pin__shape {
+  border-radius: 11px;
+  box-shadow:
+    4px -4px 0 -1px #fff,
+    4px -4px 0 1px var(--pin),
+    0 3px 8px rgba(17, 20, 28, 0.28);
+}
+.xmap-pin.is-spotted .xmap-pin__shape {
+  border-style: dashed;
+}
+.xmap-pin.is-on .xmap-pin__shape {
+  transform: scale(1.2);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--pin) 35%, transparent),
+    0 4px 12px rgba(17, 20, 28, 0.35);
+}
+.xmap-pin--club.is-on .xmap-pin__shape {
+  box-shadow:
+    4px -4px 0 -1px #fff,
+    4px -4px 0 1px var(--pin),
+    0 0 0 4px color-mix(in srgb, var(--pin) 35%, transparent);
+}
+/* Zoomed out: small shapes without icons */
+.xmap-pin.is-dot .xmap-pin__shape {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+}
+.xmap-pin.is-dot .xmap-pin__shape::after {
+  display: none;
+}
+.xmap-pin--page.is-dot .xmap-pin__shape {
+  border-radius: 4px;
+}
+.xmap-pin--club.is-dot .xmap-pin__shape {
+  border-radius: 5px;
+  box-shadow:
+    3px -3px 0 -1px #fff,
+    3px -3px 0 0.5px var(--pin);
+}
+.xmap-pin.is-dot {
+  transform: translate(-50%, -50%);
+}
+.xmap-pin__friend {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff;
+}
+.xmap-pin__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 9px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(17, 20, 28, 0.18);
+}
+.xmap-pin__label b {
+  color: var(--pin);
+}
+.xmap-pin__badge {
+  position: absolute;
+  top: 2px;
+  left: calc(100% + 3px);
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--pin);
+  font-size: 0.625rem;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(17, 20, 28, 0.2);
+}
+
+/* ---------- Layers, controls, legend ---------- */
+.xmap__layers {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 56px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.xmap__layers::-webkit-scrollbar {
+  display: none;
+}
+.xmap__layer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(17, 20, 28, 0.12);
+  cursor: pointer;
+}
+.xmap__layer .num {
+  font-weight: 600;
+  opacity: 0.75;
+}
+.xmap__layer.is-on {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--ground);
+}
+.xmap__controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.xmap__ctl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(17, 20, 28, 0.14);
+  cursor: pointer;
+}
+.xmap__legend-btn {
+  position: absolute;
+  left: 10px;
+  top: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.xmap__legend {
+  position: absolute;
+  z-index: 7;
+  left: 10px;
+  top: 82px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 250px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 6px 18px rgba(17, 20, 28, 0.18);
+}
+.xmap__legend-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.6875rem;
+  color: var(--ink-2);
+}
+.xmap-card__insight i {
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: 0;
+}
+.xmap__legend-row i,
+.xmap-card__insight i {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--ins);
+}
+.is-loved {
+  --ins: var(--ins-loved);
+}
+.is-liked {
+  --ins: var(--ins-liked);
+}
+.is-mixed {
+  --ins: var(--ins-mixed);
+}
+.is-new {
+  --ins: var(--ins-new);
+}
+.is-active {
+  --ins: var(--ins-active);
+}
+.is-quiet {
+  --ins: var(--ins-quiet);
+}
+
+/* ---------- The card a tapped pin opens ---------- */
+.xmap-card {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 6;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 10px 28px rgba(17, 20, 28, 0.24);
+  animation: xmap-card-in 0.2s ease-out;
+}
+@keyframes xmap-card-in {
+  from {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+.xmap-card__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 34px 12px 12px;
+  color: inherit;
+  text-decoration: none;
+}
+.xmap-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-grow: 1;
+  min-width: 0;
+}
+.xmap-card__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.xmap-card__insight {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.xmap-card__friends {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.xmap-card__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--muted);
+  cursor: pointer;
+}
+.xmap-card .btn {
+  flex-shrink: 0;
+}

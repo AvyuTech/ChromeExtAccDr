@@ -13,6 +13,7 @@ export const ROUTES = [
   '/ask?q=best way to Navrangpura',
   '/ask?q=hospital',
   '/explore',
+  '/explore/map',
   '/explore/food',
   '/explore/events',
   '/explore/getaways',

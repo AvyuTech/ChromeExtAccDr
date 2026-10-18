@@ -177,7 +177,17 @@ A new city is empty on day one. Phase 1 fills it with people, not scraping, beca
 
 ## Explore: finding pages
 
-Explore is for finding pages, and everything on it is something people made: pages they added and confirmed, their check-ins and their lists. One row of filters (Cafés, Food, Sports, Outdoors, Culture, Shopping, Day trips) applies to everything below it: friends' must-tries, new in the city (new pages and spotted ones waiting for confirmations), popular this week, and lists by locals. There is no events or clubs section: clubs have their own tab, and events are posts by a person, a page or a club, so they show on Home and on whoever posted them.
+Explore is for finding pages, and everything on it is something people made: pages they added and confirmed, their check-ins and their lists. One row of filters (Cafés, Food, Sports, Outdoors, Culture, Shopping, Day trips) applies to everything below it.
+
+**The map leads.** It sits right under the filters, big, and opens full screen (*Full map*, or the expand button):
+
+- **Roam the city:** drag to move (with a little glide), pinch, scroll or double-tap to zoom, + and − buttons, and a button to come back to where you live. The city goes well past your neighbourhood, from Gota to Maninagar and Bopal to the old city.
+- **Choose what to see:** *Businesses*, *Public places* and *Clubs* at the top, on or off, with counts. The category filters narrow businesses and public places.
+- **Shape says what it is, colour says how good it is:** squares are business pages, circles public places, stacked squares clubs; dashed squares are new places still being confirmed. Green is loved (70%+ must try), violet liked (50–69%), amber mixed, grey new; clubs are blue when they have meetups coming up. A friend's face on a pin means they've been. *Colours* explains it on the map.
+- **Zoom in for more:** zoomed out, pins are small dots; zoom in and they show their score (59%, 2.4k members); further in, their names.
+- **Tap a pin** for a small card: photo, what it is, the score and locals, open now, friends who've been (for a club: members and the next meetup; for a spotted place: *I've been*). **Tap the card** to open the page.
+
+Below the map: friends' must-tries, new in the city, popular this week and lists by locals. There is no events or clubs section in the list: clubs are on the map and have their own tab, and events are posts by a person, a page or a club.
 
 ## Profiles: the short version
 

@@ -1,7 +1,9 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useCallback, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Avatar, PlaceRow } from '../components/cards';
-import { CityMap, NEIGHBOURHOOD_POS, PLACE_POS, type MapPin } from '../components/CityMap';
+import { ExploreMap } from '../components/ExploreMap';
+import { FILTERS, matches, RADII, type Filter } from '../lib/exploreFilters';
+import { NEIGHBOURHOOD_POS } from '../data/mapPositions';
 import { FriendPickCard } from '../components/community';
 import { CollectionCard } from '../components/friends';
 import { SectionHead, Sheet } from '../components/ui';
@@ -12,7 +14,6 @@ import { PLACES, placeById } from '../data/places';
 import type { Place, PlaceCategory } from '../data/types';
 import { useT } from '../i18n';
 import { CheckGlyph, ChevronDownGlyph, ChevronRightGlyph, ListsGlyph, MapGlyph, NamedGlyph, PinGlyph, PlusGlyph, SearchGlyph, SparkGlyph } from '../icons';
-import { km } from '../lib/format';
 import { friendsMustTries, placeCommunity, profileInfo } from '../lib/friends';
 import { pageMatches, spotPhoto, spottedPlaces } from '../lib/places';
 import { useAppData } from '../state/appData';
@@ -25,29 +26,6 @@ import { EntityPic, placeKind } from '../components/entity';
   Events live with whoever posted them, clubs have their own tab.
 */
 
-type Filter = 'all' | 'cafes' | 'food' | 'sports' | 'outdoors' | 'culture' | 'shopping' | 'trips';
-
-const FILTERS: Array<{ id: Filter; label: string; cats?: PlaceCategory[] }> = [
-  { id: 'all', label: 'All' },
-  { id: 'cafes', label: 'Cafés', cats: ['cafe'] },
-  { id: 'food', label: 'Food', cats: ['food'] },
-  { id: 'sports', label: 'Sports', cats: ['sports'] },
-  { id: 'outdoors', label: 'Outdoors', cats: ['nature'] },
-  { id: 'culture', label: 'Culture', cats: ['culture', 'heritage'] },
-  { id: 'shopping', label: 'Shopping', cats: ['shopping'] },
-  { id: 'trips', label: 'Day trips' },
-];
-
-const RADII = [1, 2, 3, 5, 10, 20];
-
-/** Day trips only show under their own filter; everything else is in the city. */
-function matches(filter: Filter, category: PlaceCategory, outsideCity: boolean) {
-  if (filter === 'trips') return outsideCity;
-  if (outsideCity) return false;
-  const cats = FILTERS.find((f) => f.id === filter)?.cats;
-  return !cats || cats.includes(category);
-}
-
 export default function Explore() {
   const t = useT();
   const navigate = useNavigate();
@@ -55,12 +33,10 @@ export default function Explore() {
   const { data, toggle } = useAppData();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
-  const [mapOn, setMapOn] = useState(false);
   const [areaSheet, setAreaSheet] = useState(false);
 
   const radius = settings.location.radiusKm;
   const homeId = settings.location.home;
-  const home = NEIGHBOURHOOD_POS[homeId] ?? NEIGHBOURHOOD_POS.bodakdev;
   const pagesIn = (p: Place) => matches(filter, p.category, !!p.origin.outsideCity);
 
   // Popular this week: friends who've been count most, then this week's check-ins, then how many locals vouch.
@@ -89,17 +65,7 @@ export default function Explore() {
     .filter((c) => filter === 'all' || c.placeIds.some((id) => (placeById(id) ? pagesIn(placeById(id)!) : false)))
     .sort((a, b) => Number(data.following.includes(b.ownerId)) - Number(data.following.includes(a.ownerId)) || b.followers - a.followers);
 
-  const pins: MapPin[] = PLACES.filter((p) => PLACE_POS[p.id] && pagesIn(p)).map((p) => ({
-    id: p.id,
-    x: PLACE_POS[p.id][0],
-    y: PLACE_POS[p.id][1],
-    glyph: p.glyph,
-    title: p.name,
-    meta: `${p.kind} · ${km(p.distanceKm)}`,
-    to: `/place/${p.id}`,
-    photo: placePhoto(p.id),
-    far: p.distanceKm > radius,
-  }));
+  const onMap = useCallback((p: { category: PlaceCategory }) => matches(filter, p.category, false), [filter]);
 
   // Typing finds pages, people and lists straight away; nothing found means it's time to add a page.
   const typed = query.trim();
@@ -226,10 +192,10 @@ export default function Explore() {
             {t('discover.explore.around', { area: neighbourhoodName(homeId), km: radius })}
             <ChevronDownGlyph size={13} />
           </button>
-          <button type="button" className="explore-map-toggle" aria-pressed={mapOn} onClick={() => setMapOn((v) => !v)}>
+          <Link to="/explore/map" className="explore-map-toggle">
             <MapGlyph size={15} />
-            {mapOn ? 'Hide map' : 'Map'}
-          </button>
+            Full map
+          </Link>
         </div>
 
         <div className="chip-row explore-filters" role="group" aria-label="Show">
@@ -240,7 +206,8 @@ export default function Explore() {
           ))}
         </div>
 
-        {mapOn ? <CityMap pins={pins} home={home} radiusKm={radius} areaLabel={t('discover.explore.nearYou')} onArea={() => setAreaSheet(true)} className="explore-map" /> : null}
+        {/* The map leads Explore: businesses, public places and clubs around you. Day trips are outside it. */}
+        {filter !== 'trips' ? <ExploreMap category={onMap} /> : null}
 
         {mustTries.length ? (
           <section className="section" aria-labelledby="friend-picks-title">
