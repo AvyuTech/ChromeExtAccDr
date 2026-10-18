@@ -9,7 +9,7 @@ import { CalendarGlyph, CheckGlyph, ChevronRightGlyph, NamedGlyph, PinGlyph, Rep
 import { compact } from '../lib/format';
 import { DEFAULT_APP_DATA, useAppData, type AppData } from '../state/appData';
 import { useToast } from '../state/toast';
-import { Avatar, ClubTag, Cover, FaceStack, ShareButton } from './cards';
+import { Avatar, ClubTag, Cover, FaceStack, ShareButton, Votes } from './cards';
 import { useIdentity } from './identity';
 import { Sheet } from './ui';
 
@@ -216,11 +216,12 @@ function PlanHead({ hostId, club, what }: { hostId: string; club: Group; what: s
   );
 }
 
-/** The same action row as any post: replies on the left, share on the right. */
-function PlanActions({ club, replies, title }: { club: Group; replies: number; title: string }) {
+/** The same action row as any post: votes and replies on the left, share on the right. */
+function PlanActions({ id, upvotes, club, replies, title }: { id: string; upvotes: number; club: Group; replies: number; title: string }) {
   const t = useT();
   return (
     <div className="feed-post__actions">
+      <Votes id={id} up={upvotes} />
       <Link to={`/clubs/${club.id}`} className="feed-action" aria-label={`${t('common.replies', { n: replies })} · ${t('clubs.post.open', { club: club.name })}`}>
         <ReplyGlyph size={20} />
         {replies}
@@ -277,7 +278,7 @@ export function MeetupPost({ meetup, club }: { meetup: Meetup; club: Group }) {
           {left !== undefined ? ` · ${left > 0 ? t('clubs.spotsLeft', { n: left }) : t('clubs.full')}` : ''}
         </span>
       </div>
-      <PlanActions club={club} replies={meetup.replies ?? 0} title={meetup.title} />
+      <PlanActions id={meetup.id} upvotes={meetup.upvotes ?? 0} club={club} replies={meetup.replies ?? 0} title={meetup.title} />
     </article>
   );
 }
@@ -319,7 +320,7 @@ export function BuyPost({ buy, club }: { buy: GroupBuy; club: Group }) {
           {t('clubs.progress', { n: ids.length, target: buy.target })} · {enough ? t('clubs.post.enough') : t('clubs.moreNeeded', { n: buy.target - ids.length })}
         </span>
       </div>
-      <PlanActions club={club} replies={buy.replies ?? 0} title={buy.title} />
+      <PlanActions id={buy.id} upvotes={buy.upvotes ?? 0} club={club} replies={buy.replies ?? 0} title={buy.title} />
     </article>
   );
 }

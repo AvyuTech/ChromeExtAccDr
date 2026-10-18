@@ -1,22 +1,30 @@
 import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { placePhoto } from '../assets/photos';
-import { AnswerCard, Avatar, ClubTag, ShareButton } from '../components/cards';
+import { AnswerCard, Avatar, ClubTag, ShareButton, Votes } from '../components/cards';
+import { ReplyThread } from '../components/thread';
 import { EmptyState, PageHeader, Sheet, Tile } from '../components/ui';
 import { person } from '../data/core';
 import { placeById } from '../data/places';
 import { groupById, POSTS, postById } from '../data/social';
 import type { Post, Reply, SourceId } from '../data/types';
 import { useT } from '../i18n';
-import { FlagGlyph, ReplyGlyph, SaveGlyph, UpvoteGlyph } from '../icons';
-import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
+import { FlagGlyph, ReplyGlyph, SaveGlyph } from '../icons';
+import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 import { identityOf } from '../data/identity';
 import { LevelTag } from '../components/helpful';
 import { levelFor } from '../lib/helpful';
+import { buildThread, type ReplyOrder } from '../lib/thread';
 
 const REASONS = ['spam', 'wrong', 'rude', 'private', 'other'] as const;
+
+const ORDERS: Array<{ id: ReplyOrder; label: string }> = [
+  { id: 'helpful', label: 'Most helpful' },
+  { id: 'top', label: 'Top' },
+  { id: 'new', label: 'New' },
+];
 
 /** Which kinds of source a thread summary drew on, read from its basis line. */
 function summarySources(basis: string): SourceId[] {
@@ -62,34 +70,25 @@ function PostView({ post }: { post: Post }) {
   const [draft, setDraft] = useState('');
   const [flagOpen, setFlagOpen] = useState(false);
   const [reason, setReason] = useState<(typeof REASONS)[number] | null>(null);
-  const [likedReplies, setLikedReplies] = useState<string[]>([]);
-  const [order, setOrder] = useState<'helpful' | 'newest'>('helpful');
+  const [order, setOrder] = useState<ReplyOrder>('helpful');
+  const [replyTo, setReplyTo] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const author = person(post.authorId);
   const group = post.groupId ? (data.myClubs.find((c) => c.id === post.groupId) ?? groupById(post.groupId)) : undefined;
   const work = identityOf(post.authorId).work;
-  const up = has('upvoted', post.id);
   const saved = has('savedPosts', post.id);
-  // Seed counts already include this person's vote for posts upvoted in the sample data.
-  const upCount = post.upvotes + (up ? 1 : 0) - (DEFAULT_APP_DATA.upvoted.includes(post.id) ? 1 : 0);
   const showSummary = settings.ai.answers && settings.ai.summariseThreads && post.answer;
   const allowed = enabledSources(settings);
 
   const mine = data.myReplies[post.id];
-  // Most helpful: marked helpful first, then people known for helping (by level), then upvotes.
-  // Newest: yours, then the latest replies.
-  const replies = useMemo(
-    () =>
-      order === 'helpful'
-        ? [...post.replies]
-            .sort((a, b) => Number(!!b.helpful) - Number(!!a.helpful) || levelFor(b.authorId).index - levelFor(a.authorId).index || b.upvotes - a.upvotes)
-            .concat(mine ?? [])
-        : [...(mine ?? [])].reverse().concat([...post.replies].reverse()),
-    [post.replies, mine, order],
-  );
+  const replies = useMemo(() => [...post.replies, ...(mine ?? [])], [post.replies, mine]);
+  // Most helpful: marked helpful, then people known for helping (by level), then votes. Top: votes. New: newest.
+  const thread = useMemo(() => buildThread(replies, order, (id) => levelFor(id).index), [replies, order]);
   const replyTotal = post.replyCount + (mine?.length ?? 0);
+  const replyingTo = replyTo ? replies.find((r) => r.id === replyTo) : undefined;
+  const replyingName = replyingTo ? (replyingTo.authorId === 'me' ? 'yourself' : person(replyingTo.authorId).name.split(' ')[0]) : undefined;
 
   const related = useMemo(
     () => POSTS.filter((p) => p.id !== post.id && (p.topic === post.topic || p.type === post.type || (post.groupId && p.groupId === post.groupId))).slice(0, 3),
@@ -100,9 +99,10 @@ function PostView({ post }: { post: Post }) {
     e?.preventDefault();
     const text = draft.trim();
     if (!text) return;
-    const reply: Reply = { id: `my-reply-${Date.now()}`, authorId: 'me', text, ago: 'now', upvotes: 0 };
+    const reply: Reply = { id: `my-reply-${Date.now()}`, authorId: 'me', text, ago: 'now', upvotes: 0, ...(replyTo ? { parentId: replyTo } : {}) };
     addReply(post.id, reply);
     setDraft('');
+    setReplyTo(null);
     if (inputRef.current) inputRef.current.style.height = '';
     toast(t('social.replyPosted'));
     window.setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 60);
@@ -143,18 +143,15 @@ function PostView({ post }: { post: Post }) {
           </div>
           <p className="post-detail__text">{post.text}</p>
           <div className="feed-post__actions">
+            <Votes id={post.id} up={post.upvotes} down={post.downvotes} />
             <button
               type="button"
               className="feed-action"
-              aria-pressed={up}
-              aria-label={`Upvote, ${upCount}`}
-              style={up ? { color: 'var(--accent)' } : undefined}
-              onClick={() => toggle('upvoted', post.id)}
+              onClick={() => {
+                setReplyTo(null);
+                inputRef.current?.focus();
+              }}
             >
-              <UpvoteGlyph size={20} active={up} />
-              {upCount}
-            </button>
-            <button type="button" className="feed-action" onClick={() => inputRef.current?.focus()}>
               <ReplyGlyph size={20} />
               {replyTotal === 1 ? t('social.oneReply') : t('common.replies', { n: replyTotal })}
             </button>
@@ -215,9 +212,9 @@ function PostView({ post }: { post: Post }) {
             </h2>
             {replies.length > 1 ? (
               <div className="replies-order" role="group" aria-label="Order replies">
-                {(['helpful', 'newest'] as const).map((o) => (
-                  <button key={o} type="button" aria-pressed={order === o} onClick={() => setOrder(o)}>
-                    {o === 'helpful' ? 'Most helpful' : 'Newest'}
+                {ORDERS.map((o) => (
+                  <button key={o.id} type="button" aria-pressed={order === o.id} onClick={() => setOrder(o.id)}>
+                    {o.label}
                   </button>
                 ))}
               </div>
@@ -226,47 +223,21 @@ function PostView({ post }: { post: Post }) {
           {replies.length === 0 ? (
             <p className="body-sm muted">{t('social.noReplies')}</p>
           ) : (
-            <div className="list social-list">
-              {replies.map((r) => {
-                const who = person(r.authorId);
-                const liked = likedReplies.includes(r.id);
-                return (
-                  <div key={r.id} className={`reply${r.helpful ? ' reply--helpful' : ''}${r.authorId === 'me' ? ' reply--mine' : ''}`}>
-                    <Avatar who={who} size={30} />
-                    <div className="stack grow" style={{ gap: 2 }}>
-                      <div className="reply__head">
-                        <span className="strong" style={{ fontSize: '0.8125rem' }}>
-                          {r.authorId === 'me' ? t('social.you') : who.name}
-                        </span>
-                        {identityOf(r.authorId).work ? <span className="meta">· {identityOf(r.authorId).work!.title}</span> : null}
-                        <LevelTag personId={r.authorId} topic={post.topic} />
-                        {r.helpful ? <span className="badge badge--sm">{t('social.helpful')}</span> : null}
-                        <span className="meta">· {r.ago}</span>
-                      </div>
-                      <p className="reply__text">{r.text}</p>
-                      <div className="reply__actions">
-                        <button
-                          type="button"
-                          className="feed-action"
-                          aria-pressed={liked}
-                          aria-label={`Upvote reply, ${r.upvotes + (liked ? 1 : 0)}`}
-                          style={{ color: liked ? 'var(--accent)' : 'var(--muted)', fontSize: '0.75rem', height: 24 }}
-                          onClick={() => setLikedReplies((xs) => (liked ? xs.filter((x) => x !== r.id) : [...xs, r.id]))}
-                        >
-                          <UpvoteGlyph size={15} active={liked} />
-                          {r.upvotes + (liked ? 1 : 0)}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <ReplyThread
+              key={order}
+              nodes={thread}
+              postAuthorId={post.authorId}
+              topic={post.topic}
+              onReply={(rid) => {
+                setReplyTo(rid);
+                inputRef.current?.focus();
+              }}
+            />
           )}
           {replies.length && replies.length < replyTotal ? (
             <p className="replies-more">
               Showing {replies.length} of {replyTotal}
-              {order === 'helpful' ? ', most helpful first' : ''}
+              {order === 'helpful' ? ', most helpful first' : order === 'top' ? ', most votes first' : ', newest first'}
             </p>
           ) : null}
           <div ref={endRef} />
@@ -296,7 +267,15 @@ function PostView({ post }: { post: Post }) {
         ) : null}
       </main>
 
-      <form className="composer-bar composer-bar--reply" onSubmit={send}>
+      <form className={`composer-bar composer-bar--reply${replyingTo ? ' is-replying' : ''}`} onSubmit={send}>
+        {replyingTo ? (
+          <span className="composer-bar__to">
+            Replying to {replyingName}
+            <button type="button" aria-label="Reply to the post instead" onClick={() => setReplyTo(null)}>
+              ×
+            </button>
+          </span>
+        ) : null}
         <Avatar who={{ ...person('me'), verified: false }} size={30} />
         <label htmlFor="reply-input" className="sr-only">
           {t('social.writeReply')}
@@ -308,7 +287,7 @@ function PostView({ post }: { post: Post }) {
           rows={1}
           value={draft}
           maxLength={500}
-          placeholder={`Reply to ${author.name.split(' ')[0]}…`}
+          placeholder={`Reply to ${replyingName ?? author.name.split(' ')[0]}…`}
           onChange={(e) => {
             setDraft(e.target.value);
             e.target.style.height = 'auto';

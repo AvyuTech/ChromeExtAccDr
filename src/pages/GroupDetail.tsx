@@ -6,11 +6,12 @@ import { IconAction, ProfileHead, useShare } from '../components/discover';
 import { HeroRow, useBoardContext } from '../components/helpful';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { person } from '../data/core';
-import { POSTS } from '../data/social';
+import { CLUB_POSTS, POSTS } from '../data/social';
 import { useT } from '../i18n';
 import { CalendarGlyph, ChatGlyph, CheckGlyph, GlobeGlyph, LockGlyph, NamedGlyph, ShareGlyph, UsersGlyph } from '../icons';
 import { compact } from '../lib/format';
 import { clubMemberIds, leaderboard } from '../lib/helpful';
+import { ageMinutes, hotScore, netScore } from '../lib/thread';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
 
@@ -22,6 +23,7 @@ export default function GroupDetail() {
   const { data, has, add, remove } = useAppData();
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [plan, setPlan] = useState<PlanMode | null>(null);
+  const [sort, setSort] = useState<'hot' | 'new' | 'top'>('hot');
   const club = clubById(id, data);
   const boardCtx = useBoardContext();
 
@@ -47,7 +49,12 @@ export default function GroupDetail() {
   const joined = has('joinedGroups', club.id);
   const meetups = meetupsOf(club, data);
   const buys = buysOf(club, data);
-  const posts = [...data.myPosts, ...POSTS].filter((p) => p.groupId === club.id);
+  const all = [...data.myPosts, ...CLUB_POSTS, ...POSTS].filter((p) => p.groupId === club.id);
+  const pinned = all.filter((p) => p.pinned);
+  // Hot: votes that fade with age. New: newest first. Top: most votes.
+  const posts = all
+    .filter((p) => !p.pinned)
+    .sort((a, b) => (sort === 'new' ? ageMinutes(a.ago) - ageMinutes(b.ago) : sort === 'top' ? netScore(b) - netScore(a) : hotScore(b) - hotScore(a)));
   const admins = club.admins.map((a) => (a === 'me' ? 'you' : person(a).name)).join(' and ');
   // Faces people will recognise: admins, then whoever is turning up to meetups.
   const people = Array.from(new Set([...(joined ? ['me'] : []), ...club.admins, ...meetups.flatMap((m) => m.going)])).filter((x) => x !== 'me' || joined);
@@ -198,8 +205,20 @@ export default function GroupDetail() {
               </Link>
             ) : null}
           </div>
-          {posts.length ? (
+          {posts.length > 1 ? (
+            <div className="replies-order" role="group" aria-label="Order posts">
+              {(['hot', 'new', 'top'] as const).map((o) => (
+                <button key={o} type="button" aria-pressed={sort === o} onClick={() => setSort(o)}>
+                  {o === 'hot' ? 'Hot' : o === 'new' ? 'New' : 'Top'}
+                </button>
+              ))}
+            </div>
+          ) : null}
+          {pinned.length || posts.length ? (
             <div className="feed">
+              {pinned.map((p) => (
+                <PostCard key={p.id} post={p} note="Pinned by the club’s admins" />
+              ))}
               {posts.map((p) => (
                 <PostCard key={p.id} post={p} />
               ))}

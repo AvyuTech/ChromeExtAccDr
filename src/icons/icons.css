@@ -780,6 +780,24 @@
 .glyph--upvote.is-active .upvote__burst {
   animation: burst 0.6s ease-out;
 }
+.glyph--downvote .downvote__arrow {
+  transform-box: fill-box;
+  transform-origin: center top;
+}
+.glyph--downvote.is-active .g-tint {
+  opacity: 1;
+}
+.glyph--downvote.is-active .downvote__arrow {
+  animation: down-spring 0.4s ease-out;
+}
+@keyframes down-spring {
+  0% {
+    transform: translateY(-3px) scaleY(0.85);
+  }
+  100% {
+    transform: none;
+  }
+}
 @keyframes up-spring {
   0% {
     transform: translateY(3px) scaleY(0.85);

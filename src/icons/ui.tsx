@@ -645,3 +645,4 @@ export function SquiggleMark({ width = 34, className }: { width?: number; classN
     </svg>
   );
 }
+export const PushPinGlyph = g('pushpin', <path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6zM12 14v7" />);

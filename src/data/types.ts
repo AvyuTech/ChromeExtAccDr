@@ -172,6 +172,8 @@ export interface Post {
   seenInReels?: number;
   trending?: boolean;
   groupId?: string;
+  /** Pinned by the club's admins: stays at the top of the club, never in the Home feed. */
+  pinned?: boolean;
 }
 
 export type AlertKind = 'traffic' | 'weather' | 'water' | 'power' | 'safety' | 'health' | 'civic';

@@ -15,10 +15,10 @@ export const GROUPS: Group[] = [
     privacy: 'neighbours',
     kind: 'neighbours',
     areaId: 'bodakdev',
-    meetups: [{ id: 'm-clean', title: 'Lane clean-up and chai', when: 'Sun, 7 am', where: 'Judges Bungalow Rd, near the park gate', hostId: 'aditi', going: ['aditi', 'harsh', 'dev', 'farah'], note: 'Gloves and bags provided. Chai after, on the corner.' , replies: 8 }],
+    meetups: [{ id: 'm-clean', title: 'Lane clean-up and chai', when: 'Sun, 7 am', where: 'Judges Bungalow Rd, near the park gate', hostId: 'aditi', going: ['aditi', 'harsh', 'dev', 'farah'], note: 'Gloves and bags provided. Chai after, on the corner.' , replies: 8, upvotes: 31 }],
     buys: [
-      { id: 'b-solar', title: 'Rooftop solar for 10 homes', hostId: 'harsh', note: 'Installers quote about 15% less when ten homes sign up together. I’m collecting names, then we compare quotes as a group.', target: 10, joined: ['harsh', 'dev', 'aditi', 'meera', 'farah', 'nikhil'], ends: 'Ends in 9 days' , replies: 14 },
-      { id: 'b-car', title: 'Buying a mid-size SUV? Let’s go together', hostId: 'dev', note: 'Dealers give a fleet discount for 3 or more cars from one showroom. Two of us are buying this month.', target: 3, joined: ['dev', 'harsh'], ends: 'Ends Sunday' , replies: 5 },
+      { id: 'b-solar', title: 'Rooftop solar for 10 homes', hostId: 'harsh', note: 'Installers quote about 15% less when ten homes sign up together. I’m collecting names, then we compare quotes as a group.', target: 10, joined: ['harsh', 'dev', 'aditi', 'meera', 'farah', 'nikhil'], ends: 'Ends in 9 days' , replies: 14, upvotes: 38 },
+      { id: 'b-car', title: 'Buying a mid-size SUV? Let’s go together', hostId: 'dev', note: 'Dealers give a fleet discount for 3 or more cars from one showroom. Two of us are buying this month.', target: 3, joined: ['dev', 'harsh'], ends: 'Ends Sunday' , replies: 5, upvotes: 9 },
     ],
   },
   {
@@ -35,7 +35,7 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'food',
     areaId: 'navrangpura',
-    meetups: [{ id: 'm-manek', title: 'Manek Chowk night walk', when: 'Fri, 9:30 pm', where: 'Manek Chowk, by the main gate', hostId: 'riya', going: ['riya', 'zoya', 'sana', 'karan', 'aditi'], spots: 12, note: 'Sandwich, pav bhaji, kulfi. Everyone pays for themselves.' , replies: 17 }],
+    meetups: [{ id: 'm-manek', title: 'Manek Chowk night walk', when: 'Fri, 9:30 pm', where: 'Manek Chowk, by the main gate', hostId: 'riya', going: ['riya', 'zoya', 'sana', 'karan', 'aditi'], spots: 12, note: 'Sandwich, pav bhaji, kulfi. Everyone pays for themselves.' , replies: 17, upvotes: 44 }],
   },
   {
     id: 'west-commuters',
@@ -51,7 +51,7 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'neighbours',
     areaId: 'sg-highway',
-    meetups: [{ id: 'm-carpool', title: 'Weekday carpool to SG Highway', when: 'Mon–Fri, 9 am', where: 'Bodakdev → Iscon', hostId: 'nikhil', going: ['nikhil', 'kavya'], spots: 4 , replies: 3 }],
+    meetups: [{ id: 'm-carpool', title: 'Weekday carpool to SG Highway', when: 'Mon–Fri, 9 am', where: 'Bodakdev → Iscon', hostId: 'nikhil', going: ['nikhil', 'kavya'], spots: 4 , replies: 3, upvotes: 7 }],
   },
   {
     id: 'parents-thaltej',
@@ -67,8 +67,8 @@ export const GROUPS: Group[] = [
     privacy: 'neighbours',
     kind: 'parents',
     areaId: 'thaltej',
-    meetups: [{ id: 'm-playdate', title: 'Saturday playdate in the park', when: 'Sat, 5 pm', where: 'Thaltej garden, near the swings', hostId: 'sana', going: ['sana', 'kavya', 'priyank'] , replies: 4 }],
-    buys: [{ id: 'b-books', title: 'Class 6 textbooks in bulk', hostId: 'sana', note: 'The stationer on the main road gives 20% off for 15 or more sets.', target: 15, joined: ['sana', 'kavya', 'priyank', 'meera', 'aditi', 'farah', 'zoya', 'dev', 'arjun'], ends: 'Ends in 4 days' , replies: 11 }],
+    meetups: [{ id: 'm-playdate', title: 'Saturday playdate in the park', when: 'Sat, 5 pm', where: 'Thaltej garden, near the swings', hostId: 'sana', going: ['sana', 'kavya', 'priyank'] , replies: 4, upvotes: 12 }],
+    buys: [{ id: 'b-books', title: 'Class 6 textbooks in bulk', hostId: 'sana', note: 'The stationer on the main road gives 20% off for 15 or more sets.', target: 15, joined: ['sana', 'kavya', 'priyank', 'meera', 'aditi', 'farah', 'zoya', 'dev', 'arjun'], ends: 'Ends in 4 days' , replies: 11, upvotes: 27 }],
   },
   {
     id: 'green-amdavad',
@@ -84,7 +84,7 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'outdoors',
     areaId: 'vastrapur',
-    meetups: [{ id: 'm-trees', title: 'Plant 50 trees by the lake', when: 'Sun, 7 am', where: 'Vastrapur Lake, east gate', hostId: 'farah', going: ['farah', 'aditi', 'nikhil', 'kavya', 'meera', 'arjun'], spots: 40 , replies: 12 }],
+    meetups: [{ id: 'm-trees', title: 'Plant 50 trees by the lake', when: 'Sun, 7 am', where: 'Vastrapur Lake, east gate', hostId: 'farah', going: ['farah', 'aditi', 'nikhil', 'kavya', 'meera', 'arjun'], spots: 40 , replies: 12, upvotes: 52 }],
   },
   {
     id: 'pickleball-ahd',
@@ -100,7 +100,7 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'sports',
     areaId: 'thaltej',
-    meetups: [{ id: 'm-pickle', title: 'Beginners’ doubles', when: 'Today, 7 pm', where: 'Pickle & Play, Thaltej', hostId: 'karan', going: ['karan', 'nikhil', 'riya'], spots: 8, note: 'Court split four ways; paddles to borrow.' , replies: 6 }],
+    meetups: [{ id: 'm-pickle', title: 'Beginners’ doubles', when: 'Today, 7 pm', where: 'Pickle & Play, Thaltej', hostId: 'karan', going: ['karan', 'nikhil', 'riya'], spots: 8, note: 'Court split four ways; paddles to borrow.' , replies: 6, upvotes: 16 }],
   },
   {
     id: 'founders-prahlad',
@@ -116,8 +116,8 @@ export const GROUPS: Group[] = [
     privacy: 'neighbours',
     kind: 'founders',
     areaId: 'prahlad-nagar',
-    meetups: [{ id: 'm-founders', title: 'Founders’ breakfast', when: 'Sat, 8 am', where: 'The Quiet Cup, Prahlad Nagar', hostId: 'priyank', going: ['priyank', 'arjun', 'riya', 'karan', 'meera'], spots: 12, note: 'This week: hiring your first five people.' , replies: 10 }],
-    buys: [{ id: 'b-chairs', title: 'Ergonomic chairs for small teams', hostId: 'arjun', note: 'A Naroda maker sells at about 25% off for 20 chairs or more. Split across teams.', target: 20, joined: ['arjun', 'priyank', 'meera', 'karan'], ends: 'Ends in 2 weeks' , replies: 6 }],
+    meetups: [{ id: 'm-founders', title: 'Founders’ breakfast', when: 'Sat, 8 am', where: 'The Quiet Cup, Prahlad Nagar', hostId: 'priyank', going: ['priyank', 'arjun', 'riya', 'karan', 'meera'], spots: 12, note: 'This week: hiring your first five people.' , replies: 10, upvotes: 23 }],
+    buys: [{ id: 'b-chairs', title: 'Ergonomic chairs for small teams', hostId: 'arjun', note: 'A Naroda maker sells at about 25% off for 20 chairs or more. Split across teams.', target: 20, joined: ['arjun', 'priyank', 'meera', 'karan'], ends: 'Ends in 2 weeks' , replies: 6, upvotes: 14 }],
   },
   {
     id: 'sunday-cricket',
@@ -133,8 +133,8 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'sports',
     areaId: 'vastrapur',
-    meetups: [{ id: 'm-cricket', title: 'Sunday morning match', when: 'Sun, 6:30 am', where: 'Vastrapur ground', hostId: 'karan', going: ['karan', 'dev', 'nikhil', 'harsh', 'arjun', 'priyank', 'kavya', 'zoya', 'riya', 'aditi', 'meera', 'sana', 'farah'], spots: 22 , replies: 21 }],
-    buys: [{ id: 'b-kit', title: 'Club jerseys, 15 or more', hostId: 'dev', note: 'A printer in Satellite does custom jerseys at a bulk price for 15+.', target: 15, joined: ['dev', 'karan', 'harsh', 'arjun', 'nikhil', 'priyank', 'kavya'], ends: 'Ends Friday' , replies: 9 }],
+    meetups: [{ id: 'm-cricket', title: 'Sunday morning match', when: 'Sun, 6:30 am', where: 'Vastrapur ground', hostId: 'karan', going: ['karan', 'dev', 'nikhil', 'harsh', 'arjun', 'priyank', 'kavya', 'zoya', 'riya', 'aditi', 'meera', 'sana', 'farah'], spots: 22 , replies: 21, upvotes: 41 }],
+    buys: [{ id: 'b-kit', title: 'Club jerseys, 15 or more', hostId: 'dev', note: 'A printer in Satellite does custom jerseys at a bulk price for 15+.', target: 15, joined: ['dev', 'karan', 'harsh', 'arjun', 'nikhil', 'priyank', 'kavya'], ends: 'Ends Friday' , replies: 9, upvotes: 19 }],
   },
   {
     id: 'book-club-navrangpura',
@@ -166,11 +166,16 @@ export const POSTS: Post[] = [
     topic: 'Food',
     text: 'Any quiet café for a weekend brunch where I can also work for 2–3 hours? Good Wi-Fi is a must.',
     upvotes: 42,
+    downvotes: 2,
     replyCount: 18,
     replies: [
       { id: 'r1', authorId: 'aditi', text: 'The Quiet Cup before noon. After 6 pm it gets loud, but mornings are great.', ago: '1h', upvotes: 14, helpful: true },
-      { id: 'r2', authorId: 'nikhil', text: 'Corner Table in Bodakdev. Wi-Fi is properly fast, but there’s a ₹250 minimum per person.', ago: '1h', upvotes: 9 },
+      { id: 'r1a', authorId: 'riya', text: 'Do they mind if you sit for three hours?', ago: '58m', upvotes: 3, parentId: 'r1' },
+      { id: 'r1b', authorId: 'aditi', text: 'Not on weekdays. Order a second coffee around noon and nobody minds.', ago: '52m', upvotes: 6, parentId: 'r1a' },
+      { id: 'r2', authorId: 'nikhil', text: 'Corner Table in Bodakdev. Wi-Fi is properly fast, but there’s a ₹250 minimum per person.', ago: '1h', upvotes: 9, downvotes: 1 },
+      { id: 'r2a', authorId: 'zoya', text: 'The minimum goes towards your order, so it’s really just one meal.', ago: '55m', upvotes: 4, parentId: 'r2' },
       { id: 'r3', authorId: 'meera', text: 'Brew Lab on CG Road if you don’t mind a bit of buzz. Great coffee.', ago: '48m', upvotes: 6 },
+      { id: 'r3x', authorId: 'rohan', text: 'Try Café Aroma, best café in the city!!! DM us for a 20% discount code', ago: '40m', upvotes: 1, downvotes: 9 },
     ],
     answer: {
       text: 'Locals mention **The Quiet Cup** (calm before noon), **Corner Table** (fast Wi-Fi, ₹250 minimum) and **Brew Lab** on CG Road.',
@@ -188,9 +193,12 @@ export const POSTS: Post[] = [
     topic: 'New place',
     text: 'Has anyone tried the new Korean spot on Sindhu Bhavan Road? Worth the hype or just reels?',
     upvotes: 27,
+    downvotes: 3,
     replyCount: 9,
     replies: [
       { id: 'r4', authorId: 'aditi', text: 'Went Friday. Ramen was good, wait was 40 min after 8 pm. Go early.', ago: '4h', upvotes: 11, helpful: true },
+      { id: 'r4a', authorId: 'karan', text: 'Is the wait shorter on weekdays?', ago: '4h', upvotes: 2, parentId: 'r4' },
+      { id: 'r4b', authorId: 'aditi', text: 'Much shorter. We walked straight in on a Tuesday at 8.', ago: '3h', upvotes: 5, parentId: 'r4a' },
       { id: 'r5', authorId: 'sana', text: 'Bibimbap was fine, ramen is the reason to go.', ago: '3h', upvotes: 4 },
     ],
     answer: {
@@ -284,7 +292,42 @@ export const POSTS: Post[] = [
   },
 ];
 
-export const postById = (id: string) => POSTS.find((p) => p.id === id);
+/** Notes club admins pinned to the top of their club. They live in the club, not the Home feed. */
+export const CLUB_POSTS: Post[] = [
+  {
+    id: 'foodies-rules',
+    type: 'recommendation',
+    authorId: 'riya',
+    area: 'Prahlad Nagar',
+    ago: '3w',
+    topic: 'Club notes',
+    text: 'Welcome to Amdavad Foodies. Three house rules: say where and when you went, say if you were invited or got anything free, and don’t promote a place you own or work at. Owners are welcome to answer questions about their place; their replies carry an Owner tag.',
+    upvotes: 128,
+    replyCount: 2,
+    replies: [
+      { id: 'fr1', authorId: 'zoya', text: 'Thank you for the “say if it was free” rule. It’s why reviews here mean something.', ago: '3w', upvotes: 41 },
+      { id: 'fr2', authorId: 'riya', text: 'Exactly. Posts that break it get voted down and folded; repeat promoters are removed by admins.', ago: '3w', upvotes: 22, parentId: 'fr1' },
+    ],
+    groupId: 'amdavad-foodies',
+    pinned: true,
+  },
+  {
+    id: 'bodakdev-water-pinned',
+    type: 'alert',
+    authorId: 'aditi',
+    area: 'Bodakdev',
+    ago: '2w',
+    topic: 'Water',
+    text: 'Water supply in Bodakdev this month: 6–8 am and 6–7:30 pm. The ward desk tells us about changes and we update this post.',
+    upvotes: 96,
+    replyCount: 1,
+    replies: [{ id: 'bw1', authorId: 'ward', text: 'Confirmed for this month. Maintenance days are posted as city alerts.', ago: '2w', upvotes: 30, helpful: true }],
+    groupId: 'bodakdev-neighbours',
+    pinned: true,
+  },
+];
+
+export const postById = (id: string) => POSTS.find((p) => p.id === id) ?? CLUB_POSTS.find((p) => p.id === id);
 
 export const NOTIFICATIONS: AppNotification[] = [
   { id: 'nf1', kind: 'friend', title: 'Aditi had Kimchi pancake at Seoul Bowl', body: 'Must try. It’s on your Want to try list.', ago: '5m', day: 'today', link: '/checkin/ci-aditi-seoul', actorId: 'aditi' },

@@ -307,6 +307,15 @@ export function UpvoteGlyph(p: GlyphProps) {
   );
 }
 
+export function DownvoteGlyph(p: GlyphProps) {
+  return (
+    <Glyph name="downvote" {...p}>
+      <path className="downvote__arrow g-tint" d="M12 20l-7-8h4V4h6v8h4z" />
+      <path className="downvote__arrow" d="M12 20l-7-8h4V4h6v8h4z" />
+    </Glyph>
+  );
+}
+
 export function SaveGlyph(p: GlyphProps) {
   return (
     <Glyph name="save" {...p}>

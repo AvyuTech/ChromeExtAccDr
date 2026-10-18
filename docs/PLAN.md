@@ -85,6 +85,17 @@ Trust comes from knowing who is talking. Every member's profile shows:
 
 Only verified residents can post, review and run clubs.
 
+## Borrowed from Reddit: votes, threads, sorting
+
+Reddit's best ideas keep good answers on top without anyone in charge. Nearhood uses them, with real names:
+
+- **Up and down votes** on every post, reply, meetup and group buy (▲ score ▼). One vote each; tap again to take it back. Only verified residents' votes count. Friends' check-ins keep a simple like, because a check-in is someone's own experience, not an answer to rank.
+- **Down votes sink, they never punish:** they don't take helpful points away. A reply at −4 or lower starts *folded* ("folded by neighbours' votes") but is never deleted, so anyone can open it.
+- **Threads:** reply to a reply; conversations nest under the answer they're about. Tap the line beside a thread to fold it. The person who posted is tagged *Author*.
+- **Sorting replies:** *Most helpful* (marked helpful, then people known for helping, then votes), *Top* (votes) and *New*.
+- **Sorting a club:** *Hot* (votes that fade with age), *New* and *Top*. Admins can pin a note (house rules, water timings) to the top of their club; pinned notes stay in the club and never enter the Home feed.
+- **Not borrowed:** anonymous accounts, paid awards, karma for posting volume, and subreddit-style mods who can delete anything. Admins can pin and remove rule-breaking posts; votes do the rest.
+
 ## Helpful points, levels and City heroes
 
 Nearhood rewards being useful to other people, not posting a lot. Points only come from what *other verified people* do with your contribution; posting, checking in or commenting earns nothing on its own.
@@ -106,7 +117,7 @@ Nearhood rewards being useful to other people, not posting a lot. Points only co
 | Your post was removed after reports | −50 |
 | A check-in of yours was confirmed fake | −100, level frozen for 30 days |
 
-**Fair play:** at most 100 points a day; the same person's votes count once a week; unverified accounts' votes don't count; pairs who keep voting for each other are zeroed; points can never be bought.
+**Fair play:** down votes never take points away (they only sink and fold); at most 100 points a day; the same person's votes count once a week; unverified accounts' votes don't count; pairs who keep voting for each other are zeroed; points can never be bought.
 
 **Levels** (lifetime points plus trust checks; a level waits until the check is done)
 

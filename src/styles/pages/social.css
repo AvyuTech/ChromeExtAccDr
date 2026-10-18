@@ -180,6 +180,130 @@
   align-items: center;
   gap: 4px;
 }
+
+/* ---------- Threads: replies to replies, folding, votes ---------- */
+.thread {
+  margin: 0 calc(var(--gutter) * -1);
+}
+.thread > .reply-node + .reply-node {
+  border-top: 1px solid var(--divider);
+}
+.thread .reply {
+  border-bottom: none;
+}
+.reply-children {
+  position: relative;
+  margin-left: calc(var(--gutter) + 14px);
+}
+.reply-children .reply {
+  padding-left: 16px;
+  padding-top: 6px;
+}
+/* The line beside a thread folds it, as on Reddit. */
+.thread-line {
+  position: absolute;
+  top: 0;
+  bottom: 10px;
+  left: -8px;
+  width: 16px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+.thread-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 7px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--divider);
+}
+.thread-line:hover::before,
+.thread-line:focus-visible::before {
+  background: var(--ink-3);
+}
+.reply--folded {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px var(--gutter);
+  border: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  text-align: left;
+  cursor: pointer;
+}
+.reply-children .reply--folded {
+  padding-left: 16px;
+}
+.reply--folded__plus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--border-strong);
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+.reply--folded .meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reply__act {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 6px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.reply__act:hover {
+  color: var(--ink);
+}
+.op-tag {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+.composer-bar--reply.is-replying {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.composer-bar__to {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.composer-bar__to button {
+  padding: 0 4px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
 .reason-option {
   display: flex;
   align-items: center;

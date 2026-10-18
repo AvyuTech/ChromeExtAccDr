@@ -20,6 +20,8 @@ import {
   SparkGlyph,
   TrustRing,
   UpvoteGlyph,
+  DownvoteGlyph,
+  PushPinGlyph,
   type GlyphName,
 } from '../icons';
 import { compact, km, price, priceLevel } from '../lib/format';
@@ -165,7 +167,7 @@ export function AnswerCard({
 }
 
 /* ---------- Feed post ---------- */
-export function PostCard({ post }: { post: Post }) {
+export function PostCard({ post, note }: { post: Post; /** A line above the post, e.g. "Pinned by the club's admins". */ note?: string }) {
   const t = useT();
   const navigate = useNavigate();
   const { settings } = useSettings();
@@ -176,10 +178,8 @@ export function PostCard({ post }: { post: Post }) {
   const work = useIdentity(post.authorId).work;
   // Posted in a club: name it, so the feed says where the conversation lives.
   const club = post.groupId ? (data.myClubs.find((c) => c.id === post.groupId) ?? groupById(post.groupId)) : undefined;
-  const up = has('upvoted', post.id);
   const saved = has('savedPosts', post.id);
   // Sample counts for posts upvoted in the seed data already include this person's vote.
-  const upCount = post.upvotes + (up ? 1 : 0) - (DEFAULT_APP_DATA.upvoted.includes(post.id) ? 1 : 0);
   const myReplies = data.myReplies[post.id]?.length ?? 0;
   const helpful = post.replies.find((r) => r.helpful) ?? post.replies[0];
   const showAnswer = settings.ai.answers && settings.ai.summariseThreads && post.answer;
@@ -188,6 +188,12 @@ export function PostCard({ post }: { post: Post }) {
 
   return (
     <article className="feed-post">
+      {note ? (
+        <span className="feed-post__pin">
+          <PushPinGlyph size={12} />
+          {note}
+        </span>
+      ) : null}
       <div className="feed-post__head">
         <Link to={post.authorId === 'me' ? '/me' : `/people/${post.authorId}`} aria-label={author.name}>
           <Avatar who={author} size={34} />
@@ -233,17 +239,7 @@ export function PostCard({ post }: { post: Post }) {
         </Link>
       ) : null}
       <div className="feed-post__actions">
-        <button
-          type="button"
-          className="feed-action"
-          aria-pressed={up}
-          aria-label={`Upvote, ${upCount}`}
-          style={up ? { color: 'var(--accent)' } : undefined}
-          onClick={() => toggle('upvoted', post.id)}
-        >
-          <UpvoteGlyph size={20} active={up} />
-          {upCount}
-        </button>
+        <Votes id={post.id} up={post.upvotes} down={post.downvotes} />
         <Link to={`/post/${post.id}`} className="feed-action" aria-label={t('common.replies', { n: post.replyCount + myReplies })}>
           <ReplyGlyph size={20} />
           {post.replyCount + myReplies}
@@ -265,6 +261,43 @@ export function PostCard({ post }: { post: Post }) {
         </button>
       </div>
     </article>
+  );
+}
+
+/** "−3", "42", "1.2k": a vote score. */
+export function formatScore(n: number) {
+  return n < 0 ? `−${compact(-n)}` : compact(n);
+}
+
+/** The net score of something people vote on: seed votes, minus the seed vote you had, plus yours. */
+export function useScore(id: string, up: number, down = 0) {
+  const { data } = useAppData();
+  const mine = data.upvoted.includes(id) ? 1 : data.downvoted.includes(id) ? -1 : 0;
+  const seed = DEFAULT_APP_DATA.upvoted.includes(id) ? 1 : DEFAULT_APP_DATA.downvoted.includes(id) ? -1 : 0;
+  return { score: up - down - seed + mine, mine };
+}
+
+/**
+ * Up and down votes, Reddit style: ▲ score ▼. One vote each; tap again to take it
+ * back. Only verified residents' votes count, and down votes never take helpful
+ * points away; they only sink and, past −4, fold away what isn't useful.
+ */
+export function Votes({ id, up, down = 0, small }: { id: string; up: number; down?: number; small?: boolean }) {
+  const { vote } = useAppData();
+  const { score, mine } = useScore(id, up, down);
+  const size = small ? 15 : 19;
+  return (
+    <span className={`votes${small ? ' votes--sm' : ''}${mine === 1 ? ' is-up' : mine === -1 ? ' is-down' : ''}`}>
+      <button type="button" className="votes__btn" aria-pressed={mine === 1} aria-label="Vote up" onClick={() => vote(id, 'up')}>
+        <UpvoteGlyph size={size} active={mine === 1} />
+      </button>
+      <span className="votes__score num" aria-label={`Score ${score}`}>
+        {formatScore(score)}
+      </span>
+      <button type="button" className="votes__btn" aria-pressed={mine === -1} aria-label="Vote down" onClick={() => vote(id, 'down')}>
+        <DownvoteGlyph size={size} active={mine === -1} />
+      </button>
+    </span>
   );
 }
 
