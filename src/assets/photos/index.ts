@@ -47,6 +47,7 @@ const ITEM_PHOTO: Record<string, string> = {
   'Morning visit': 'place-adalaj',
   'Trail walk': 'place-polo-forest',
   'Kite-making': 'event-kite-workshop',
+  'Lakeside sunset': 'scene-sunset-friends',
 };
 
 export function itemPhoto(item: string | undefined, placeId?: string, eventId?: string): string | undefined {

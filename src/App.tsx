@@ -11,8 +11,6 @@ import CheckInDetail from './pages/CheckInDetail';
 import Chat from './pages/Chat';
 import City from './pages/City';
 import Compose from './pages/Compose';
-import DealDetail from './pages/DealDetail';
-import Deals from './pages/Deals';
 import EventDetail from './pages/EventDetail';
 import Explore from './pages/Explore';
 import Friends from './pages/Friends';
@@ -34,7 +32,6 @@ import ReportDetail from './pages/ReportDetail';
 import Reports from './pages/Reports';
 import Safety from './pages/Safety';
 import Saved from './pages/Saved';
-import Services from './pages/Services';
 import SettingsHome from './pages/settings/SettingsHome';
 import SettingsSection from './pages/settings/SettingsSection';
 import Transit from './pages/Transit';
@@ -80,8 +77,7 @@ function Shell() {
                   <Route path="/ask" element={<Ask />} />
                   <Route path="/explore" element={<Explore />} />
                   <Route path="/explore/:category" element={<Category />} />
-                  <Route path="/deals" element={<Deals />} />
-                  <Route path="/deals/:id" element={<DealDetail />} />
+                  <Route path="/deals/*" element={<Navigate to="/explore" replace />} />
                   <Route path="/place/:id" element={<PlaceDetail />} />
                   <Route path="/event/:id" element={<EventDetail />} />
                   <Route path="/clubs" element={<Groups />} />
@@ -107,7 +103,7 @@ function Shell() {
                   <Route path="/city/report" element={<Report />} />
                   <Route path="/city/reports" element={<Reports />} />
                   <Route path="/city/reports/:id" element={<ReportDetail />} />
-                  <Route path="/city/services" element={<Services />} />
+                  <Route path="/city/services" element={<Navigate to="/city" replace />} />
                   <Route path="/city/safety" element={<Safety />} />
                   <Route path="/me" element={<Me />} />
                   <Route path="/me/saved" element={<Saved />} />

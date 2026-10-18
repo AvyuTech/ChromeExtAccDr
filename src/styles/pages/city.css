@@ -4,13 +4,8 @@
 .city {
   gap: 14px;
 }
-.city-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-.city-head .hero-title {
+.city-headline {
+  margin-top: 2px;
   font-size: 1.5rem;
 }
 .city-status {
@@ -190,7 +185,7 @@
 /* Quick actions: round tinted icons, no boxes */
 .city-quick {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
   padding: 2px 0;
 }
@@ -303,14 +298,6 @@
   width: 36px;
   height: 36px;
   border-radius: 18px;
-}
-.city .city-bills {
-  border-top: 1px solid var(--divider);
-  border-bottom: 1px solid var(--divider);
-  padding-left: 0;
-  padding-right: 0;
-  color: inherit;
-  text-decoration: none;
 }
 
 /* Flat alert rows */

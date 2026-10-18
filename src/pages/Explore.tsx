@@ -1,21 +1,22 @@
 import { useMemo, useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaceStack, GroupRow, PlaceRow } from '../components/cards';
+import { CheckInCard, CollectionCard } from '../components/friends';
 import { CityMap, eventPos, NEIGHBOURHOOD_POS, PLACE_POS, type MapPin } from '../components/CityMap';
 import { FriendPickCard } from '../components/community';
-import { CollectionCard } from '../components/friends';
 import { SectionHead, Sheet } from '../components/ui';
 import { photo, placePhoto, eventPhoto } from '../assets/photos';
 import { NEIGHBOURHOODS, neighbourhoodName, person } from '../data/core';
-import { EVENTS, MOVIES } from '../data/events';
+import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
 import { COLLECTIONS } from '../data/friends';
-import { DEALS, GROUPS } from '../data/social';
+import { GROUPS } from '../data/social';
+import { WEB_PICKS } from '../data/web';
 import type { Place, PlaceCategory, Tone } from '../data/types';
 import { useT } from '../i18n';
 import { CheckGlyph, ChevronDownGlyph, HeartGlyph, ChevronRightGlyph, NamedGlyph, PinGlyph, SaveGlyph, SearchGlyph, SquiggleMark, StarGlyph, type GlyphName } from '../icons';
 import { km } from '../lib/format';
-import { friendsMustTries, placeCommunity } from '../lib/friends';
+import { friendCities, friendsIn, friendsMustTries, placeCommunity } from '../lib/friends';
 import { spottedPlaces } from '../lib/places';
 import { visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
@@ -113,13 +114,20 @@ export default function Explore() {
   const categories: CategoryTile[] = [
     { key: 'discover.cat.food', to: '/explore/food', glyph: 'food', tone: 'peach', photo: photo('dish-pav-bhaji'), count: newFood ? `${foodCount} places · ${newFood} new` : `${foodCount} places` },
     { key: 'discover.cat.events', to: '/explore/events', glyph: 'events', tone: 'violet', photo: photo('scene-concert'), count: `${eventsThisWeek} this week` },
-    { key: 'discover.cat.deals', to: '/deals', glyph: 'deals', tone: 'green', photo: photo('dish-samosa'), count: `${DEALS.length} live` },
-    { key: 'discover.cat.getaways', to: '/explore/getaways', glyph: 'getaways', tone: 'teal', photo: photo('place-polo-forest'), count: 'Within 3 hrs' },
-    { key: 'discover.cat.movies', to: '/explore/movies', glyph: 'movies', tone: 'blue', count: `${MOVIES.length} showing` },
+    { key: 'discover.cat.clubs', to: '/clubs', glyph: 'groups', tone: 'green', photo: photo('scene-friends'), count: `${GROUPS.length} clubs nearby` },
+    { key: 'discover.cat.getaways', to: '/explore/getaways', glyph: 'getaways', tone: 'teal', photo: photo('place-polo-forest'), count: 'From friends’ lists' },
     { key: 'discover.cat.alerts', to: '/city/alerts', glyph: 'alert', tone: 'yellow', count: alerts.length ? `${alerts.length} today` : 'All quiet', live: alerts.some((a) => a.severity !== 'info') },
   ];
 
   const newThisWeek = PLACES.filter((p) => p.isNew).slice(0, 3);
+  const [params, setParams] = useSearchParams();
+  const [citySheet, setCitySheet] = useState(false);
+  const cities = friendCities(data);
+  const awayCity = params.get('city') && params.get('city') !== settings.location.city ? params.get('city')! : null;
+  const pickCity = (city: string | null) => {
+    setCitySheet(false);
+    setParams(city ? { city } : {}, { replace: true });
+  };
   const suggestedGroups = GROUPS.filter((g) => !data.joinedGroups.includes(g.id)).slice(0, 2);
   const mustTries = friendsMustTries(data);
   // Lists by other people first; your own lists live on your profile.
@@ -142,7 +150,10 @@ export default function Explore() {
       <main className="page explore">
         <header className="explore-head">
           <div className="stack" style={{ gap: 8, minWidth: 0 }}>
-            <span className="eyebrow muted">{t('discover.explore.eyebrow', { city: settings.location.city })}</span>
+            <button type="button" className="eyebrow muted explore-city" onClick={() => setCitySheet(true)} aria-haspopup="dialog">
+              {t('discover.explore.eyebrow', { city: awayCity ?? settings.location.city })}
+              <ChevronDownGlyph size={12} />
+            </button>
             <h1 className="hero-title">
               {t('discover.explore.headline')}
               <SquiggleMark width={30} className="explore-head__squiggle" />
@@ -152,6 +163,33 @@ export default function Explore() {
             <SaveGlyph size={22} />
           </Link>
         </header>
+        {awayCity ? (
+          <section className="section away" aria-labelledby="away-title">
+            <p className="meta" style={{ marginTop: -6 }}>
+              {t('discover.away.sub', { city: settings.location.city })}
+            </p>
+            {friendsIn(awayCity, data).length ? (
+              <>
+                <h2 className="section__title" id="away-title">
+                  {t('discover.away.title', { city: awayCity })}
+                </h2>
+                <div className="feed">
+                  {friendsIn(awayCity, data).map((c) => (
+                    <CheckInCard key={c.id} c={c} />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="body-sm muted" id="away-title">
+                {t('discover.away.none', { city: awayCity })}
+              </p>
+            )}
+            <button type="button" className="btn btn--soft btn--sm" style={{ alignSelf: 'flex-start' }} onClick={() => pickCity(null)}>
+              {t('discover.away.back', { city: settings.location.city })}
+            </button>
+          </section>
+        ) : (
+          <>
         <button type="button" className="home-location explore-area" onClick={() => setAreaSheet(true)}>
           <PinGlyph size={16} />
           {areaLabel}
@@ -339,6 +377,36 @@ export default function Explore() {
           </div>
         </section>
 
+        <section className="section" aria-labelledby="reels-title">
+          <div className="section__head">
+            <h2 className="section__title" id="reels-title">
+              {t('discover.reels.title')}
+            </h2>
+          </div>
+          <p className="meta" style={{ marginTop: -6 }}>
+            {t('discover.reels.sub')}
+          </p>
+          <div className="hscroll">
+            {WEB_PICKS.map((w) => (
+              <Link key={w.id} to={`/place/${w.placeId}`} className="photo-card reel-card" style={{ width: 150 }}>
+                <span className="photo-frame photo-card__media" style={{ height: 190 }}>
+                  {photo(w.photo) ? <img src={photo(w.photo)} alt="" loading="lazy" /> : null}
+                  <span className="photo-pill" style={{ left: 8, bottom: 8 }}>
+                    <span className="reel-card__play" aria-hidden="true" />
+                    {t('discover.reels.count', { n: w.reels })}
+                  </span>
+                </span>
+                <span className="photo-card__body">
+                  <span className="photo-card__title" style={{ fontSize: '0.8438rem' }}>
+                    {w.title}
+                  </span>
+                  <span className="meta">{w.gist}</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {more.length ? (
           <section className="section" aria-labelledby="more-title">
             <SectionHead id="more-title" title={t('discover.explore.more')} to="/explore/places" />
@@ -434,12 +502,39 @@ export default function Explore() {
         </section>
 
         <section className="section" aria-labelledby="groups-title">
-          <SectionHead id="groups-title" title={t('discover.explore.groups')} to="/groups" />
+          <SectionHead id="groups-title" title={t('discover.explore.clubs')} to="/clubs" />
           {(suggestedGroups.length ? suggestedGroups : GROUPS.slice(0, 2)).map((g) => (
             <GroupRow key={g.id} group={g} />
           ))}
         </section>
+          </>
+        )}
       </main>
+
+      <Sheet open={citySheet} onClose={() => setCitySheet(false)} title={t('discover.away.pick')}>
+        <div className="list">
+          <button type="button" className="list-row" aria-pressed={!awayCity} onClick={() => pickCity(null)}>
+            <span className="list-row__body">
+              <span className="list-row__title">{settings.location.city}</span>
+              <span className="list-row__meta">{t('discover.away.home')}</span>
+            </span>
+            {!awayCity ? <CheckGlyph size={20} style={{ color: 'var(--accent)' }} /> : null}
+          </button>
+        </div>
+        <span className="field__label">{t('discover.away.friendsBeen')}</span>
+        <div className="list">
+          {cities.map((c) => (
+            <button key={c.city} type="button" className="list-row" aria-pressed={awayCity === c.city} onClick={() => pickCity(c.city)}>
+              <FaceStack ids={c.friendIds} size={26} />
+              <span className="list-row__body">
+                <span className="list-row__title">{c.city}</span>
+                <span className="list-row__meta">{t('discover.away.count', { n: c.count })}</span>
+              </span>
+              {awayCity === c.city ? <CheckGlyph size={20} style={{ color: 'var(--accent)' }} /> : null}
+            </button>
+          ))}
+        </div>
+      </Sheet>
 
       <Sheet open={areaSheet} onClose={() => setAreaSheet(false)} title={t('discover.explore.radius')}>
         <div className="chip-wrap">

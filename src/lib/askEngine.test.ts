@@ -26,7 +26,8 @@ describe('detectIntent', () => {
     ['power cut in satellite', 'power'],
     ['report a pothole', 'civic'],
     ['nearest hospital', 'safety'],
-    ['any food deals', 'deals'],
+    ['any group buys near me', 'groups'],
+    ['cricket club near me', 'groups'],
     ['what are my friends eating', 'friends'],
     ['zzzz', 'general'],
   ])('%s → %s', (q, intent) => {

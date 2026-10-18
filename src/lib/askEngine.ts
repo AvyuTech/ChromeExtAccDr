@@ -1,14 +1,14 @@
-import { ALERTS, EMERGENCY, FACILITIES, REPORTS, SERVICES } from '../data/city';
+import { ALERTS, EMERGENCY, FACILITIES, REPORTS } from '../data/city';
 import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
 import { CHECKINS } from '../data/friends';
 import { NEIGHBOURHOODS, PEOPLE } from '../data/core';
-import { DEALS, GROUPS, POSTS } from '../data/social';
+import { GROUPS, POSTS } from '../data/social';
 import type { CityEvent, CityPulse, Place, SourceId } from '../data/types';
 import { aqiBand, TRAFFIC_LABEL } from '../icons/live';
 import { NEIGHBOURHOOD_POS } from '../data/mapPositions';
 import { planRoutes, whyBest } from './traffic';
-import { price, rupees } from './format';
+import { price } from './format';
 
 /*
   The on-device "Nearhood answer" engine.
@@ -30,10 +30,8 @@ export type Intent =
   | 'water'
   | 'power'
   | 'civic'
-  | 'deals'
   | 'groups'
   | 'safety'
-  | 'services'
   | 'friends'
   | 'general';
 
@@ -105,9 +103,8 @@ export function detectIntent(q: string): Intent {
   if (has(q, ['water', 'supply', 'tanker', 'pressure'])) return 'water';
   if (has(q, ['power', 'electricity', 'outage', 'light cut', 'power cut', 'load shedding'])) return 'power';
   if (has(q, ['pothole', 'garbage', 'complaint', 'streetlight', 'drain', 'report', 'cattle', 'civic'])) return 'civic';
-  if (has(q, ['bill', 'tax', 'certificate', 'licen', 'pay ', 'service', 'book a hall'])) return 'services';
-  if (has(q, ['deal', 'offer', 'discount', 'coupon', 'sale'])) return 'deals';
-  if (has(q, ['group', 'community', 'club', 'meet people'])) return 'groups';
+  // No deals or coupons: saving money is done together, through group buys in clubs.
+  if (has(q, ['group', 'community', 'club', 'meet people', 'meetup', 'buy together', 'group buy', 'discount', 'deal', 'cricket', 'founders', 'book club'])) return 'groups';
   if (has(q, ['café', 'cafe', 'coffee', 'wifi', 'wi-fi', 'work from', 'brunch', 'laptop'])) return 'cafe';
   if (has(q, ['food', 'eat', 'restaurant', 'dinner', 'lunch', 'korean', 'thali', 'street food', 'hungry'])) return 'food';
   if (has(q, ['weekend', 'happening', 'event', 'things to do', 'tonight', 'concert', 'show', 'gig', 'market', 'workshop', 'what to do', 'plans'])) return 'events';
@@ -182,7 +179,7 @@ export function ask(query: string, o: AskOptions): AskResult {
       if (m.today) events = events.filter((e) => e.day === 'Today');
       else if (m.weekend) events = events.filter((e) => ['Sat', 'Sun', 'Sat–Sun'].includes(e.day));
       if (m.near) events = events.filter((e) => e.distanceKm <= 5);
-      events.sort((a, b) => Number(b.confirmed) - Number(a.confirmed) || b.going - a.going);
+      events.sort((a, b) => Number(b.confirmed) - Number(a.confirmed) || b.sources.length - a.sources.length || a.distanceKm - b.distanceKm);
       const sources = uniq(events.flatMap((e) => e.sources)).filter(o.sourceAllowed);
       if (events.length === 0) {
         return {
@@ -207,13 +204,14 @@ export function ask(query: string, o: AskOptions): AskResult {
             ? `Here are **${events.length} good plans for two** ${when}.`
             : `There are **${events.length} things happening** near you ${when}.`;
       const dayName = top.day === 'Sat–Sun' ? 'Saturday and Sunday' : top.day === 'Sat' ? 'Saturday' : top.day === 'Sun' ? 'Sunday' : top.day.toLowerCase();
-      const second = `The biggest is the **${short(top.title)}**${top.title.includes(dayName) ? '' : ` on ${dayName}`}.`;
+      const second = `The most talked about is the **${short(top.title)}**${top.title.includes(dayName) ? '' : ` on ${dayName}`}.`;
       const third = freeOne && !m.free ? `For something free, the **${freeOne.title.replace(/^Sunday /, 'Sunday ').replace(/^(?!Sunday )./, (c) => c.toLowerCase())}** is the local favourite.` : '';
       const unconfirmed = events.some((e) => !e.confirmed) ? 'Listings seen in only one place are marked unconfirmed.' : '';
+      const linkOut = 'Details and tickets are on each organiser’s page; Nearhood doesn’t sell them.';
       return {
         ...base,
-        heading: 'Most locals going',
-        answer: finish([lead, [second, third].filter(Boolean).join(' '), unconfirmed].filter(Boolean), o.length),
+        heading: 'Happening around the city',
+        answer: finish([lead, [second, third].filter(Boolean).join(' '), unconfirmed, linkOut].filter(Boolean), o.length),
         sources,
         results: events.map((e) => ({ type: 'event', id: e.id })),
         followUps: [
@@ -430,65 +428,34 @@ export function ask(query: string, o: AskOptions): AskResult {
       };
     }
 
-    case 'services': {
-      const due = SERVICES.filter((s) => s.due);
-      return {
-        ...base,
-        heading: 'City services',
-        answer: finish(
-          [
-            due.length
-              ? `You have **${due.length} bills due**: ${due.map((d) => `${d.name.toLowerCase()} (${rupees(d.amount ?? 0)}, ${d.due?.toLowerCase()})`).join(' and ')}.`
-              : 'No bills due right now.',
-            'Pay, apply or book from City › Services.',
-          ],
-          o.length,
-        ),
-        sources: ['amc', 'utility'],
-        results: SERVICES.map((s) => ({ type: 'service', id: s.id })),
-        followUps: [{ label: 'Water timings', query: 'Water supply timings today' }],
-        confidence: 'high',
-      };
-    }
-
-    case 'deals': {
-      let deals = [...DEALS];
-      if (has(q, ['food', 'eat', 'buffet', 'dinner'])) deals = deals.filter((d) => d.category === 'food');
-      if (has(q, ['coffee', 'café', 'cafe'])) deals = deals.filter((d) => d.category === 'cafe');
-      if (has(q, ['movie', 'film', 'cinema'])) deals = deals.filter((d) => d.category === 'movies');
-      if (deals.length === 0) deals = [...DEALS];
-      deals.sort((a, b) => b.claimedBy - a.claimedBy);
-      return {
-        ...base,
-        heading: 'Live deals',
-        answer: finish([`**${deals.length} deals** near you right now.`, `Most claimed: **${lowerFirst(deals[0].title)}** at ${deals[0].merchant} (${lowerFirst(deals[0].ends)}).`], o.length),
-        sources: ['maps', 'neighbours'].filter((s) => o.sourceAllowed(s as SourceId)) as SourceId[],
-        results: deals.map((d) => ({ type: 'deal', id: d.id })),
-        followUps: [{ label: 'Food deals', query: 'Food deals near me' }],
-        confidence: 'medium',
-      };
-    }
-
     case 'groups': {
-      const words = q.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 3 && !['group', 'groups', 'community', 'club', 'clubs', 'near', 'join'].includes(w));
+      const words = q.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 3 && !['group', 'groups', 'community', 'club', 'clubs', 'near', 'join', 'together', 'want'].includes(w));
       const busiest = [...GROUPS].sort((a, b) => b.postsToday - a.postsToday);
-      const matching = busiest.filter((g) => words.some((w) => `${g.name} ${g.description}`.toLowerCase().includes(w)));
+      const matching = busiest.filter((g) => words.some((w) => `${g.name} ${g.description} ${g.kind}`.toLowerCase().includes(w)));
       const groups = matching.length ? [...matching, ...busiest.filter((g) => !matching.includes(g))] : busiest;
+      const buying = has(q, ['buy', 'discount', 'deal', 'cheaper', 'bulk']);
+      const buys = GROUPS.flatMap((g) => (g.buys ?? []).map((b) => ({ g, b })));
+      const top = groups[0];
+      const next = top.meetups?.[0];
+      const lead =
+        buying && buys.length
+          ? `People are buying together in **${new Set(buys.map((x) => x.g.id)).size} clubs** right now, for example **${lowerFirst(buys[0].b.title)}** in ${buys[0].g.name} (${buys[0].b.joined.length} of ${buys[0].b.target} in).`
+          : matching.length
+            ? `**${top.name}** is the closest match, with ${top.members.toLocaleString('en-IN')} members${next ? `; next up: ${lowerFirst(next.title)}, ${next.when}` : ''}.`
+            : `The most active clubs today are **${groups[0].name}** and **${groups[1].name}**.`;
       return {
         ...base,
-        heading: 'Groups near you',
+        heading: buying ? 'Buying together' : 'Clubs near you',
         answer: finish(
-          [
-            matching.length
-              ? `**${matching[0].name}** is the closest match, with ${matching[0].members.toLocaleString('en-IN')} members.`
-              : `The busiest groups today are **${groups[0].name}** and **${groups[1].name}**.`,
-            'Joining a group adds its posts to your Home feed.',
-          ],
+          [lead, buying ? 'Nearhood only gathers people; the deal and the payment happen outside the app.' : 'Joining a club adds its meetups and posts to your Home feed.'],
           o.length,
         ),
         sources: ['neighbours'],
         results: groups.map((g) => ({ type: 'group', id: g.id })),
-        followUps: [{ label: 'Pickleball partners', query: 'Pickleball groups' }],
+        followUps: [
+          { label: 'Sunday cricket', query: 'Cricket club near me' },
+          { label: 'Buy together', query: 'Any group buys near me?' },
+        ],
         confidence: 'medium',
       };
     }
@@ -609,4 +576,5 @@ export const SUGGESTED_QUESTIONS = [
   'Best way to Navrangpura now',
   'Is the water supply normal today?',
   'Free things to do with kids',
+  'Any group buys near me?',
 ];

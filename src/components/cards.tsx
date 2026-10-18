@@ -374,8 +374,13 @@ export function eventStatus(e: CityEvent): { text: string; tone: 'mint' | 'muted
   return { text: `${compact(e.interested ?? 0)} interested`, tone: 'muted' };
 }
 
+/** Where an event was found, e.g. "From BookMyShow + 2 more". Nearhood lists events; it never sells them. */
+export function eventSourceLine(event: CityEvent) {
+  const first = SOURCES[event.sources[0]]?.label ?? 'the web';
+  return event.sources.length > 1 ? `From ${first} + ${event.sources.length - 1} more` : `From ${first}`;
+}
+
 export function EventTile({ event, width = 200 }: { event: CityEvent; width?: number }) {
-  const status = eventStatus(event);
   const when = `${event.day} · ${event.time.split(' – ')[0]}`;
   return (
     <Link to={`/event/${event.id}`} className="photo-card" style={{ width }}>
@@ -389,12 +394,8 @@ export function EventTile({ event, width = 200 }: { event: CityEvent; width?: nu
         <span className="meta">
           {event.area} · {price(event.price)}
         </span>
-        <span
-          className="row"
-          style={{ gap: 6, fontSize: '0.75rem', fontWeight: 700, color: status.tone === 'mint' ? 'var(--mint-ink)' : status.tone === 'amber' ? 'var(--amber-ink)' : 'var(--muted)' }}
-        >
-          <span className={`live-dot${status.tone === 'muted' ? ' live-dot--muted' : status.tone === 'amber' ? ' live-dot--amber' : ''}`} />
-          {status.text}
+        <span className="meta" style={{ color: event.confirmed ? 'var(--accent)' : 'var(--amber-ink)', fontWeight: 600 }}>
+          {event.confirmed ? eventSourceLine(event) : (event.unconfirmedNote ?? 'Unconfirmed')}
         </span>
       </span>
     </Link>
@@ -416,14 +417,9 @@ export function EventRow({ event }: { event: CityEvent }) {
           {event.day}, {event.time} · {event.area} · {price(event.price)}
         </span>
         {event.confirmed ? (
-          <span className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--mint-ink)' }}>
-              {event.going > 0 ? `${compact(event.going)} going` : `${compact(event.interested ?? 0)} interested`}
-            </span>
-            <span className="row meta" style={{ gap: 5 }}>
-              <TrustRing agree={Math.min(agree, 4)} size={16} />
-              {event.seatsLeft !== undefined && event.seatsLeft <= 12 ? `${event.seatsLeft} seats left` : `${agree} sources agree`}
-            </span>
+          <span className="row meta" style={{ gap: 5 }}>
+            <TrustRing agree={Math.min(agree, 4)} size={16} />
+            {eventSourceLine(event)} · {agree} sources agree
           </span>
         ) : (
           <span className="badge badge--sm tone-amber" style={{ alignSelf: 'flex-start' }}>
@@ -542,13 +538,18 @@ export function GroupRow({ group }: { group: Group }) {
   return (
     <div className="row group-row" style={{ gap: 12 }}>
       <Cover src={groupPhoto(group.id)} glyph={group.glyph} tone={group.tone} className="place-thumb" />
-      <Link to={`/groups/${group.id}`} className="stack grow" style={{ gap: 2, textDecoration: 'none', color: 'inherit', minWidth: 0 }}>
+      <Link to={`/clubs/${group.id}`} className="stack grow" style={{ gap: 2, textDecoration: 'none', color: 'inherit', minWidth: 0 }}>
         <span className="strong" style={{ fontSize: '0.9688rem' }}>
           {group.name}
         </span>
         <span className="meta">
-          {compact(group.members)} members · {group.postsToday} posts today
+          {compact(group.members)} members · {group.area}
         </span>
+        {group.meetups?.[0] ? (
+          <span className="meta" style={{ color: 'var(--accent)', fontWeight: 600 }}>
+            Next: {group.meetups[0].title} · {group.meetups[0].when}
+          </span>
+        ) : null}
       </Link>
       <button
         type="button"

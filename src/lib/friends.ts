@@ -155,11 +155,11 @@ export function planTogether(data: AppData): Array<{ personId: string; item: Wan
   return out;
 }
 
-/** Friends' must-tries from this week, one per place. */
+/** Friends' must-tries from this week in the home city, one per place. */
 export function friendsMustTries(data: AppData): CheckIn[] {
   const seen = new Set<string>();
   return friendFeed(data)
-    .filter((c) => c.verdict === 'must' && c.recency <= 1)
+    .filter((c) => !c.city && c.verdict === 'must' && c.recency <= 1)
     .filter((c) => {
       const key = c.placeId ?? c.placeName;
       if (seen.has(key)) return false;
@@ -193,4 +193,21 @@ export function collectionFor(data: AppData, id: string): Collection | undefined
 
 export function isWanted(data: AppData, item: Pick<WantItem, 'refId' | 'title'>) {
   return data.wantToTry.some((w) => sameWant(w, item));
+}
+
+/** Other cities friends have checked in from, most check-ins first. */
+export function friendCities(data: AppData): Array<{ city: string; count: number; friendIds: string[] }> {
+  const by = new Map<string, CheckIn[]>();
+  for (const c of friendFeed(data)) if (c.city) by.set(c.city, [...(by.get(c.city) ?? []), c]);
+  return [...by.entries()]
+    .map(([city, list]) => ({ city, count: list.length, friendIds: Array.from(new Set(list.map((c) => c.authorId))) }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/** What friends did and recommended in another city, must-tries first. */
+export function friendsIn(city: string, data: AppData): CheckIn[] {
+  const rank = { must: 0, good: 1, skip: 2 } as const;
+  return friendFeed(data)
+    .filter((c) => c.city === city)
+    .sort((a, b) => rank[a.verdict] - rank[b.verdict] || a.recency - b.recency);
 }
