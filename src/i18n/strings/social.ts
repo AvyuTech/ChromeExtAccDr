@@ -150,4 +150,11 @@ export const social: Dict = {
     gu: 'લિંક જૂની હોઈ શકે અથવા પેજ ખસેડાયું હોય.',
     hi: 'लिंक पुराना हो सकता है या पेज हट गया हो।',
   },
+  'social.startChat': { en: 'Start a chat', gu: 'ચેટ શરૂ કરો', hi: 'चैट शुरू करें' },
+  'social.activeNow': { en: 'Active now', gu: 'હમણાં સક્રિય', hi: 'अभी सक्रिय' },
+  'social.lostTitle': { en: 'This street isn’t on our map.', gu: 'આ શેરી અમારા નકશા પર નથી.', hi: 'यह गली हमारे नक्शे पर नहीं है।' },
+  'social.postingAs': { en: 'Posting as {name}', gu: '{name} તરીકે પોસ્ટ કરી રહ્યા છો', hi: '{name} के रूप में पोस्ट कर रहे हैं' },
+  'social.visibleTo': { en: 'Visible to {where}', gu: '{where} ને દેખાશે', hi: '{where} को दिखेगा' },
+  'social.photoHint': { en: 'A photo helps neighbours spot it faster', gu: 'ફોટો પડોશીઓને ઝડપથી ઓળખવામાં મદદ કરે છે', hi: 'फ़ोटो से पड़ोसी इसे जल्दी पहचानते हैं' },
+  'social.aboutPlace': { en: 'Chatting about', gu: 'આ વિશે વાત', hi: 'इस बारे में बात' },
 };

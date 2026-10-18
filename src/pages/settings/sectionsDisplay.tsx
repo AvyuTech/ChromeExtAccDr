@@ -1,3 +1,5 @@
+import { Avatar } from '../../components/cards';
+import { person } from '../../data/core';
 import { LANGUAGES, translate, useT } from '../../i18n';
 import { AccessibilityGlyph, CheckGlyph, EyeGlyph, MoonGlyph, NoiseGlyph, SunGlyph, TextSizeGlyph, UpvoteGlyph } from '../../icons';
 import { SystemThemeGlyph } from '../../icons/extra-settings';
@@ -12,15 +14,38 @@ const THEMES: Array<{ value: ThemeChoice; G: GlyphComp }> = [
   { value: 'dark', G: MoonGlyph },
 ];
 
-function ThemeMock({ mode }: { mode: ThemeChoice }) {
+/** A tiny Home screen in each theme's colours. */
+function MockScreen({ mode }: { mode: 'light' | 'dark' }) {
   return (
-    <span className={`theme-mock theme-mock--${mode}`} aria-hidden="true">
-      <span className="theme-mock__bar" />
+    <span className={`theme-mock theme-mock--${mode}`}>
+      <span className="theme-mock__title" />
+      <span className="theme-mock__title theme-mock__title--short" />
+      <span className="theme-mock__search">
+        <i />
+      </span>
       <span className="theme-mock__card">
+        <span className="theme-mock__chip" />
         <span className="theme-mock__line" />
         <span className="theme-mock__line theme-mock__line--short" />
       </span>
-      <span className="theme-mock__band" />
+    </span>
+  );
+}
+
+function ThemeMock({ mode }: { mode: ThemeChoice }) {
+  if (mode !== 'system') {
+    return (
+      <span className="theme-mock-frame" aria-hidden="true">
+        <MockScreen mode={mode} />
+      </span>
+    );
+  }
+  return (
+    <span className="theme-mock-frame" aria-hidden="true">
+      <MockScreen mode="light" />
+      <span className="theme-mock-half">
+        <MockScreen mode="dark" />
+      </span>
     </span>
   );
 }
@@ -65,9 +90,7 @@ export function AppearanceSection() {
           <span className="eyebrow muted">{t('settings.appearance.preview')}</span>
           <div className="set-preview-post">
             <span className="row" style={{ gap: 8 }}>
-              <span className="avatar tone-peach" style={{ ['--avatar-size' as string]: '30px' }} aria-hidden="true">
-                R
-              </span>
+              <Avatar who={{ ...person('riya'), verified: false }} size={32} />
               <span className="stack" style={{ gap: 0 }}>
                 <span className="strong" style={{ fontSize: '0.875rem' }}>
                   Riya S.

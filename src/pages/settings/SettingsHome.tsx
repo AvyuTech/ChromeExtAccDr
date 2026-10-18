@@ -5,7 +5,7 @@ import { EmptyState, PageHeader, Sheet } from '../../components/ui';
 import { ALERT_KIND_META } from '../../data/city';
 import { PEOPLE, TOGGLEABLE_SOURCES, neighbourhoodName } from '../../data/core';
 import { LANGUAGES, useT } from '../../i18n';
-import { ChevronRightGlyph, LogoutGlyph, RefreshGlyph, SearchGlyph } from '../../icons';
+import { BellGlyph, CheckGlyph, ChevronRightGlyph, DataGlyph, LogoutGlyph, MoonGlyph, RefreshGlyph, SearchGlyph } from '../../icons';
 import { useAppData } from '../../state/appData';
 import { useSettings, type Settings } from '../../state/settings';
 import { useToast } from '../../state/toast';
@@ -61,28 +61,62 @@ export default function SettingsHome() {
   const [sheet, setSheet] = useState<'reset' | 'signout' | null>(null);
 
   const query = q.trim().toLowerCase();
-  const matches = SECTIONS.filter((s) => !query || `${t(s.key)} ${s.keywords}`.toLowerCase().includes(query));
+  const matches = SECTIONS.filter((s) => (query ? `${t(s.key)} ${s.keywords}`.toLowerCase().includes(query) : !s.nested));
+  const dark = settings.appearance.theme === 'dark';
   const me = { ...PEOPLE.me, name: settings.profile.name, initials: (settings.profile.name.trim()[0] ?? 'N').toUpperCase(), verified: settings.profile.verifiedResident };
 
   return (
     <>
       <PageHeader title={t('settings.title')} fallback="/me" />
       <main className="page page--with-header settings-page">
-        <Link to="/settings/account" className="card row set-profile-card" aria-label={`${settings.profile.name}, ${t('settings.account')}`}>
-          <Avatar who={me} size={52} />
-          <span className="stack grow" style={{ gap: 2 }}>
-            <span className="display strong" style={{ fontSize: '1.0625rem' }}>
-              {settings.profile.name}
+        <Link to="/settings/account" className="card set-profile-card" aria-label={`${settings.profile.name}, ${t('settings.account')}`}>
+          <Avatar who={me} size={64} ring />
+          <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
+            <span className="set-profile-card__name">{settings.profile.name}</span>
+            <span className="meta truncate">
+              @{settings.profile.handle} · {neighbourhoodName(settings.location.home)}
             </span>
-            <span className="meta">
-              @{settings.profile.handle} · {neighbourhoodName(settings.location.home)}, {settings.location.city}
+            <span className="row row--wrap" style={{ gap: 6, marginTop: 4 }}>
+              {settings.profile.verifiedResident ? (
+                <span className="badge badge--sm tone-mint" style={{ gap: 4 }}>
+                  <CheckGlyph size={12} />
+                  {t('settings.home.verified')}
+                </span>
+              ) : null}
+              {PEOPLE.me.badge ? <span className="badge badge--sm tone-violet">{PEOPLE.me.badge}</span> : null}
             </span>
           </span>
-          <ChevronRightGlyph size={18} style={{ color: 'var(--muted)' }} />
+          <span className="set-profile-card__go" aria-hidden="true">
+            <ChevronRightGlyph size={18} />
+          </span>
         </Link>
 
+        <div className="quick-grid" role="group" aria-label={t('settings.home.quick')}>
+          <button type="button" className="quick-tile" aria-pressed={dark} onClick={() => update('appearance', { theme: dark ? 'light' : 'dark' })}>
+            <span className="quick-tile__icon">
+              <MoonGlyph size={20} active={dark} />
+            </span>
+            <span className="quick-tile__label">{t('settings.home.darkMode')}</span>
+            <span className="quick-tile__state">{dark ? t('settings.on') : t(`settings.theme.${settings.appearance.theme}`)}</span>
+          </button>
+          <button type="button" className="quick-tile" aria-pressed={settings.notifications.push} onClick={() => update('notifications', { push: !settings.notifications.push })}>
+            <span className="quick-tile__icon">
+              <BellGlyph size={20} ringing={settings.notifications.push} active={settings.notifications.push} />
+            </span>
+            <span className="quick-tile__label">{t('settings.home.push')}</span>
+            <span className="quick-tile__state">{settings.notifications.push ? t('settings.on') : t('settings.off')}</span>
+          </button>
+          <button type="button" className="quick-tile" aria-pressed={settings.data.dataSaver} onClick={() => update('data', { dataSaver: !settings.data.dataSaver })}>
+            <span className="quick-tile__icon">
+              <DataGlyph size={20} active={settings.data.dataSaver} />
+            </span>
+            <span className="quick-tile__label">{t('settings.data.saver')}</span>
+            <span className="quick-tile__state">{settings.data.dataSaver ? t('settings.on') : t('settings.off')}</span>
+          </button>
+        </div>
+
         <label className="search-field" htmlFor="settings-search">
-          <SearchGlyph size={18} />
+          <SearchGlyph size={20} />
           <span className="sr-only">{t('settings.search')}</span>
           <input id="settings-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('settings.search')} autoComplete="off" />
         </label>

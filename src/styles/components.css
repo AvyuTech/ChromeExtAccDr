@@ -1322,6 +1322,13 @@ button.list-row:active {
   .device__scroll::-webkit-scrollbar {
     display: none;
   }
+  /* Sticky offsets already start below the scroller's padding (the status bar) */
+  .device__scroll .page-header {
+    top: 0;
+  }
+  .device__scroll .report-steps {
+    top: 64px;
+  }
   .device__screen .app-frame,
   .device__screen .app-column {
     min-height: calc(100% - var(--status-h));

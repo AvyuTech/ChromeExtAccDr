@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { placePhoto } from '../assets/photos';
 import { AnswerCard, Avatar, ShareButton } from '../components/cards';
 import { POST_TYPE_META } from '../components/social';
 import { EmptyState, PageHeader, SectionHead, Sheet, Tile } from '../components/ui';
@@ -115,8 +116,8 @@ function PostView({ post }: { post: Post }) {
       />
       <main className="page page--with-header page--with-composer">
         <article className="card stack" style={{ gap: 14 }}>
-          <div className="row">
-            <Avatar who={author} size={44} />
+          <div className="row" style={{ gap: 12 }}>
+            <Avatar who={author} size={48} />
             <div className="grow" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <span className="row row--wrap" style={{ gap: '2px 6px' }}>
                 <span className="strong">{author.name}</span>
@@ -126,7 +127,7 @@ function PostView({ post }: { post: Post }) {
                 {post.area} · {post.ago}
               </span>
             </div>
-            <span className={`badge tone-${meta.tone}`} style={{ fontWeight: 600 }}>
+            <span className={`badge tone-${meta.tone}`} style={{ fontWeight: 700 }}>
               {post.topic}
             </span>
           </div>
@@ -191,9 +192,12 @@ function PostView({ post }: { post: Post }) {
                         const place = placeById(pid);
                         if (!place) return null;
                         return (
-                          <Link key={pid} to={`/place/${pid}`} className="chip chip--soft glyph-host" style={{ paddingLeft: 6 }}>
-                            <Tile glyph={place.glyph} tone={place.tone} size="sm" />
-                            {place.name}
+                          <Link key={pid} to={`/place/${pid}`} className="place-chip glyph-host">
+                            {placePhoto(pid) ? <img src={placePhoto(pid)} alt="" /> : <Tile glyph={place.glyph} tone={place.tone} size="sm" />}
+                            <span className="stack" style={{ gap: 0, minWidth: 0 }}>
+                              <span className="place-chip__name">{place.name}</span>
+                              <span className="place-chip__meta">{place.area}</span>
+                            </span>
                           </Link>
                         );
                       })}
@@ -256,10 +260,9 @@ function PostView({ post }: { post: Post }) {
             <SectionHead id="related-title" title={t('social.related')} />
             <div className="list">
               {related.map((p) => {
-                const m = POST_TYPE_META[p.type];
                 return (
                   <Link key={p.id} to={`/post/${p.id}`} className="list-row glyph-host">
-                    <Tile glyph={m.glyph} tone={m.tone} size="sm" />
+                    <Avatar who={{ ...person(p.authorId), verified: false }} size={40} />
                     <span className="list-row__body">
                       <span className="related-row__text">{p.text}</span>
                       <span className="list-row__meta">

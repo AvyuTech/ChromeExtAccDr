@@ -1,12 +1,14 @@
 import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { placePhoto } from '../assets/photos';
 import { Avatar } from '../components/cards';
 import { EmptyState, PageHeader } from '../components/ui';
 import { PEOPLE, person } from '../data/core';
+import { PLACES } from '../data/places';
 import { CONVERSATIONS } from '../data/social';
 import type { ChatMessage, Conversation } from '../data/types';
 import { useT } from '../i18n';
-import { BackGlyph, SendGlyph, ShieldGlyph } from '../icons';
+import { BackGlyph, ChevronRightGlyph, SendGlyph, ShieldGlyph } from '../icons';
 import { nowTime } from '../lib/format';
 import { useAppData } from '../state/appData';
 
@@ -42,8 +44,13 @@ export default function Chat() {
   }, [convo, add]);
 
   // Runs after the shell's scroll-to-top on navigation, so the latest message stays in view.
+  // On wide screens the app scrolls inside the phone frame (#scroller) rather than the window.
   useEffect(() => {
-    const timer = window.setTimeout(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }), 40);
+    const timer = window.setTimeout(() => {
+      const frame = document.getElementById('scroller');
+      if (frame && frame.scrollHeight > frame.clientHeight) frame.scrollTo({ top: frame.scrollHeight, behavior: 'smooth' });
+      else window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    }, 40);
     return () => window.clearTimeout(timer);
   }, [messages.length]);
 
@@ -67,6 +74,8 @@ export default function Chat() {
   }
 
   const who = person(convo.withId);
+  // "About: Seoul Bowl" links the chat to a place we can show.
+  const place = convo.context ? PLACES.find((p) => convo.context!.includes(p.name)) : undefined;
 
   const send = (e: FormEvent) => {
     e.preventDefault();
@@ -89,20 +98,34 @@ export default function Chat() {
         >
           <BackGlyph size={20} />
         </button>
-        <Avatar who={who} size={40} />
-        <div className="grow" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          <h1 className="page-header__title" style={{ fontSize: '1rem' }}>
-            {who.name}
-          </h1>
-          <span className="meta">
-            {who.area}
-            {who.badge ? ` · ${who.badge}` : ''}
+        <Link to={who.id === 'ward' ? '/city' : `/people/${who.id}`} className="chat-head__who">
+          <Avatar who={who} size={42} />
+          <span className="grow" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <h1 className="page-header__title" style={{ fontSize: '1.0625rem' }}>
+              {who.name}
+            </h1>
+            <span className="meta truncate">
+              {who.area}
+              {who.badge ? ` · ${who.badge}` : ''}
+            </span>
           </span>
-        </div>
+        </Link>
       </header>
 
       <main className="page page--with-header chat-page" aria-label={`Conversation with ${who.name}`}>
-        {convo.context ? (
+        {place ? (
+          <Link to={`/place/${place.id}`} className="chat-context">
+            {placePhoto(place.id) ? <img src={placePhoto(place.id)} alt="" /> : null}
+            <span className="stack grow" style={{ gap: 1, minWidth: 0 }}>
+              <span className="eyebrow muted">{t('social.aboutPlace')}</span>
+              <span className="strong truncate">{place.name}</span>
+              <span className="meta truncate">
+                {place.kind} · {place.area}
+              </span>
+            </span>
+            <ChevronRightGlyph size={18} />
+          </Link>
+        ) : convo.context ? (
           <span className="chip chip--soft" style={{ alignSelf: 'center', height: 32 }}>
             {convo.context}
           </span>
@@ -125,14 +148,26 @@ export default function Chat() {
             const day = dayOf(m);
             const newDay = i === 0 || dayOf(messages[i - 1]) !== day;
             const mine = m.from === 'me';
+            // Their face sits beside the last bubble of each run, as in most chat apps.
+            const lastOfRun = i === messages.length - 1 || messages[i + 1].from !== m.from;
+            const bubble = (
+              <div className={`bubble ${mine ? 'bubble--mine' : 'bubble--theirs'}`}>
+                <span className="sr-only">{mine ? `${t('social.you')}: ` : `${who.name}: `}</span>
+                {m.text}
+                {day === 'today' ? <span className="bubble__time">{m.time}</span> : null}
+              </div>
+            );
             return (
               <Fragment key={m.id}>
                 {newDay ? <span className="day-sep">{dayLabel(day)}</span> : null}
-                <div className={`bubble ${mine ? 'bubble--mine' : 'bubble--theirs'}`}>
-                  <span className="sr-only">{mine ? `${t('social.you')}: ` : `${who.name}: `}</span>
-                  {m.text}
-                  {day === 'today' ? <span className="bubble__time">{m.time}</span> : null}
-                </div>
+                {mine ? (
+                  bubble
+                ) : (
+                  <div className="bubble-row">
+                    <span className="bubble-row__face">{lastOfRun ? <Avatar who={{ ...who, verified: false }} size={28} /> : null}</span>
+                    {bubble}
+                  </div>
+                )}
               </Fragment>
             );
           })}

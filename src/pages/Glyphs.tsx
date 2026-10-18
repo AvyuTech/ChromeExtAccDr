@@ -12,6 +12,7 @@ import {
   HeartGlyph,
   HomeGlyph,
   Logo,
+  Wordmark,
   MeGlyph,
   NamedGlyph,
   PowerGlyph,
@@ -82,10 +83,19 @@ export default function Glyphs() {
       <main className="page page--with-header">
         <section className="card stack" aria-labelledby="g-brand">
           <SectionHead id="g-brand" title="Brand mark" />
-          <div className="row">
-            <Logo key={logoKey} size={64} title="Nearhood logo" />
-            <p className="body-sm grow">The arch is a doorway and an "n"; the mint dot is "you are here". Every glyph below borrows that dot as its accent.</p>
+          <div className="brand-sheet">
+            <span className="brand-sheet__cell">
+              <Logo key={logoKey} size={64} title="Nearhood logo" />
+            </span>
+            <span className="brand-sheet__cell brand-sheet__cell--violet">
+              <Logo key={`tile-${logoKey}`} size={64} tile title="Nearhood app icon" />
+            </span>
+            <span className="brand-sheet__word">
+              <Wordmark size={30} />
+              <span className="meta">A little closer to your city.</span>
+            </span>
           </div>
+          <p className="body-sm">The arch is a doorway and an "n"; the lime dot is "you are here". Every glyph below borrows that dot as its accent.</p>
           <button type="button" className="btn btn--soft btn--sm" style={{ alignSelf: 'flex-start' }} onClick={() => setLogoKey((k) => k + 1)}>
             Replay
           </button>
@@ -218,14 +228,14 @@ export default function Glyphs() {
 
         <section className="card stack" aria-labelledby="g-react">
           <SectionHead id="g-react" title="Reactions" />
-          <div className="row" style={{ gap: 12 }}>
-            <button type="button" className="btn btn--outline" aria-pressed={up} onClick={() => setUp((v) => !v)} style={{ color: up ? 'var(--accent)' : undefined }}>
+          <div className="row row--wrap" style={{ gap: 8 }}>
+            <button type="button" className="btn btn--sm btn--outline" aria-pressed={up} onClick={() => setUp((v) => !v)} style={{ color: up ? 'var(--accent)' : undefined }}>
               <UpvoteGlyph size={20} active={up} /> Upvote
             </button>
-            <button type="button" className="btn btn--outline" aria-pressed={saved} onClick={() => setSaved((v) => !v)} style={{ color: saved ? 'var(--accent)' : undefined }}>
+            <button type="button" className="btn btn--sm btn--outline" aria-pressed={saved} onClick={() => setSaved((v) => !v)} style={{ color: saved ? 'var(--accent)' : undefined }}>
               <SaveGlyph size={20} active={saved} /> Save
             </button>
-            <button type="button" className="btn btn--outline" aria-pressed={liked} onClick={() => setLiked((v) => !v)} style={{ color: liked ? 'var(--red)' : undefined }}>
+            <button type="button" className="btn btn--sm btn--outline" aria-pressed={liked} onClick={() => setLiked((v) => !v)} style={{ color: liked ? 'var(--red)' : undefined }}>
               <HeartGlyph size={20} active={liked} /> Love
             </button>
           </div>

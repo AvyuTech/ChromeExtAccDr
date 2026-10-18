@@ -8,10 +8,11 @@ import { ChevronRightGlyph, type GlyphProps } from '../../icons';
 
 export type GlyphComp = ComponentType<GlyphProps>;
 
-export function GlyphTile({ G, tone = 'violet', live, size = 32 }: { G: GlyphComp; tone?: Tone; live?: boolean; size?: number }) {
+/** Outline glyph on a soft tinted square, as on Home and Explore. */
+export function GlyphTile({ G, tone = 'violet', live, size = 36 }: { G: GlyphComp; tone?: Tone; live?: boolean; size?: number }) {
   return (
-    <span className={`tile tone-${tone}`} style={{ width: size, height: size, borderRadius: size * 0.31 }}>
-      <G size={Math.round(size * 0.56)} duo live={live} />
+    <span className={`tile set-tile tone-${tone}`} style={{ width: size, height: size, borderRadius: Math.round(size * 0.34) }}>
+      <G size={Math.round(size * 0.56)} live={live} />
     </span>
   );
 }

@@ -1,11 +1,16 @@
 import { useId, useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
+import { photo, PHOTO_SOURCES } from '../../assets/photos';
 import { LinkRow } from '../../components/ui';
+import { person } from '../../data/core';
+import { EVENTS } from '../../data/events';
+import { placeById } from '../../data/places';
 import { useT } from '../../i18n';
-import { FlagGlyph, Logo, PinGlyph, PlusGlyph, TrashGlyph, TrustRing, WalkGlyph } from '../../icons';
+import { FlagGlyph, ImageGlyph, Logo, PinGlyph, PlusGlyph, SparkGlyph, TrashGlyph, TrustRing, WalkGlyph, Wordmark } from '../../icons';
 import { useSettings } from '../../state/settings';
 import { useToast } from '../../state/toast';
 import { APP_VERSION } from './meta';
-import { Group, SettingToggle } from './parts';
+import { Group, SettingLink, SettingToggle } from './parts';
 
 /* ======================= Safety & SOS ======================= */
 
@@ -247,19 +252,30 @@ export function HelpSection() {
 
 export function AboutSection() {
   const t = useT();
+  const total = Object.keys(PHOTO_SOURCES).length;
   return (
     <>
-      <section className="card set-about">
-        <Logo size={64} title="Nearhood" />
-        <h2 className="page-title" style={{ fontSize: '1.5rem' }}>
-          nearhood
+      <section className="set-about" aria-labelledby="about-brand">
+        <span className="set-about__mark">
+          <Logo size={76} tile title="Nearhood" />
+        </span>
+        <h2 id="about-brand" className="sr-only">
+          Nearhood
         </h2>
-        <span className="meta">{t('settings.about.version', { v: APP_VERSION })}</span>
-        <p className="body-sm">{t('onboarding.tagline')} A smart, city-level companion for Ahmedabad.</p>
+        <Wordmark size={34} />
+        <p className="set-about__tag">{t('onboarding.tagline')}</p>
+        <span className="row" style={{ gap: 6 }}>
+          <span className="badge tone-violet">{t('settings.about.version', { v: APP_VERSION })}</span>
+          <span className="badge badge--lime">{t('settings.about.madeIn')}</span>
+        </span>
+        <p className="body-sm muted" style={{ maxWidth: 300 }}>
+          {t('settings.about.blurb')}
+        </p>
       </section>
 
       <div className="list">
-        <LinkRow to="/about/glyphs" glyph="spark" tone="violet" title={t('settings.about.glyphs')} meta={t('settings.about.glyphsMeta')} />
+        <SettingLink to="/settings/credits" G={ImageGlyph} tone="peach" title={t('settings.credits')} meta={t('settings.credits.meta', { n: total })} />
+        <SettingLink to="/about/glyphs" G={SparkGlyph} tone="violet" title={t('settings.about.glyphs')} meta={t('settings.about.glyphsMeta')} />
       </div>
 
       <section className="card stack" aria-labelledby="about-data">
@@ -288,11 +304,88 @@ export function AboutSection() {
           {t('settings.about.credits')}
         </h2>
         <ul className="set-list">
-          <li>Designed from the Nearhood canvas.</li>
+          <li>Designed from the Nearhood canvas, Porcelain theme.</li>
           <li>Icons: the Nearhood glyph family, drawn for this app.</li>
-          <li>Type: Sora and DM Sans, via Google Fonts.</li>
+          <li>Type: Plus Jakarta Sans for headlines and Manrope for text, via Google Fonts.</li>
+          <li>
+            Photos: {total} images from Unsplash, Flickr and Wikimedia Commons. <Link to="/settings/credits">See every credit</Link>.
+          </li>
         </ul>
       </section>
+    </>
+  );
+}
+
+/* ======================= Photo credits ======================= */
+
+const PHOTO_GROUPS: Array<{ prefix: string; key: string }> = [
+  { prefix: 'place-', key: 'settings.credits.places' },
+  { prefix: 'event-', key: 'settings.credits.events' },
+  { prefix: 'dish-', key: 'settings.credits.dishes' },
+  { prefix: 'scene-', key: 'settings.credits.scenes' },
+  { prefix: 'person-', key: 'settings.credits.people' },
+];
+
+const UNSPLASH_LICENSE = 'https://unsplash.com/license';
+
+/** Name a photo from its key: the place or event it shows, else "dish-cold-brew" → "Cold brew". */
+function photoLabel(key: string) {
+  const id = key.replace(/^[a-z]+-/, '');
+  if (key.startsWith('place-') && placeById(id)) return placeById(id)!.name;
+  if (key.startsWith('event-')) {
+    const e = EVENTS.find((x) => x.id === id);
+    if (e) return e.title;
+  }
+  const name = id.replace(/-/g, ' ');
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+export function PhotoCreditsSection() {
+  const t = useT();
+  const entries = Object.entries(PHOTO_SOURCES);
+  const cc = entries.filter(([, s]) => s.license.startsWith('CC')).length;
+  return (
+    <>
+      <div className="credits-hero">
+        <div className="credits-hero__stack" aria-hidden="true">
+          {['place-adalaj', 'dish-pav-bhaji', 'place-law-garden'].map((k) => (
+            <img key={k} src={photo(k)} alt="" />
+          ))}
+        </div>
+        <div className="stack" style={{ gap: 4 }}>
+          <span className="strong">{t('settings.credits.title', { n: entries.length })}</span>
+          <span className="body-sm muted">{t('settings.credits.intro', { cc, unsplash: entries.length - cc })}</span>
+        </div>
+      </div>
+
+      {PHOTO_GROUPS.map((g) => {
+        const rows = entries.filter(([k]) => k.startsWith(g.prefix));
+        if (!rows.length) return null;
+        return (
+          <Group key={g.prefix} title={`${t(g.key)} · ${rows.length}`}>
+            {rows.map(([k, src]) => (
+              <div key={k} className="list-row credit-row">
+                <img className="credit-row__thumb" src={photo(k)} alt="" loading="lazy" />
+                <span className="list-row__body">
+                  <span className="list-row__title">{g.prefix === 'person-' ? t('settings.credits.portrait', { name: person(k.slice(7)).name }) : photoLabel(k)}</span>
+                  <span className="list-row__meta credit-row__credit">{src.credit}</span>
+                  <span className="credit-row__links">
+                    <a href={src.url} target="_blank" rel="noopener noreferrer">
+                      {src.source}
+                    </a>
+                    <span aria-hidden="true">·</span>
+                    <a href={src.licenseUrl ?? UNSPLASH_LICENSE} target="_blank" rel="noopener noreferrer" className={src.license.startsWith('CC') ? 'credit-row__cc' : undefined}>
+                      {src.license}
+                    </a>
+                  </span>
+                </span>
+              </div>
+            ))}
+          </Group>
+        );
+      })}
+
+      <p className="set-group__note">{t('settings.credits.note')}</p>
     </>
   );
 }

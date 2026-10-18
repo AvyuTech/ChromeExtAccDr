@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Avatar } from '../components/cards';
 import { POST_TYPE_META } from '../components/social';
 import { Segmented, Sheet } from '../components/ui';
 import { ALERT_KIND_META } from '../data/city';
-import { neighbourhoodName } from '../data/core';
+import { neighbourhoodName, PEOPLE } from '../data/core';
 import { groupById, POSTS } from '../data/social';
 import type { AlertKind, Post, PostType } from '../data/types';
 import { useT } from '../i18n';
@@ -177,6 +178,13 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
       </header>
 
       <form id="compose-form" className="compose-form page page--with-header page--no-nav" onSubmit={submit} noValidate>
+        <div className="compose-as">
+          <Avatar who={{ ...PEOPLE.me, name: settings.profile.name, verified: settings.profile.verifiedResident }} size={44} />
+          <span className="stack grow" style={{ gap: 1, minWidth: 0 }}>
+            <span className="strong">{t('social.postingAs', { name: settings.profile.name })}</span>
+            <span className="meta truncate">{t('social.visibleTo', { where: whereLabel })}</span>
+          </span>
+        </div>
         <fieldset className="stack" style={{ border: 'none', margin: 0, padding: 0, gap: 10 }}>
           <legend className="field__label" style={{ marginBottom: 10 }}>
             {t('social.whatType')}
@@ -187,8 +195,8 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
               const on = type === x.id;
               return (
                 <button key={x.id} type="button" role="radio" aria-checked={on} className="type-option glyph-host" onClick={() => chooseType(x.id)}>
-                  <span className={`tile tone-${meta.tone}`} style={{ width: 34, height: 34, borderRadius: 11 }}>
-                    <NamedGlyph name={meta.glyph} size={19} duo active={on} />
+                  <span className={`tile tone-${meta.tone}`} style={{ width: 38, height: 38, borderRadius: 13 }}>
+                    <NamedGlyph name={meta.glyph} size={20} active={on} />
                   </span>
                   {t(x.key)}
                 </button>
@@ -370,8 +378,16 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
           </div>
         ) : (
           <label className="photo-picker glyph-host">
-            <CameraGlyph size={20} duo />
-            {t('social.addPhoto')}
+            <span className="photo-picker__icon">
+              <CameraGlyph size={22} />
+            </span>
+            <span className="stack grow" style={{ gap: 2 }}>
+              <span className="strong">{t('social.addPhoto')}</span>
+              <span className="meta">{t('social.photoHint')}</span>
+            </span>
+            <span className="photo-picker__plus" aria-hidden="true">
+              +
+            </span>
             <input
               type="file"
               accept="image/*"

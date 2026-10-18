@@ -10,6 +10,9 @@ import { LockGlyph, SearchGlyph } from '../icons';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 
+/** Sample "active now" neighbours. */
+const ONLINE = ['aditi', 'riya', 'karan', 'farah'];
+
 export default function Messages() {
   const t = useT();
   const { settings } = useSettings();
@@ -39,6 +42,8 @@ export default function Messages() {
     : rows;
 
   const privacy = settings.privacy.allowMessages;
+  // People you follow, for a quick new chat.
+  const friends = data.following.filter((id) => PEOPLE[id] && id !== 'ward').slice(0, 8);
 
   return (
     <>
@@ -49,6 +54,23 @@ export default function Messages() {
           <span className="sr-only">{t('social.searchChats')}</span>
           <input id="chat-search" type="search" value={query} placeholder={t('social.searchChats')} onChange={(e) => setQuery(e.target.value)} autoComplete="off" />
         </label>
+
+        {!q && friends.length ? (
+          <section className="dm-strip" aria-label={t('social.startChat')}>
+            {friends.map((id) => {
+              const who = person(id);
+              return (
+                <Link key={id} to={`/messages/c-${id}`} className="dm-strip__item">
+                  <span className="dm-strip__face">
+                    <Avatar who={{ ...who, verified: false }} size={58} />
+                    {ONLINE.includes(id) ? <span className="dm-strip__online" aria-label={t('social.activeNow')} /> : null}
+                  </span>
+                  <span className="dm-strip__name">{who.name.split(' ')[0]}</span>
+                </Link>
+              );
+            })}
+          </section>
+        ) : null}
 
         {shown.length === 0 ? (
           <EmptyState glyph="question" title={t('social.noChats')} body={t('social.noChatsBody')} />
@@ -61,7 +83,10 @@ export default function Messages() {
                 className={`list-row${unread ? ' chat-row--unread' : ''}`}
                 aria-label={`${who.name}${unread ? `, ${t('social.unreadCount', { n: unread })}` : ''}. ${last?.text ?? ''}`}
               >
-                <Avatar who={who} size={46} />
+                <span className="dm-strip__face">
+                  <Avatar who={who} size={52} />
+                  {ONLINE.includes(who.id) ? <span className="dm-strip__online" /> : null}
+                </span>
                 <span className="list-row__body">
                   <span className="row row--between" style={{ gap: 8 }}>
                     <span className="list-row__title">{who.name}</span>

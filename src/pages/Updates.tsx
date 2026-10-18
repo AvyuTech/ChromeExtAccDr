@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { eventPhoto, groupPhoto, personPhoto, placePhoto } from '../assets/photos';
+import { Avatar } from '../components/cards';
 import { FollowButton } from '../components/friends';
 import { NOTIFICATION_META } from '../components/social';
 import { EmptyState, PageHeader } from '../components/ui';
 import { person } from '../data/core';
+import { DEALS } from '../data/social';
 import type { AppNotification } from '../data/types';
 import { useT } from '../i18n';
 import { BellOffGlyph, NamedGlyph } from '../icons';
@@ -96,12 +99,9 @@ export default function Updates() {
                 <div className="list">
                   {g.items.map((n) => {
                     const isUnread = !data.readNotifications.includes(n.id);
-                    const meta = NOTIFICATION_META[n.kind];
                     const content = (
                       <>
-                        <span className={`tile tone-${meta.tone}`}>
-                          <NamedGlyph name={meta.glyph} size={20} duo live={(n.kind === 'alert' || n.kind === 'friend') && isUnread} />
-                        </span>
+                        <NotifVisual n={n} live={(n.kind === 'alert' || n.kind === 'friend') && isUnread} />
                         <span className="list-row__body" style={{ gap: 3 }}>
                           <span className="notif-row__title">{pendingRequest(n) ? `${person(n.actorId!).name} wants to follow you` : n.title}</span>
                           <span className="notif-row__body">{pendingRequest(n) ? 'Approve to let them see your friends-only check-ins.' : n.body}</span>
@@ -159,6 +159,41 @@ export default function Updates() {
         )}
       </main>
     </>
+  );
+}
+
+/** Who or what the update is about: a face, a photo of the event or place, or the kind's glyph. */
+function NotifVisual({ n, live }: { n: AppNotification; live: boolean }) {
+  const meta = NOTIFICATION_META[n.kind];
+  const eventId = n.link.startsWith('/event/') ? n.link.slice(7) : undefined;
+  const groupId = n.link.startsWith('/groups/') ? n.link.slice(8) : undefined;
+  const deal = n.kind === 'deal' ? DEALS.find((d) => n.body.includes(d.title) || n.title.includes(d.title)) : undefined;
+  const src = n.actorId ? personPhoto(n.actorId) : eventId ? eventPhoto(eventId) : groupId ? groupPhoto(groupId) : deal?.placeId ? placePhoto(deal.placeId) : undefined;
+  const badge = (
+    <span className={`notif-visual__badge tone-${meta.tone}`}>
+      <NamedGlyph name={meta.glyph} size={12} />
+    </span>
+  );
+  if (n.actorId) {
+    return (
+      <span className="notif-visual">
+        <Avatar who={{ ...person(n.actorId), verified: false }} size={46} />
+        {badge}
+      </span>
+    );
+  }
+  if (src) {
+    return (
+      <span className="notif-visual">
+        <img className="notif-visual__photo" src={src} alt="" loading="lazy" />
+        {badge}
+      </span>
+    );
+  }
+  return (
+    <span className={`notif-visual notif-visual--tile tone-${meta.tone}`}>
+      <NamedGlyph name={meta.glyph} size={22} live={live} />
+    </span>
   );
 }
 

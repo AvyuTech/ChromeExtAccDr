@@ -225,6 +225,35 @@ export const settings: Dict = {
   'settings.about.how': { en: 'How answers work', gu: 'જવાબો કેવી રીતે કામ કરે છે', hi: 'जवाब कैसे काम करते हैं' },
   'settings.about.credits': { en: 'Credits', gu: 'આભાર', hi: 'आभार' },
   'settings.about.glyphs': { en: 'Glyph gallery', gu: 'ગ્લિફ ગેલેરી', hi: 'ग्लिफ़ गैलरी' },
+  'settings.home.quick': { en: 'Quick settings', gu: 'ઝડપી સેટિંગ્સ', hi: 'त्वरित सेटिंग्स' },
+  'settings.home.darkMode': { en: 'Dark mode', gu: 'ડાર્ક મોડ', hi: 'डार्क मोड' },
+  'settings.home.push': { en: 'Notifications', gu: 'સૂચનાઓ', hi: 'सूचनाएँ' },
+  'settings.home.verified': { en: 'Verified resident', gu: 'ચકાસાયેલ રહેવાસી', hi: 'सत्यापित निवासी' },
+  'settings.about.madeIn': { en: 'Made in Ahmedabad', gu: 'અમદાવાદમાં બનેલું', hi: 'अहमदाबाद में बना' },
+  'settings.about.blurb': {
+    en: 'A smart, city-level companion for Ahmedabad: neighbours, verified city updates and local know-how in one place.',
+    gu: 'અમદાવાદ માટે સ્માર્ટ શહેર સાથી: પડોશીઓ, ચકાસાયેલા અપડેટ્સ અને સ્થાનિક જાણકારી એક જગ્યાએ.',
+    hi: 'अहमदाबाद के लिए स्मार्ट शहर साथी: पड़ोसी, सत्यापित अपडेट और स्थानीय जानकारी एक जगह।',
+  },
+  'settings.credits': { en: 'Photo credits', gu: 'ફોટો શ્રેય', hi: 'फ़ोटो श्रेय' },
+  'settings.credits.meta': { en: '{n} photos, with sources and licences', gu: '{n} ફોટા, સ્રોત અને લાઇસન્સ સાથે', hi: '{n} फ़ोटो, स्रोत और लाइसेंस के साथ' },
+  'settings.credits.title': { en: '{n} photos make Nearhood feel like home', gu: '{n} ફોટા Nearhoodને ઘર જેવું બનાવે છે', hi: '{n} फ़ोटो Nearhood को घर जैसा बनाते हैं' },
+  'settings.credits.intro': {
+    en: '{unsplash} come from Unsplash and {cc} from Flickr and Wikimedia Commons photographers under Creative Commons. Thank you to everyone below.',
+    gu: '{unsplash} Unsplash પરથી અને {cc} Creative Commons હેઠળ Flickr અને Wikimedia Commons ફોટોગ્રાફરો પાસેથી. નીચેના દરેકનો આભાર.',
+    hi: '{unsplash} Unsplash से और {cc} Creative Commons के तहत Flickr और Wikimedia Commons फ़ोटोग्राफ़रों से। नीचे सभी का धन्यवाद।',
+  },
+  'settings.credits.places': { en: 'Places', gu: 'સ્થળો', hi: 'जगहें' },
+  'settings.credits.events': { en: 'Events', gu: 'ઇવેન્ટ્સ', hi: 'इवेंट' },
+  'settings.credits.dishes': { en: 'Food & drink', gu: 'ખાણી-પીણી', hi: 'खाना-पीना' },
+  'settings.credits.scenes': { en: 'Around the city', gu: 'શહેરમાં', hi: 'शहर में' },
+  'settings.credits.people': { en: 'Sample neighbours', gu: 'નમૂના પડોશીઓ', hi: 'नमूना पड़ोसी' },
+  'settings.credits.portrait': { en: 'Portrait for {name}', gu: '{name} માટે પોર્ટ્રેટ', hi: '{name} के लिए पोर्ट्रेट' },
+  'settings.credits.note': {
+    en: 'Photos were resized and cropped for the app. Creative Commons photos keep their original licence; tap a licence to read it. Portraits stand in for sample neighbours and do not show real members.',
+    gu: 'ફોટા એપ માટે નાના અને કાપેલા છે. Creative Commons ફોટા તેમના મૂળ લાઇસન્સ હેઠળ જ છે. પોર્ટ્રેટ નમૂના પડોશીઓ માટે છે, સાચા સભ્યો નથી.',
+    hi: 'फ़ोटो ऐप के लिए छोटे और क्रॉप किए गए हैं। Creative Commons फ़ोटो अपने मूल लाइसेंस में ही हैं। पोर्ट्रेट नमूना पड़ोसियों के लिए हैं, असली सदस्य नहीं।',
+  },
   'settings.about.glyphsMeta': { en: 'Every Nearhood icon, live', gu: 'Nearhoodનું દરેક આઇકન, લાઇવ', hi: 'Nearhood का हर आइकन, लाइव' },
 
   /* ---------- Me ---------- */
@@ -257,7 +286,11 @@ export const settings: Dict = {
   /* ---------- Onboarding ---------- */
   'onboarding.skip': { en: 'Skip', gu: 'છોડો', hi: 'छोड़ें' },
   'onboarding.step': { en: 'Step {n} of 4', gu: 'પગલું {n} / 4', hi: 'चरण {n} / 4' },
-  'onboarding.tagline': { en: 'Your city, answered.', gu: 'તમારું શહેર, તમારા જવાબો.', hi: 'आपका शहर, आपके जवाब।' },
+  'onboarding.tagline': { en: 'A little closer to your city.', gu: 'તમારા શહેરની થોડી વધુ નજીક.', hi: 'अपने शहर के थोड़ा और क़रीब।' },
+  'onboarding.eyebrow': { en: 'Welcome to {city}', gu: '{city}માં સ્વાગત છે', hi: '{city} में स्वागत है' },
+  'onboarding.stepOf': { en: 'Step {n} of {total}', gu: 'પગલું {n} / {total}', hi: 'चरण {n} / {total}' },
+  'onboarding.fineprint': { en: 'Takes under a minute. Change anything later in Settings.', gu: 'એક મિનિટથી ઓછો સમય. પછી સેટિંગ્સમાં કંઈ પણ બદલો.', hi: 'एक मिनट से कम लगेगा। बाद में सेटिंग्स में कुछ भी बदलें।' },
+  'onboarding.pushMeta': { en: 'Only for the alert types above and replies to you.', gu: 'ફક્ત ઉપરની ચેતવણીઓ અને તમને મળેલા જવાબો માટે.', hi: 'सिर्फ़ ऊपर चुने अलर्ट और आपको मिले जवाबों के लिए।' },
   'onboarding.intro': {
     en: 'Neighbours, verified city updates and local know-how in one place.',
     gu: 'પડોશીઓ, ચકાસાયેલા શહેર અપડેટ્સ અને સ્થાનિક જાણકારી એક જ જગ્યાએ.',

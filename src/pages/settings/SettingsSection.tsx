@@ -4,7 +4,7 @@ import { EmptyState, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n';
 import { SECTIONS, type SectionId } from './meta';
 import { AccessibilitySection, AppearanceSection, LanguageSection } from './sectionsDisplay';
-import { AboutSection, HelpSection, SafetySection } from './sectionsSupport';
+import { AboutSection, HelpSection, PhotoCreditsSection, SafetySection } from './sectionsSupport';
 import { DataSection, PrivacySection, SourcesSection } from './sectionsTrust';
 import { AccountSection, AlertsSection, LocationSection, NotificationsSection } from './sectionsYou';
 
@@ -22,6 +22,7 @@ const BODIES: Record<SectionId, ComponentType> = {
   safety: SafetySection,
   help: HelpSection,
   about: AboutSection,
+  credits: PhotoCreditsSection,
 };
 
 export default function SettingsSection() {
@@ -51,7 +52,7 @@ export default function SettingsSection() {
   const Body = BODIES[meta.id];
   return (
     <>
-      <PageHeader title={t(meta.key)} fallback="/settings" />
+      <PageHeader title={t(meta.key)} fallback={meta.nested ? '/settings/about' : '/settings'} />
       <main className="page page--with-header settings-page">
         <Body />
       </main>

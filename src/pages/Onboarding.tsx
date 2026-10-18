@@ -1,54 +1,84 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { photo, placePhoto } from '../assets/photos';
+import { Avatar, FaceStack } from '../components/cards';
+import { CityMap, NEIGHBOURHOOD_POS, PLACE_POS, type MapPin } from '../components/CityMap';
 import { Segmented, Switch } from '../components/ui';
 import { ALERT_KIND_META } from '../data/city';
-import { CITIES, NEIGHBOURHOODS } from '../data/core';
+import { CITIES, NEIGHBOURHOODS, person } from '../data/core';
+import { PLACES } from '../data/places';
 import type { AlertKind } from '../data/types';
 import { LANGUAGES, useT } from '../i18n';
-import {
-  AlertGlyph,
-  BackGlyph,
-  BellGlyph,
-  CafeGlyph,
-  CheckGlyph,
-  DealsGlyph,
-  EventsGlyph,
-  FoodGlyph,
-  GroupsGlyph,
-  HeritageGlyph,
-  KidsGlyph,
-  Logo,
-  MicGlyph,
-  MusicGlyph,
-  NamedGlyph,
-  NatureGlyph,
-  ReportGlyph,
-  ShoppingGlyph,
-  SparkGlyph,
-  SportsGlyph,
-} from '../icons';
+import { AlertGlyph, BackGlyph, BellGlyph, CheckGlyph, Logo, NamedGlyph, ReportGlyph, SparkGlyph, SparkleMark, Wordmark } from '../icons';
+import { km } from '../lib/format';
 import { useSettings } from '../state/settings';
 import type { GlyphComp } from './settings/parts';
 
 const STEPS = 4;
 const MIN_INTERESTS = 3;
 
-const INTERESTS: Array<{ id: string; G: GlyphComp; tone: string }> = [
-  { id: 'food', G: FoodGlyph, tone: 'peach' },
-  { id: 'cafes', G: CafeGlyph, tone: 'clay' },
-  { id: 'events', G: EventsGlyph, tone: 'violet' },
-  { id: 'music', G: MusicGlyph, tone: 'night' },
-  { id: 'comedy', G: MicGlyph, tone: 'violet' },
-  { id: 'heritage', G: HeritageGlyph, tone: 'amber' },
-  { id: 'sports', G: SportsGlyph, tone: 'green' },
-  { id: 'kids', G: KidsGlyph, tone: 'yellow' },
-  { id: 'nature', G: NatureGlyph, tone: 'teal' },
-  { id: 'shopping', G: ShoppingGlyph, tone: 'peach' },
-  { id: 'deals', G: DealsGlyph, tone: 'mint' },
-  { id: 'groups', G: GroupsGlyph, tone: 'blue' },
+/** Every interest gets a real photo so picking feels like flicking through the city. */
+const INTERESTS: Array<{ id: string; photo: string }> = [
+  { id: 'food', photo: 'dish-pav-bhaji' },
+  { id: 'cafes', photo: 'dish-latte-art' },
+  { id: 'events', photo: 'scene-concert' },
+  { id: 'music', photo: 'event-sufi-night' },
+  { id: 'comedy', photo: 'event-open-mic' },
+  { id: 'heritage', photo: 'place-adalaj' },
+  { id: 'sports', photo: 'event-pickleball-social' },
+  { id: 'kids', photo: 'event-kite-workshop' },
+  { id: 'nature', photo: 'place-vastrapur-lake' },
+  { id: 'shopping', photo: 'place-law-garden' },
+  { id: 'deals', photo: 'dish-samosa' },
+  { id: 'groups', photo: 'scene-friends' },
+];
+
+const PROMISES: Array<{ G: GlyphComp; title: string; body: string }> = [
+  { G: SparkGlyph, title: 'onboarding.ask', body: 'onboarding.askBody' },
+  { G: AlertGlyph, title: 'onboarding.alerts', body: 'onboarding.alertsBody' },
+  { G: ReportGlyph, title: 'onboarding.fix', body: 'onboarding.fixBody' },
 ];
 
 const KINDS = Object.keys(ALERT_KIND_META) as AlertKind[];
+
+/** The first-run collage: real places and people, with a few live Nearhood moments floating on top. */
+function Collage() {
+  const riya = person('riya');
+  return (
+    <div className="onb-collage" aria-hidden="true">
+      <span className="onb-collage__photo onb-collage__photo--a">
+        <img src={photo('place-law-garden')} alt="" />
+      </span>
+      <span className="onb-collage__photo onb-collage__photo--b">
+        <img src={photo('dish-pav-bhaji')} alt="" />
+      </span>
+      <span className="onb-collage__photo onb-collage__photo--c">
+        <img src={photo('scene-friends')} alt="" />
+      </span>
+      <span className="onb-collage__photo onb-collage__photo--d">
+        <img src={photo('place-adalaj')} alt="" />
+      </span>
+
+      <span className="onb-float onb-float--pick">
+        <Avatar who={{ ...riya, verified: false }} size={30} />
+        <span className="stack" style={{ gap: 0 }}>
+          <b>Cold brew</b>
+          <small>Riya · Must try</small>
+        </span>
+      </span>
+      <span className="onb-float onb-float--plans">
+        <SparkleMark size={14} />5 plans tonight
+      </span>
+      <span className="onb-float onb-float--faces">
+        <FaceStack ids={['aditi', 'karan', 'farah']} size={22} />
+        <small>18 neighbours replied</small>
+      </span>
+      <span className="onb-float onb-float--pin">
+        <Logo size={30} tile animated={false} />
+      </span>
+    </div>
+  );
+}
 
 export default function Onboarding() {
   const t = useT();
@@ -56,6 +86,13 @@ export default function Onboarding() {
   const { settings, update } = useSettings();
   const [step, setStep] = useState(0);
   const workId = useId();
+  const homeChips = useRef<HTMLDivElement>(null);
+
+  // Each step starts at the top, in the window or inside the desktop phone frame.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.getElementById('scroller')?.scrollTo(0, 0);
+  }, [step]);
 
   const finish = () => {
     update('onboarded', true);
@@ -69,60 +106,84 @@ export default function Onboarding() {
   const toggleInterest = (id: string) =>
     update('interests', settings.interests.includes(id) ? settings.interests.filter((x) => x !== id) : [...settings.interests, id]);
 
+  const home = NEIGHBOURHOOD_POS[settings.location.home];
+  const pins: MapPin[] = useMemo(
+    () =>
+      PLACES.filter((p) => PLACE_POS[p.id]).map((p) => ({
+        id: p.id,
+        x: PLACE_POS[p.id][0],
+        y: PLACE_POS[p.id][1],
+        glyph: p.glyph,
+        title: p.name,
+        meta: `${p.kind} · ${km(p.distanceKm)}`,
+        to: `/place/${p.id}`,
+        photo: placePhoto(p.id),
+      })),
+    [],
+  );
+  const homeName = NEIGHBOURHOODS.find((n) => n.id === settings.location.home)?.name ?? settings.location.home;
+
   return (
-    <main className="page page--no-nav onb" aria-labelledby={`onb-title-${step}`}>
+    <main className={`page page--no-nav onb onb--step-${step}`} aria-labelledby={`onb-title-${step}`}>
       <div className="onb__top">
         {step > 0 ? (
           <button type="button" className="icon-btn" aria-label={t('common.back')} onClick={() => setStep(step - 1)}>
             <BackGlyph size={20} />
           </button>
         ) : (
-          <span style={{ width: 44 }} aria-hidden="true" />
+          <span className="row" style={{ gap: 8 }}>
+            <Logo size={30} />
+            <Wordmark size={22} />
+          </span>
         )}
         <div className="onb__dots" role="progressbar" aria-label={t('onboarding.step', { n: step + 1 })} aria-valuemin={1} aria-valuemax={STEPS} aria-valuenow={step + 1}>
           {Array.from({ length: STEPS }, (_, i) => (
             <span key={i} className={i === step ? 'is-current' : i < step ? 'is-done' : undefined} />
           ))}
         </div>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={finish}>
+        <button type="button" className="btn btn--ghost btn--sm onb__skip" onClick={finish}>
           {t('onboarding.skip')}
         </button>
       </div>
 
       {step === 0 && (
         <section className="onb__body fade-up" key="s0">
+          <Collage />
           <div className="onb__hero">
-            <Logo size={76} title="Nearhood" />
-            <h1 className="page-title" id="onb-title-0">
+            <span className="eyebrow muted">{t('onboarding.eyebrow', { city: settings.location.city })}</span>
+            <h1 className="hero-title" id="onb-title-0">
               {t('onboarding.tagline')}
+              <SparkleMark size={26} className="hero-title__spark" />
             </h1>
             <p className="body muted">{t('onboarding.intro')}</p>
           </div>
-          <div className="list">
-            {[
-              { G: SparkGlyph, tone: 'violet', title: 'onboarding.ask', body: 'onboarding.askBody' },
-              { G: AlertGlyph, tone: 'amber', title: 'onboarding.alerts', body: 'onboarding.alertsBody' },
-              { G: ReportGlyph, tone: 'mint', title: 'onboarding.fix', body: 'onboarding.fixBody' },
-            ].map((v) => (
-              <div key={v.title} className="list-row" style={{ alignItems: 'flex-start' }}>
-                <span className={`tile tone-${v.tone}`}>
-                  <v.G size={22} duo live />
+          <ul className="onb-promises">
+            {PROMISES.map((v) => (
+              <li key={v.title} className="glyph-host">
+                <span className="onb-promises__icon">
+                  <v.G size={22} live />
                 </span>
-                <span className="list-row__body">
-                  <span className="list-row__title">{t(v.title)}</span>
-                  <span className="list-row__meta">{t(v.body)}</span>
+                <span className="stack" style={{ gap: 2 }}>
+                  <span className="strong">{t(v.title)}</span>
+                  <span className="body-sm muted">{t(v.body)}</span>
                 </span>
-              </div>
+              </li>
             ))}
-          </div>
-          <div className="stack" style={{ gap: 8 }}>
+          </ul>
+          <div className="stack" style={{ gap: 10 }}>
             <span className="field__label" id="onb-lang">
               {t('onboarding.pickLanguage')}
             </span>
-            <div className="chip-wrap" role="group" aria-labelledby="onb-lang">
+            <div className="onb-langs" role="group" aria-labelledby="onb-lang">
               {LANGUAGES.map((l) => (
-                <button key={l.id} type="button" className="chip chip--accent" aria-pressed={settings.language === l.id} lang={l.id} onClick={() => update('language', l.id)}>
-                  {l.native}
+                <button key={l.id} type="button" className="onb-lang" aria-pressed={settings.language === l.id} lang={l.id} onClick={() => update('language', l.id)}>
+                  <span className="onb-lang__native">{l.native}</span>
+                  <span className="onb-lang__name">{l.name}</span>
+                  {settings.language === l.id ? (
+                    <span className="onb-lang__check" aria-hidden="true">
+                      <CheckGlyph size={12} />
+                    </span>
+                  ) : null}
                 </button>
               ))}
             </div>
@@ -132,13 +193,35 @@ export default function Onboarding() {
 
       {step === 1 && (
         <section className="onb__body fade-up" key="s1">
-          <div className="stack" style={{ gap: 6 }}>
-            <h1 className="page-title" id="onb-title-1">
+          <div className="stack" style={{ gap: 8 }}>
+            <span className="eyebrow muted">{t('onboarding.stepOf', { n: 2, total: STEPS })}</span>
+            <h1 className="hero-title" id="onb-title-1">
               {t('onboarding.whereTitle')}
             </h1>
             <p className="body muted">{t('onboarding.whereBody')}</p>
           </div>
-          <div className="stack" style={{ gap: 8 }}>
+          {home ? (
+            <CityMap
+              pins={pins}
+              home={home}
+              radiusKm={settings.location.radiusKm}
+              areaLabel={homeName}
+              onArea={() => homeChips.current?.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus()}
+            />
+          ) : null}
+          <div className="stack" style={{ gap: 10 }}>
+            <span className="field__label" id="onb-home">
+              {t('settings.location.home')}
+            </span>
+            <div className="chip-wrap" role="group" aria-labelledby="onb-home" ref={homeChips}>
+              {NEIGHBOURHOODS.map((n) => (
+                <button key={n.id} type="button" aria-pressed={settings.location.home === n.id} className="chip" onClick={() => update('location', { home: n.id })}>
+                  {n.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="stack" style={{ gap: 10 }}>
             <span className="field__label" id="onb-city">
               {t('settings.location.city')}
             </span>
@@ -155,24 +238,6 @@ export default function Onboarding() {
                   </button>
                 );
               })}
-            </div>
-          </div>
-          <div className="stack" style={{ gap: 8 }}>
-            <span className="field__label" id="onb-home">
-              {t('settings.location.home')}
-            </span>
-            <div className="chip-wrap" role="group" aria-labelledby="onb-home">
-              {NEIGHBOURHOODS.map((n) => (
-                <button
-                  key={n.id}
-                  type="button"
-                  aria-pressed={settings.location.home === n.id}
-                  className="chip chip--accent"
-                  onClick={() => update('location', { home: n.id })}
-                >
-                  {n.name}
-                </button>
-              ))}
             </div>
           </div>
           <div className="field">
@@ -193,8 +258,9 @@ export default function Onboarding() {
 
       {step === 2 && (
         <section className="onb__body fade-up" key="s2">
-          <div className="stack" style={{ gap: 6 }}>
-            <h1 className="page-title" id="onb-title-2">
+          <div className="stack" style={{ gap: 8 }}>
+            <span className="eyebrow muted">{t('onboarding.stepOf', { n: 3, total: STEPS })}</span>
+            <h1 className="hero-title" id="onb-title-2">
               {t('onboarding.interestsTitle')}
             </h1>
             <p className="body muted">{t('onboarding.interestsBody')}</p>
@@ -203,21 +269,18 @@ export default function Onboarding() {
             {INTERESTS.map((i) => {
               const on = settings.interests.includes(i.id);
               return (
-                <button key={i.id} type="button" aria-pressed={on} className={`interest-tile glyph-host tone-${i.tone}`} onClick={() => toggleInterest(i.id)}>
-                  <span className="tile tile--lg">
-                    <i.G size={24} duo active={on} live={on} />
+                <button key={i.id} type="button" aria-pressed={on} className="interest-photo" onClick={() => toggleInterest(i.id)}>
+                  <img src={photo(i.photo)} alt="" loading="lazy" />
+                  <span className="interest-photo__label">{t(`interest.${i.id}`)}</span>
+                  <span className="interest-photo__check" aria-hidden="true">
+                    {on ? <CheckGlyph size={13} /> : null}
                   </span>
-                  <span>{t(`interest.${i.id}`)}</span>
-                  {on ? (
-                    <span className="interest-tile__check" aria-hidden="true">
-                      <CheckGlyph size={12} />
-                    </span>
-                  ) : null}
                 </button>
               );
             })}
           </div>
-          <p className="meta" aria-live="polite" style={{ textAlign: 'center' }}>
+          <p className="onb-count" aria-live="polite">
+            <span className={`onb-count__dot${picked >= MIN_INTERESTS ? ' is-done' : ''}`} />
             {picked >= MIN_INTERESTS ? t('onboarding.picked', { n: picked }) : t('onboarding.pickMore', { n: MIN_INTERESTS - picked })}
           </p>
         </section>
@@ -225,8 +288,9 @@ export default function Onboarding() {
 
       {step === 3 && (
         <section className="onb__body fade-up" key="s3">
-          <div className="stack" style={{ gap: 6 }}>
-            <h1 className="page-title" id="onb-title-3">
+          <div className="stack" style={{ gap: 8 }}>
+            <span className="eyebrow muted">{t('onboarding.stepOf', { n: 4, total: STEPS })}</span>
+            <h1 className="hero-title" id="onb-title-3">
               {t('onboarding.alertsTitle')}
             </h1>
             <p className="body muted">{t('onboarding.alertsIntro')}</p>
@@ -240,30 +304,32 @@ export default function Onboarding() {
                   key={k}
                   type="button"
                   aria-pressed={on}
-                  className={`interest-tile interest-tile--row glyph-host tone-${m.tone}`}
+                  className={`kind-tile glyph-host tone-${m.tone}`}
                   onClick={() => update('alerts', { kinds: { ...settings.alerts.kinds, [k]: !on } })}
                 >
-                  <span className="tile" style={{ width: 32, height: 32, borderRadius: 10 }}>
-                    <NamedGlyph name={m.glyph} size={18} duo />
+                  <span className="kind-tile__icon">
+                    <NamedGlyph name={m.glyph} size={20} active={on} />
                   </span>
                   <span className="grow" style={{ textAlign: 'left' }}>
                     {t(`settings.kind.${k}`)}
                   </span>
-                  {on ? <CheckGlyph size={16} style={{ color: 'var(--accent)' }} /> : null}
+                  <span className="kind-tile__check" aria-hidden="true">
+                    {on ? <CheckGlyph size={12} /> : null}
+                  </span>
                 </button>
               );
             })}
           </div>
           <div className="list">
             <div className="list-row">
-              <span className="tile tone-amber" style={{ width: 32, height: 32, borderRadius: 10 }}>
-                <BellGlyph size={18} duo ringing={settings.notifications.push} />
+              <span className="tile tone-amber" style={{ width: 36, height: 36, borderRadius: 12 }}>
+                <BellGlyph size={20} ringing={settings.notifications.push} />
               </span>
               <span className="list-row__body">
                 <span className="list-row__title" id="onb-push">
                   {t('settings.notif.push')}
                 </span>
-                <span className="list-row__meta">Only for the alert types above and replies to you.</span>
+                <span className="list-row__meta">{t('onboarding.pushMeta')}</span>
               </span>
               <Switch checked={settings.notifications.push} onChange={(v) => update('notifications', { push: v })} label={t('settings.notif.push')} />
             </div>
@@ -285,9 +351,10 @@ export default function Onboarding() {
       )}
 
       <div className="onb__footer">
-        <button type="button" className="btn btn--primary btn--lg btn--block" onClick={next} disabled={!canNext}>
+        <button type="button" className="btn btn--primary btn--lg btn--block onb__next" onClick={next} disabled={!canNext}>
           {step === 0 ? t('onboarding.start') : step === STEPS - 1 ? t('onboarding.finish') : t('common.next')}
         </button>
+        {step === 0 ? <p className="onb__fineprint">{t('onboarding.fineprint')}</p> : null}
       </div>
     </main>
   );

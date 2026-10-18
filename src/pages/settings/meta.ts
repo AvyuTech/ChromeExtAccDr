@@ -6,6 +6,7 @@ import {
   DataGlyph,
   GlobeGlyph,
   HelpGlyph,
+  ImageGlyph,
   InfoGlyph,
   LayersGlyph,
   LockGlyph,
@@ -29,7 +30,8 @@ export type SectionId =
   | 'data'
   | 'safety'
   | 'help'
-  | 'about';
+  | 'about'
+  | 'credits';
 
 export interface SectionMeta {
   id: SectionId;
@@ -39,6 +41,8 @@ export interface SectionMeta {
   group: 'you' | 'display' | 'trust' | 'support';
   /** Extra words people might search for. */
   keywords: string;
+  /** Reached from another section (About › Photo credits); listed on Settings only when searching. */
+  nested?: boolean;
 }
 
 export const SECTIONS: SectionMeta[] = [
@@ -55,6 +59,7 @@ export const SECTIONS: SectionMeta[] = [
   { id: 'safety', key: 'settings.safety', G: SosGlyph, tone: 'red', group: 'support', keywords: 'sos emergency contacts location safe walk' },
   { id: 'help', key: 'settings.help', G: HelpGlyph, tone: 'yellow', group: 'support', keywords: 'faq support problem bug feedback guidelines' },
   { id: 'about', key: 'settings.about', G: InfoGlyph, tone: 'blue', group: 'support', keywords: 'version credits licence glyphs icons' },
+  { id: 'credits', key: 'settings.credits', G: ImageGlyph, tone: 'peach', group: 'support', keywords: 'photo photos images credits licence license unsplash flickr creative commons attribution', nested: true },
 ];
 
 export const GROUPS: Array<{ id: SectionMeta['group']; key: string }> = [
