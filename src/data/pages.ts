@@ -79,9 +79,28 @@ export interface PageUpdate {
   text: string;
   photo?: string;
   link?: { label: string; url: string };
+  /** The person who posted it, when they're on Nearhood. */
+  byId?: string;
 }
 
 export const PAGE_UPDATES: PageUpdate[] = [
+  {
+    id: 'pu-pickle-1',
+    placeId: 'pickle-play',
+    by: 'Jay Mehta, owner',
+    byId: 'me',
+    ago: '3d',
+    text: 'Courts 3 and 4 are now open from 6 am on weekdays. Beginner sessions stay at 7 pm, paddles to borrow.',
+  },
+  {
+    id: 'pu-brew-1',
+    placeId: 'brew-lab',
+    by: 'Jay Mehta, owner',
+    byId: 'me',
+    ago: '2w',
+    text: 'This month’s single origin is from Chikmagalur, a washed Arabica with a cocoa finish. Ask for it as a pour-over.',
+    photo: 'dish-iced-latte',
+  },
   {
     id: 'pu-quiet-cup-1',
     placeId: 'quiet-cup',
@@ -138,6 +157,35 @@ export interface PageEdit {
   /** What changed, newest first: "Hours: 7 am – 11 pm → 6 am – 11 pm". */
   log?: Array<{ what: string; when: string }>;
 }
+
+/** Updates a page can post in a week. Enough to keep people informed, too few to spam. */
+export const UPDATES_PER_WEEK = 2;
+
+/** An owner's one public reply to a check-in on their page. */
+export interface OwnerReply {
+  placeId: string;
+  /** "Neha, owner". */
+  by: string;
+  byId?: string;
+  text: string;
+  ago: string;
+}
+
+/** Replies owners already gave, keyed by check-in id. */
+export const OWNER_REPLIES: Record<string, OwnerReply> = {
+  'ci-kavya-quietcup': {
+    placeId: 'quiet-cup',
+    by: 'Neha, owner',
+    text: 'Thanks Kavya, fair point. We’ve halved the syrup in the hazelnut latte since; ask for it less sweet any time.',
+    ago: '2 days',
+  },
+};
+
+/** This week's simple counts for pages people run. Never who, only how many. */
+export const PAGE_WEEK: Record<string, { saves: number; checkIns: number }> = {
+  'brew-lab': { saves: 46, checkIns: 19 },
+  'pickle-play': { saves: 31, checkIns: 12 },
+};
 
 /* ---------- Adding a page ---------- */
 

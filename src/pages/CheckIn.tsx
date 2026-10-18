@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { eventPhoto, placePhoto } from '../assets/photos';
 import { Avatar, Cover } from '../components/cards';
 import { VerdictPicker } from '../components/checkin';
@@ -13,6 +13,7 @@ import { useT } from '../i18n';
 import { CameraGlyph, CheckGlyph, ChevronDownGlyph, CloseGlyph, ImageGlyph, NamedGlyph, PinGlyph, PlusGlyph, SearchGlyph, ShieldGlyph } from '../icons';
 import { km, rupees } from '../lib/format';
 import { itemsFor } from '../lib/friends';
+import { runsPage } from '../lib/places';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
@@ -103,7 +104,9 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
   const chips = Array.from(new Set([...suggestions, ...items]));
 
   const done = [!!target, items.length > 0, !!verdict].filter(Boolean).length;
-  const ready = done === 3;
+  // People who run a page can't give it a verdict: theirs would never be neutral.
+  const ownPage = target?.type === 'place' && runsPage(target.place);
+  const ready = done === 3 && !ownPage;
   const dirty = !!target || items.length > 0 || !!verdict || !!note || !!photo;
 
   const pick = (next: Target) => {
@@ -237,6 +240,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
         <section className="section" aria-labelledby="ci-where">
           {stepHead(1, 'ci-where', t('checkin.where'), !!target)}
           {target ? (
+            <>
             <div className="checkin-target">
               {target.type === 'place' ? (
                 <Cover src={placePhoto(target.place.id)} glyph={target.place.glyph} tone={target.place.tone} className="checkin-target__photo" />
@@ -270,6 +274,16 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
                 {t('checkin.change')}
               </button>
             </div>
+            {ownPage ? (
+              <p className="notice checkin-own">
+                <ShieldGlyph size={16} />
+                <span>
+                  You run this page, so your verdict won’t count. You can still post an update from{' '}
+                  <Link to={`/place/${target.type === 'place' ? target.place.id : ''}/manage`}>Manage page</Link>.
+                </span>
+              </p>
+            ) : null}
+            </>
           ) : (
             <>
               {guess && !q ? (

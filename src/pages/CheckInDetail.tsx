@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { eventPhoto, placePhoto } from '../assets/photos';
 import { Avatar, Cover } from '../components/cards';
 import { CheckInRow } from '../components/checkin';
+import { OwnerReplyView } from '../components/discover';
 import { AvatarStack, CheckInCard, FollowButton, WantButton, wantFromCheckIn } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { person } from '../data/core';
@@ -12,6 +13,7 @@ import { useT } from '../i18n';
 import { ChatGlyph, ChevronRightGlyph, NamedGlyph, SendGlyph } from '../icons';
 import { compact } from '../lib/format';
 import { allCheckIns, canSee, checkInFor, placeCommunity } from '../lib/friends';
+import { ownerReplyFor, runsPage } from '../lib/places';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 
@@ -71,6 +73,8 @@ export default function CheckInDetail() {
   const moreFromAuthor = everything.filter((x) => x.authorId === c.authorId).slice(0, 3);
   const othersHere = community ? community.reviews.filter((x) => x.id !== c.id).slice(0, 4) : [];
   const mine = c.authorId === 'me';
+  const ownerReply = place ? ownerReplyFor(c.id, place.id, data) : undefined;
+  const canReply = !!place && runsPage(place) && !ownerReply && !mine;
   const draft = `Hi ${first}! How was the ${c.items[0]?.toLowerCase() ?? 'visit'} at ${c.placeName}?`;
 
   const send = (e: FormEvent) => {
@@ -86,6 +90,12 @@ export default function CheckInDetail() {
       <PageHeader title={t('checkin.detail')} sub={c.placeName} />
       <main className="page page--with-header">
         <CheckInCard c={c} layout="hero" />
+        {ownerReply && place ? <OwnerReplyView reply={ownerReply} place={place} /> : null}
+        {canReply && place ? (
+          <Link to={`/place/${place.id}/manage?reply=${c.id}`} className="btn btn--soft btn--sm" style={{ alignSelf: 'flex-start' }}>
+            Reply as the owner of {place.name}
+          </Link>
+        ) : null}
 
         {place && community ? (
           <Link to={`/place/${place.id}`} className="place-mini glyph-host">

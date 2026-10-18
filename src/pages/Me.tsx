@@ -10,6 +10,7 @@ import { REPORTS } from '../data/city';
 import { PEOPLE, neighbourhoodName } from '../data/core';
 import { HELPFUL } from '../data/helpful';
 import { PLACES } from '../data/places';
+import { pagesRunBy } from '../lib/places';
 import type { WantItem } from '../data/types';
 import { useT } from '../i18n';
 import {
@@ -58,6 +59,7 @@ export default function Me() {
   const { apply } = useListEdits();
   const [confirm, setConfirm] = useState(false);
   const [menu, setMenu] = useState(false);
+  const myPages = pagesRunBy('me');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [newList, setNewList] = useState(false);
 
@@ -497,6 +499,27 @@ export default function Me() {
 
       <Sheet open={menu} onClose={() => setMenu(false)} title={t('me.menu')}>
         <div className="me-menu" onClick={(e) => (e.target as HTMLElement).closest('a') && setMenu(false)}>
+        {myPages.length ? (
+          <section className="set-group" aria-labelledby="me-pages">
+            <h2 className="set-group__title" id="me-pages">
+              Pages you run
+            </h2>
+            <div className="list list--grouped">
+              {myPages.map((p) => (
+                <Link key={p.id} to={`/place/${p.id}/manage`} className="list-row">
+                  <img className="me-page__photo" src={data.pageEdits[p.id]?.cover ?? placePhoto(p.id)} alt="" />
+                  <span className="list-row__body">
+                    <span className="list-row__title">{p.name}</span>
+                    <span className="list-row__meta">
+                      {p.kind} · {p.origin.claimed?.role} since {p.origin.claimed?.since}
+                    </span>
+                  </span>
+                  <span className="set-trail">Manage</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
         <section className="set-group" aria-labelledby="me-stuff">
           <h2 className="set-group__title" id="me-stuff">
             {t('me.shortcuts')}

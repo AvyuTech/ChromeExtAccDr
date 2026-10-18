@@ -14,6 +14,7 @@ import { Avatar, Cover } from './cards';
 import { AvatarStack, WantButton } from './friends';
 import { HelpfulLine } from './helpful';
 import { AskMeAbout, IdentitySheet, TrustLine, useIdentity, WorkLine } from './identity';
+import { pagesRunBy } from '../lib/places';
 
 /* Pieces shared by the Friends hub, profiles, lists and Me. */
 
@@ -97,6 +98,7 @@ export function ProfileHero({
 }) {
   const identity = useIdentity(who.id);
   const [idOpen, setIdOpen] = useState(false);
+  const runs = pagesRunBy(who.id);
   return (
     <section className="profile-hero" aria-label={label}>
       <div className="profile-hero__cover">
@@ -126,6 +128,21 @@ export function ProfileHero({
         <h2 className="profile-hero__name">{name}</h2>
         <span className="profile-hero__sub">{sub}</span>
         <WorkLine identity={identity} />
+        {runs.length ? (
+          // Said plainly, so people know when someone recommending a café runs one.
+          <span className="id-work runs-line">
+            <PinGlyph size={14} />
+            <span className="grow">
+              Runs{' '}
+              {runs.map((p, i) => (
+                <span key={p.id}>
+                  {i ? ' · ' : ''}
+                  <Link to={`/place/${p.id}`}>{p.name}</Link>
+                </span>
+              ))}
+            </span>
+          </span>
+        ) : null}
         <HelpfulLine personId={who.id} />
         {bio ? <p className="profile-hero__bio">{bio}</p> : null}
         <TrustLine identity={identity} area={who.area} onOpen={() => setIdOpen(true)} />

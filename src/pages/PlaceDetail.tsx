@@ -3,17 +3,17 @@ import { Link, useParams } from 'react-router-dom';
 import { ownItemPhoto, photo, placePhoto } from '../assets/photos';
 import { AnswerCard, PlaceRow, PostCard } from '../components/cards';
 import { FriendVerdictRow, RecommendSheet, TrustSheet } from '../components/community';
-import { AwayLine, EventLinkRow, IconAction, PageUpdateRow, PlaceClaim, PlaceOriginLine, ProfileHead, useShare } from '../components/discover';
+import { AwayLine, EventLinkRow, IconAction, OwnerReplyView, PageHistorySheet, PageUpdateRow, PlaceClaim, PlaceOriginLine, ProfileHead, useShare } from '../components/discover';
 import { CheckInCard, TasteMatchPill, VerdictBar, WantButton } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { EVENTS } from '../data/events';
-import { updatesFor } from '../data/pages';
 import { PLACES, placeById } from '../data/places';
 import { POSTS } from '../data/social';
 import { useT } from '../i18n';
-import { CheckGlyph, CheckInGlyph, ClockGlyph, InfoGlyph, MustGlyph, NamedGlyph, NavigateGlyph, PinGlyph, SaveGlyph, SendGlyph, ShareGlyph, ShieldGlyph, SparkGlyph, WantGlyph } from '../icons';
+import { CheckGlyph, CheckInGlyph, ClockGlyph, EditGlyph, InfoGlyph, MustGlyph, NamedGlyph, NavigateGlyph, PhoneGlyph, PinGlyph, SaveGlyph, SendGlyph, ShareGlyph, ShieldGlyph, SparkGlyph, WantGlyph } from '../icons';
 import { isWanted, itemsFor, placeCommunity } from '../lib/friends';
 import { compact, km, priceLevel } from '../lib/format';
+import { ownerReplyFor, pageUpdates, runsPage, withOwnerEdits } from '../lib/places';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
@@ -25,12 +25,13 @@ export default function PlaceDetail() {
   const { settings } = useSettings();
   const { data, has, toggle, toggleWant } = useAppData();
   const share = useShare();
-  const place = placeById(id);
+  const found = placeById(id);
   const [trustOpen, setTrustOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [recommendOpen, setRecommendOpen] = useState(false);
   const [allReviews, setAllReviews] = useState(false);
 
-  if (!place) {
+  if (!found) {
     return (
       <>
         <PageHeader title={t('nav.explore')} fallback="/explore" />
@@ -49,6 +50,10 @@ export default function PlaceDetail() {
     );
   }
 
+  // What the person who runs the page changed sits on top of what locals added; the history shows each change.
+  const edit = data.pageEdits[found.id];
+  const place = withOwnerEdits(found, edit);
+  const mine = runsPage(place);
   const saved = has('savedPlaces', place.id);
   const sources = place.sources.filter(enabledSources(settings));
   const related = POSTS.filter((p) => p.answer?.placeIds?.includes(place.id));
@@ -62,7 +67,8 @@ export default function PlaceDetail() {
   const reviews = allReviews ? community.reviews : community.reviews.slice(0, 4);
   const checkInLink = `/checkin?place=${place.id}`;
   // Posts from the page itself: owner updates once claimed, and events it hosts (they link out, never booked here).
-  const updates = place.origin.claimed ? updatesFor(place.id) : [];
+  const updates = pageUpdates(place, data);
+  const offers = place.origin.claimed ? (edit?.offers ?? []) : [];
   const hosted = EVENTS.filter((e) => e.host?.kind === 'page' && e.host.id === place.id);
   // Dishes and activities that have their own photo, most-ordered first.
   const gallery = Array.from(new Set([...community.items.map((i) => i.name), ...itemsFor(place.id)]))
@@ -80,7 +86,7 @@ export default function PlaceDetail() {
       <PageHeader title={place.name} fallback="/explore" />
       <main className="page page--with-header">
         <ProfileHead
-          cover={placePhoto(place.id)}
+          cover={edit?.cover ?? placePhoto(place.id)}
           coverBadge={
             place.isNew ? (
               <span className="photo-pill" style={{ top: 12, left: 'var(--gutter)' }}>
@@ -121,7 +127,12 @@ export default function PlaceDetail() {
         </ProfileHead>
 
         <nav className="icon-row" aria-label={t('discover.place.actions')}>
-          <IconAction primary to={checkInLink} icon={<CheckInGlyph size={19} />} label={t('discover.action.checkIn')} ariaLabel={t('community.checkInHere')} />
+          {mine ? (
+            // People who run a page don't give it a verdict; they manage it.
+            <IconAction primary to={`/place/${place.id}/manage`} icon={<EditGlyph size={18} />} label={t('discover.owner.manageShort')} ariaLabel={t('discover.claim.manage')} />
+          ) : (
+            <IconAction primary to={checkInLink} icon={<CheckInGlyph size={19} />} label={t('discover.action.checkIn')} ariaLabel={t('community.checkInHere')} />
+          )}
           <IconAction
             pressed={wanted}
             onClick={() => {
@@ -269,7 +280,27 @@ export default function PlaceDetail() {
               Address
             </dt>
             <dd>{place.address}</dd>
+            {edit?.phone ? (
+              <>
+                <dt className="row" style={{ gap: 6 }}>
+                  <PhoneGlyph size={15} />
+                  Phone
+                </dt>
+                <dd>
+                  <a href={`tel:${edit.phone.replace(/\s+/g, '')}`} className="kv__link">
+                    {edit.phone}
+                  </a>
+                </dd>
+              </>
+            ) : null}
           </dl>
+          {edit?.editedAt ? (
+            <button type="button" className="owner-edited" onClick={() => setHistoryOpen(true)} aria-haspopup="dialog">
+              <EditGlyph size={13} />
+              {t('discover.owner.updated', { when: edit.editedAt })}
+              <span className="owner-edited__link">{t('discover.owner.seeChanges')}</span>
+            </button>
+          ) : null}
           <div className="chip-wrap">
             {place.tags.map((tag) => (
               <Link key={tag} to={`/ask?q=${encodeURIComponent(tag)}`} className="chip" style={{ height: 28, padding: '0 11px', fontSize: '0.75rem' }}>
@@ -279,11 +310,23 @@ export default function PlaceDetail() {
           </div>
         </section>
 
-        {updates.length || hosted.length ? (
+        {updates.length || hosted.length || offers.length ? (
           <section className="dsec" aria-labelledby="from-page-title">
             <SectionHead id="from-page-title" title={t('discover.place.fromPage')} />
+            {offers.length ? (
+              <div className="page-offers">
+                <span className="page-offers__label">{t('discover.owner.offers')}</span>
+                <div className="chip-wrap">
+                  {offers.map((o) => (
+                    <span key={o} className="chip page-offers__chip">
+                      {o}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             {updates.map((u) => (
-              <PageUpdateRow key={u.id} update={u} place={place} photo={u.photo ? photo(u.photo) : undefined} />
+              <PageUpdateRow key={u.id} update={u} place={place} photo={u.photo ? (u.photo.startsWith('data:') ? u.photo : photo(u.photo)) : undefined} />
             ))}
             {hosted.length ? (
               <div className="list">
@@ -313,14 +356,22 @@ export default function PlaceDetail() {
                   key={c.id}
                   c={c}
                   showPlace={false}
-                  footer={
-                    c.authorId !== 'me' && !data.following.includes(c.authorId) ? (
-                      <span className="row meta" style={{ gap: 6 }}>
-                        <TasteMatchPill personId={c.authorId} />
-                        {t('community.tasteMatchNote')}
-                      </span>
-                    ) : null
-                  }
+                  footer={(() => {
+                    const reply = ownerReplyFor(c.id, place.id, data);
+                    const match =
+                      c.authorId !== 'me' && !data.following.includes(c.authorId) ? (
+                        <span className="row meta" style={{ gap: 6 }}>
+                          <TasteMatchPill personId={c.authorId} />
+                          {t('community.tasteMatchNote')}
+                        </span>
+                      ) : null;
+                    return match || reply ? (
+                      <>
+                        {match}
+                        {reply ? <OwnerReplyView reply={reply} place={place} /> : null}
+                      </>
+                    ) : null;
+                  })()}
                 />
               ))}
               {community.reviews.length > 4 ? (
@@ -353,6 +404,7 @@ export default function PlaceDetail() {
         ) : null}
       </main>
       <TrustSheet open={trustOpen} onClose={() => setTrustOpen(false)} />
+      <PageHistorySheet place={place} open={historyOpen} onClose={() => setHistoryOpen(false)} />
       <RecommendSheet open={recommendOpen} onClose={() => setRecommendOpen(false)} placeName={place.name} area={place.area} />
     </>
   );

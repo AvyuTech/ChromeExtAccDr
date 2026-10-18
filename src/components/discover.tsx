@@ -8,12 +8,12 @@ import { placeById } from '../data/places';
 import { groupById, postById } from '../data/social';
 import { alertById } from '../data/city';
 import type { CityEvent, CityPulse, Corridor, Group, Place, Tone } from '../data/types';
-import { CheckGlyph, ChevronRightGlyph, ClockGlyph, NamedGlyph, PhoneGlyph, ShieldGlyph, TrafficGlyph, UsersGlyph } from '../icons';
-import type { PageUpdate } from '../data/pages';
+import { CheckGlyph, ChevronRightGlyph, ClockGlyph, EditGlyph, NamedGlyph, PhoneGlyph, ShieldGlyph, TrafficGlyph, UsersGlyph } from '../icons';
+import type { OwnerReply, PageUpdate } from '../data/pages';
 import { TRAFFIC_LABEL } from '../icons/live';
 import type { ResultRef } from '../lib/askEngine';
 import { compact, km } from '../lib/format';
-import { placeOrigin } from '../lib/places';
+import { pageHistory, runsPage } from '../lib/places';
 import { allCheckIns, profileInfo } from '../lib/friends';
 import { person, SOURCES } from '../data/core';
 import { collectionById } from '../data/friends';
@@ -538,18 +538,17 @@ const ORIGIN_RULES = [
   'Every page is built the same way, whether it’s a café, a court or a lake.',
   'Owners claim a page with a licence and a code to the venue’s phone, then fix facts and post updates.',
   'Owners can’t post verdicts, pay for placement or hide reviews.',
+  'Every fact an owner changes is listed in the page’s history, for anyone to read.',
   'Parks, lakes, markets and streets belong to everyone and can’t be claimed.',
   'AI only merges duplicates and flags fakes. It never adds pages or reviews.',
 ];
 
-/** "Added by Riya S. · Jan 2024 · Confirmed by 39 locals": opens the full story. */
+/** "Added by Riya S. · Jan 2024 · Confirmed by 39 locals": opens the page's history. */
 export function PlaceOriginLine({ place }: { place: Place }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const o = place.origin;
-  const origin = placeOrigin(place);
   const adder = person(o.addedBy);
-  const guide = o.guide ? person(o.guide) : undefined;
   return (
     <>
       <button type="button" className="origin-line" onClick={() => setOpen(true)} aria-haspopup="dialog">
@@ -559,51 +558,59 @@ export function PlaceOriginLine({ place }: { place: Place }) {
         </span>
         <ChevronRightGlyph size={14} />
       </button>
-      <Sheet open={open} onClose={() => setOpen(false)} title={t('discover.origin.title', { name: place.name })}>
-        <ul className="origin-facts">
-          <li>
-            <Avatar who={{ ...adder, verified: false }} size={32} />
-            <span>
-              <b>{origin.added}</b>
-              <small>{t('discover.origin.addedNote')}</small>
-            </span>
-          </li>
-          <li>
-            <span className="origin-facts__icon tone-mint">
-              <UsersGlyph size={16} />
-            </span>
-            <span>
-              <b>{origin.confirmed}</b>
-              <small>{t('discover.origin.confirmedNote')}</small>
-            </span>
-          </li>
-          {guide ? (
-            <li>
-              <Avatar who={{ ...guide, verified: false }} size={32} />
-              <span>
-                <b>{origin.guide}</b>
-                <small>{t('discover.origin.guideNote')}</small>
-              </span>
-            </li>
-          ) : null}
-          <li>
-            <span className="origin-facts__icon tone-violet">
-              <ShieldGlyph size={16} />
-            </span>
-            <span>
-              <b>{origin.claim}</b>
-              <small>{o.publicPlace ? t('discover.origin.publicNote') : o.claimed ? t('discover.origin.claimedNote') : t('discover.origin.unclaimedNote')}</small>
-            </span>
-          </li>
-        </ul>
-        <span className="field__label">{t('discover.origin.how')}</span>
-        <ol className="rules">
-          {ORIGIN_RULES.map((r) => (
-            <li key={r}>{r}</li>
-          ))}
-        </ol>
-      </Sheet>
+      <PageHistorySheet place={place} open={open} onClose={() => setOpen(false)} />
     </>
+  );
+}
+
+const HISTORY_NOTE = {
+  added: 'discover.origin.addedNote',
+  confirmed: 'discover.origin.confirmedNote',
+  guide: 'discover.origin.guideNote',
+  public: 'discover.origin.publicNote',
+  claimed: 'discover.origin.claimedNote',
+  owner: 'discover.history.ownerNote',
+} as const;
+
+/**
+ * A page's public history: who added it, who confirmed and checked it, who claimed it
+ * and every fact the owner changed. Anyone can read it and nobody can delete from it.
+ */
+export function PageHistorySheet({ place, open, onClose }: { place: Place; open: boolean; onClose: () => void }) {
+  const t = useT();
+  const { data } = useAppData();
+  const entries = pageHistory(place, data.pageEdits[place.id]);
+  return (
+    <Sheet open={open} onClose={onClose} title={t('discover.history.title', { name: place.name })}>
+      <ol className="page-history">
+        {entries.map((e, i) => (
+          <li key={`${e.kind}-${i}`} className={`page-history__item page-history__item--${e.kind}`}>
+            {e.who && (e.kind === 'added' || e.kind === 'guide' || e.kind === 'claimed') ? (
+              <Avatar who={{ ...person(e.who), verified: false }} size={28} />
+            ) : (
+              <span className="page-history__icon" aria-hidden="true">
+                {e.kind === 'owner' ? <EditGlyph size={14} /> : e.kind === 'claimed' ? <ShieldGlyph size={14} /> : <UsersGlyph size={14} />}
+              </span>
+            )}
+            <span className="page-history__body">
+              <b>{e.what}</b>
+              <small>
+                {e.when} · {t(HISTORY_NOTE[e.kind])}
+              </small>
+            </span>
+          </li>
+        ))}
+      </ol>
+      <p className="meta" style={{ margin: 0 }}>
+        {t('discover.history.note')}
+      </p>
+      <span className="field__label">{t('discover.origin.how')}</span>
+      <ol className="rules">
+        {ORIGIN_RULES.map((r) => (
+          <li key={r}>{r}</li>
+        ))}
+      </ol>
+    </Sheet>
   );
 }
 
@@ -618,6 +625,19 @@ export function PlaceClaim({ place }: { place: Place }) {
       <span className="claim-line">
         <UsersGlyph size={13} />
         {t('discover.claim.public')}
+      </span>
+    );
+  }
+  if (o.claimed && runsPage(place)) {
+    return (
+      <span className="claim-own">
+        <span className="claim-chip" title={`Since ${o.claimed.since}`}>
+          <CheckGlyph size={13} />
+          {t('discover.claim.runByYou', { role: o.claimed.role })}
+        </span>
+        <Link to={`/place/${place.id}/manage`} className="claim-link">
+          {t('discover.claim.manage')}
+        </Link>
       </span>
     );
   }
@@ -668,6 +688,27 @@ export function PageUpdateRow({ update, place, photo }: { update: PageUpdate; pl
         </a>
       ) : null}
     </article>
+  );
+}
+
+/** The owner's one public reply to a check-in, shown under it for everyone. */
+export function OwnerReplyView({ reply, place }: { reply: OwnerReply; place: Place }) {
+  const t = useT();
+  const name = reply.byId === 'me' ? 'You' : reply.by.split(',')[0];
+  return (
+    <div className="owner-reply">
+      <span className={`owner-reply__icon tone-${place.tone}`} aria-hidden="true">
+        {placePhoto(place.id) ? <img src={placePhoto(place.id)} alt="" /> : <NamedGlyph name={place.glyph} size={14} />}
+      </span>
+      <span className="owner-reply__body">
+        <span className="owner-reply__by">
+          <b>{name}</b>
+          <span className="owner-reply__tag">{t('discover.owner.tag', { name: place.name })}</span>
+          <span className="meta">· {reply.ago}</span>
+        </span>
+        <span className="owner-reply__text">{reply.text}</span>
+      </span>
+    </div>
   );
 }
 

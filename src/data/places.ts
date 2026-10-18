@@ -67,7 +67,7 @@ export const PLACES: Place[] = [
     tone: 'clay',
     glyph: 'cafe',
     address: '[Street address], CG Road',
-    origin: { addedBy: 'meera', addedWhen: 'Aug 2023', confirmedBy: 118, guide: 'arjun' },
+    origin: { addedBy: 'meera', addedWhen: 'Aug 2023', confirmedBy: 118, guide: 'arjun', claimed: { name: 'Jay Mehta', role: 'Owner', since: 'Sep 2026', personId: 'me' } },
   },
   {
     id: 'seoul-bowl',
@@ -136,7 +136,7 @@ export const PLACES: Place[] = [
     tone: 'green',
     glyph: 'sports',
     address: '[Street address], Thaltej',
-    origin: { addedBy: 'karan', addedWhen: 'Jun 2024', confirmedBy: 22 },
+    origin: { addedBy: 'karan', addedWhen: 'Jun 2024', confirmedBy: 22, claimed: { name: 'Jay Mehta', role: 'Owner', since: 'Oct 2026', personId: 'me' } },
   },
   {
     id: 'manek-chowk',

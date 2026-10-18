@@ -383,3 +383,336 @@ a.claim-link {
 .page-flow.page--with-header {
   padding-top: 14px;
 }
+
+/* ---------- Pages people run ---------- */
+.claim-own {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.claim-own .claim-link {
+  text-decoration: none;
+}
+
+/* "Updated by the owner · Today · See what changed" under hours */
+.owner-edited {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.owner-edited__link {
+  color: var(--accent);
+  font-weight: 700;
+}
+.kv__link {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* What the owner says they offer */
+.page-offers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--divider);
+}
+.page-offers__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.page-offers__chip {
+  height: 28px;
+  padding: 0 11px;
+  font-size: 0.75rem;
+  cursor: default;
+}
+
+/* An owner's one public reply under a check-in */
+.owner-reply {
+  display: flex;
+  gap: 8px;
+  padding: 8px 0 0 10px;
+  border-left: 2px solid var(--border-strong, var(--border));
+}
+.owner-reply__icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.owner-reply__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.owner-reply__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.owner-reply__by {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  font-size: 0.75rem;
+}
+.owner-reply__tag {
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong, var(--border));
+  color: var(--ink-2, var(--ink));
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+.owner-reply__text {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ink-2, var(--ink));
+}
+
+/* Page history: a plain timeline anyone can read */
+.page-history {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.page-history__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.page-history__item:last-child {
+  border-bottom: none;
+}
+.page-history__icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.page-history__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.page-history__body b {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.page-history__body small {
+  font-size: 0.6875rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ---------- Manage page ---------- */
+.manage-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--divider);
+}
+.manage-head__photo {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  object-fit: cover;
+  background: var(--surface-3);
+}
+.manage-head__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex-grow: 1;
+}
+.manage-head__name {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.manage-head__role {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-2, var(--ink));
+}
+.manage-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+}
+.manage-stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 1px;
+}
+.manage-stats > div + div {
+  padding-left: 12px;
+  border-left: 1px solid var(--divider);
+}
+.manage-stats dt {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.manage-stats dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.manage-fact {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.manage-fact > .glyph {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.manage-fact__icon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.manage-update__link {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 8px;
+}
+.manage-post__text {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+.manage-checkin {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.manage-checkin:last-child {
+  border-bottom: none;
+}
+.manage-checkin__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.manage-checkin__note {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-2, var(--ink));
+}
+.manage-checkin__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.manage-verdict {
+  font-weight: 700;
+}
+.manage-verdict--must {
+  color: var(--mint-ink);
+}
+.manage-verdict--skip {
+  color: var(--muted);
+}
+.manage-report {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.manage-stop,
+.manage-reason {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.manage-stop .list-row__title {
+  color: var(--red-ink, var(--ink));
+}
+.manage-reason {
+  justify-content: space-between;
+  border-bottom: 1px solid var(--divider);
+}
+.me-page__photo {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  object-fit: cover;
+  background: var(--surface-3);
+}
+.runs-line a {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+.checkin-own {
+  margin: 8px 0 0;
+}
+.checkin-own a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
