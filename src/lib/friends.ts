@@ -1,5 +1,6 @@
 import { CHECKINS, COLLECTIONS, COMMUNITY_BASE, PLACE_ITEMS, PROFILE_INFO } from '../data/friends';
 import { PEOPLE } from '../data/core';
+import { placeById } from '../data/places';
 import type { CheckIn, Collection, ProfileInfo, Verdict, WantItem } from '../data/types';
 import { sameWant, type AppData } from '../state/appData';
 import type { Settings } from '../state/settings';
@@ -96,7 +97,9 @@ export interface PlaceCommunity {
 export function placeCommunity(placeId: string, data: AppData, settings: Settings): PlaceCommunity {
   const base = COMMUNITY_BASE[placeId] ?? { must: 0, good: 0, skip: 0, verifiedPct: 0, items: [] };
   const live = allCheckIns(data).filter((c) => c.placeId === placeId && canSee(data, c));
-  const counted = live.filter((c) => !c.invited && c.verifiedVisit);
+  // Invited visits, unverified visits and the owner's own verdicts never count.
+  const owner = placeById(placeId)?.origin.claimed?.personId;
+  const counted = live.filter((c) => !c.invited && c.verifiedVisit && c.authorId !== owner);
   const tally = { must: base.must, good: base.good, skip: base.skip };
   for (const c of counted) tally[c.verdict] += 1;
   const total = tally.must + tally.good + tally.skip;

@@ -61,7 +61,16 @@ Claiming exists so owners can keep facts right, not to buy attention.
 6. **Review:** the Nearhood team checks the documents within 2 working days; if anything is unclear, a local guide visits. The page shows *Claim pending · you* with a timeline: sent ▸ venue phone confirmed ▸ documents checked ▸ approved.
 7. **Approved:** the page says *Run by Name, owner*.
 
-Owners can edit hours, phone, address, what's offered and the cover photo, post updates and events (with a link out), reply once in public to a check-in, and see simple counts (saves, check-ins). They can never edit or remove reviews or verdicts, pay for ranking or placement, see who saved them, or message people who didn't write first. If a business changes hands, the new owner claims it with fresh proof and the old owner is told. A second claim on the same page gets both sides asked for proof.
+**Running a page** (Manage page, from the page or Me ▸ Pages you run):
+
+- Edit hours, phone, address, what's offered and the cover photo. Each change shows on the page as *Updated by the owner* and goes into the page's **public history**, which nobody can delete from. If locals say a fact is wrong, a guide checks it.
+- Post up to 2 updates a week (an optional link out for booking or details). They show on the page and reach people who saved it; never the Home feed, never ads.
+- Reply once, in public, to any check-in, marked *Owner · Page name*. No hiding, editing or deleting check-ins; *Report to guides* is the only option, and guides decide.
+- See simple weekly counts (saves, check-ins, must-try %), never who.
+
+**What keeps owners honest:** an owner's own check-ins, verdicts and votes on their page never count (the Check in button becomes Manage); everything they post anywhere carries a *Runs Page name* tag, so a recommendation from an owner always reads as one; every change is in the public history; and owners can never pay for ranking or placement, see who saved them, or message people who didn't write first.
+
+In the prototype, Jay Mehta runs **Brew Lab** (a café) and **Pickle & Play** (pickleball courts), to show the same owner tools on two very different pages; Seoul Bowl, Kettle & Crumb, Taco Tiempo and Board & Brew are unclaimed for trying the claim flow. If a business changes hands, the new owner claims it with fresh proof and the old owner is told. A second claim on the same page gets both sides asked for proof.
 
 ## Who creates what
 

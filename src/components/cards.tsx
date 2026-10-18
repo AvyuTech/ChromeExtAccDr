@@ -32,6 +32,7 @@ import { useToast } from '../state/toast';
 import { RichText, Sheet } from './ui';
 import { useIdentity } from './identity';
 import { eventHost } from '../lib/hosts';
+import { pagesRunBy } from '../lib/places';
 import { LevelTag } from './helpful';
 
 /* ---------- Avatar: a real photo when we have one, initials otherwise ---------- */
@@ -203,6 +204,7 @@ export function PostCard({ post, note }: { post: Post; /** A line above the post
             <span className="feed-post__name">{author.name}</span>
             {club ? <ClubTag club={club} /> : null}
             <LevelTag personId={post.authorId} topic={post.topic} />
+            <OwnerTag personId={post.authorId} />
           </span>
           <span className="meta">
             {work ? `${work.title} · ` : ''}
@@ -298,6 +300,21 @@ export function Votes({ id, up, down = 0, small }: { id: string; up: number; dow
         <DownvoteGlyph size={size} active={mine === -1} />
       </button>
     </span>
+  );
+}
+
+/**
+ * "Runs Brew Lab": anyone who runs a page says so next to everything they post,
+ * so a recommendation from an owner always reads as one.
+ */
+export function OwnerTag({ personId }: { personId: string }) {
+  const pages = pagesRunBy(personId);
+  if (!pages.length) return null;
+  return (
+    <Link to={`/place/${pages[0].id}`} className="owner-tag" title={pages.map((p) => p.name).join(', ')}>
+      Runs {pages[0].name}
+      {pages.length > 1 ? ` +${pages.length - 1}` : ''}
+    </Link>
   );
 }
 

@@ -5,7 +5,7 @@ import { identityOf } from '../data/identity';
 import { useT } from '../i18n';
 import { ReplyGlyph } from '../icons';
 import { countBelow, isFolded, type ReplyNode } from '../lib/thread';
-import { Avatar, Votes } from './cards';
+import { Avatar, OwnerTag, Votes } from './cards';
 import { LevelTag } from './helpful';
 
 /**
@@ -92,6 +92,7 @@ function ReplyItem({
               {name}
             </span>
             {r.authorId === postAuthorId ? <span className="op-tag">Author</span> : null}
+            <OwnerTag personId={r.authorId} />
             {work ? <span className="meta">· {work.title}</span> : null}
             <LevelTag personId={r.authorId} topic={topic} />
             {r.helpful ? <span className="badge badge--sm">{t('social.helpful')}</span> : null}

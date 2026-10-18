@@ -17,6 +17,7 @@ import {
   BellGlyph,
   ChatGlyph,
   CheckGlyph,
+  ChevronRightGlyph,
   EditGlyph,
   FriendsGlyph,
   GroupsGlyph,
@@ -511,10 +512,10 @@ export default function Me() {
                   <span className="list-row__body">
                     <span className="list-row__title">{p.name}</span>
                     <span className="list-row__meta">
-                      {p.kind} · {p.origin.claimed?.role} since {p.origin.claimed?.since}
+                      {p.kind} · {p.origin.claimed?.role}
                     </span>
                   </span>
-                  <span className="set-trail">Manage</span>
+                  <ChevronRightGlyph size={16} style={{ color: 'var(--muted)', flexShrink: 0 }} />
                 </Link>
               ))}
             </div>

@@ -24,6 +24,7 @@ export const ROUTES = [
   '/place/brew-lab/manage',
   '/pages/new',
   '/claim/pickle-play',
+  '/claim/seoul-bowl',
   '/heroes',
   '/me/impact',
   '/post/giveaway-books',

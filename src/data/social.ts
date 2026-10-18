@@ -175,6 +175,7 @@ export const POSTS: Post[] = [
       { id: 'r2', authorId: 'nikhil', text: 'Corner Table in Bodakdev. Wi-Fi is properly fast, but there’s a ₹250 minimum per person.', ago: '1h', upvotes: 9, downvotes: 1 },
       { id: 'r2a', authorId: 'zoya', text: 'The minimum goes towards your order, so it’s really just one meal.', ago: '55m', upvotes: 4, parentId: 'r2' },
       { id: 'r3', authorId: 'meera', text: 'Brew Lab on CG Road if you don’t mind a bit of buzz. Great coffee.', ago: '48m', upvotes: 6 },
+      { id: 'r3a', authorId: 'me', text: 'I run Brew Lab, so take this with a pinch of salt: the bench by the roaster is the quietest spot before 11.', ago: '44m', upvotes: 3, parentId: 'r3' },
       { id: 'r3x', authorId: 'rohan', text: 'Try Café Aroma, best café in the city!!! DM us for a 20% discount code', ago: '40m', upvotes: 1, downvotes: 9 },
     ],
     answer: {

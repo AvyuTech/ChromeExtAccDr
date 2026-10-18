@@ -1,10 +1,11 @@
 import { useState, type ChangeEvent } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { placePhoto } from '../assets/photos';
 import { Cover } from '../components/cards';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { CLAIM_PROOFS, CLAIM_ROLES, CLAIM_STEPS, OWNER_CAN, OWNER_CANNOT, pagePhone, type ClaimProof, type ClaimRole, type PageClaim } from '../data/pages';
 import { placeById } from '../data/places';
+import { runsPage } from '../lib/places';
 import type { Place } from '../data/types';
 import { BackGlyph, CertificateGlyph, CheckGlyph, ClockGlyph, CloseGlyph, PhoneGlyph, ShieldGlyph, UsersGlyph } from '../icons';
 import { useAppData } from '../state/appData';
@@ -37,6 +38,8 @@ export default function Claim() {
       </>
     );
   }
+  // You already run it: there's nothing to claim, so go to Manage.
+  if (runsPage(place)) return <Navigate to={`/place/${place.id}/manage`} replace />;
   const mine = data.myClaims[place.id];
   if (mine) return <ClaimStatus place={place} claim={mine} />;
   if (place.origin.publicPlace) return <PublicPlace place={place} />;

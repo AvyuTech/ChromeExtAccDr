@@ -277,6 +277,16 @@
 .reply__act:hover {
   color: var(--ink);
 }
+.owner-tag {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--border-strong);
+}
+.feed-post__line .owner-tag {
+  margin-left: 6px;
+}
 .op-tag {
   font-size: 0.6875rem;
   font-weight: 800;

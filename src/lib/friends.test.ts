@@ -40,28 +40,38 @@ describe('community verdicts', () => {
     expect(seoul.friendIds).toEqual(expect.arrayContaining(['aditi', 'karan']));
   });
 
+  const mine = (): CheckIn => ({
+    id: 'mine',
+    authorId: 'me',
+    kind: 'ate',
+    placeId: 'seoul-bowl',
+    placeName: 'Seoul Bowl',
+    area: 'x',
+    items: ['Kimchi pancake'],
+    verdict: 'must',
+    tags: [],
+    audience: 'friends',
+    verifiedVisit: true,
+    ago: 'now',
+    recency: 0,
+    likes: 0,
+    comments: [],
+  });
+
   it('counts your own check-in', () => {
-    const mine: CheckIn = {
-      id: 'mine',
-      authorId: 'me',
-      kind: 'ate',
-      placeId: 'seoul-bowl',
-      placeName: 'Seoul Bowl',
-      area: 'x',
-      items: ['Kimchi pancake'],
-      verdict: 'must',
-      tags: [],
-      audience: 'friends',
-      verifiedVisit: true,
-      ago: 'now',
-      recency: 0,
-      likes: 0,
-      comments: [],
-    };
     const before = placeCommunity('seoul-bowl', data, DEFAULT_SETTINGS).must;
-    const after = placeCommunity('seoul-bowl', { ...data, myCheckIns: [mine] }, DEFAULT_SETTINGS);
+    const after = placeCommunity('seoul-bowl', { ...data, myCheckIns: [mine()] }, DEFAULT_SETTINGS);
     expect(after.must).toBe(before + 1);
     expect(after.reviews[0].id).toBe('mine');
+  });
+
+  it('never counts the verdict of the person who runs the page', () => {
+    // Jay runs Pickle & Play, so a Must try from Jay there changes nothing.
+    const own = { ...mine(), placeId: 'pickle-play', placeName: 'Pickle & Play' };
+    const before = placeCommunity('pickle-play', data, DEFAULT_SETTINGS);
+    const after = placeCommunity('pickle-play', { ...data, myCheckIns: [own] }, DEFAULT_SETTINGS);
+    expect(after.must).toBe(before.must);
+    expect(after.excluded).toBe(before.excluded + 1);
   });
 });
 

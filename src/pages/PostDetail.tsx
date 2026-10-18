@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { placePhoto } from '../assets/photos';
-import { AnswerCard, Avatar, ClubTag, ShareButton, Votes } from '../components/cards';
+import { AnswerCard, Avatar, ClubTag, OwnerTag, ShareButton, Votes } from '../components/cards';
 import { ReplyThread } from '../components/thread';
 import { EmptyState, PageHeader, Sheet, Tile } from '../components/ui';
 import { person } from '../data/core';
@@ -133,6 +133,7 @@ function PostView({ post }: { post: Post }) {
                 </Link>
                 {group ? <ClubTag club={group} /> : null}
                 <LevelTag personId={post.authorId} topic={post.topic} />
+                <OwnerTag personId={post.authorId} />
               </span>
               <span className="meta">
                 {work ? `${work.title} · ` : ''}
