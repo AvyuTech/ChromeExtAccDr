@@ -13,9 +13,19 @@ It is built from the Nearhood design canvas (Home feed, Search and Explore artbo
 | **Explore** | Category grid, category pages (food, events, movies, getaways, places), deals and deal details, place and event pages with source trust panel, groups |
 | **City** | Live *City pulse* dashboard (weather, AQI dial, roads, next metro/BRTS/bus, water and power, ward civic health, parking), alerts and alert details, transit and commute, **report a civic issue** with duplicate detection and a tracker, city services, safety & SOS |
 | **Social** | Post details with replies, composer (question, recommendation, alert, lost & found, event, give away) with similar-question detection, updates, messages and chat |
+| **Friends & community reviews** | Follow friends; a strip on Home shows who checked in today. **Quick check-in** (place → what you had → Must try / Good / Skip, in about ten seconds) instead of long posts. Places show the share of locals who say *must try* and what people actually order, with friends' reviews first. Profiles with a **Want to try** list (a to-do list for the city), curated lists, taste match and "you both want to try" plans |
 | **Me & Settings** | Profile, saved items, onboarding, and full settings: account, location & commute, notifications, city alerts, appearance (light/dark/system, text size), language (English, ગુજરાતી, हिन्दी), accessibility, privacy, sources & AI answers, data & storage, safety contacts, help, about |
 
 Settings change behaviour, not just switches: turning off a source removes its listings and chips from answers, alert preferences filter the alert feed and tab badge, *Data saver* pauses the live city feed, theme, contrast, motion and text size apply app-wide, and language switches the interface.
+
+## Reviews you can trust
+
+Community verdicts replace star ratings. A verdict is one tap (Must try, Good or Skip), which is quicker to give and harder to inflate than five stars.
+
+- Only **verified visits** (confirmed at the venue) count towards a place's score; unverified check-ins are shown but labelled.
+- Free or **invited** visits are labelled and left out of the score.
+- Reviews are ordered **friends first**, then people with similar taste, then other locals; every reviewer's history is public.
+- What people **order** is counted per dish, so you see "Kimchi pancake · 88% must try" rather than a single number for the whole place.
 
 ## Nearhood glyphs
 

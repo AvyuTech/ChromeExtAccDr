@@ -27,6 +27,17 @@ export const ROUTES = [
   '/groups/bodakdev-neighbours',
   '/post/brunch-wifi',
   '/compose',
+  '/checkin',
+  '/checkin?place=seoul-bowl',
+  '/checkin/ci-aditi-seoul',
+  '/checkin/ci-harsh-corner',
+  '/friends',
+  '/friends?tab=following',
+  '/friends?tab=find',
+  '/people/riya',
+  '/people/zoya',
+  '/lists/work-cafes',
+  '/messages/c-riya?draft=Hi',
   '/updates',
   '/messages',
   '/messages/c-aditi',
@@ -106,6 +117,15 @@ for (const scheme of ['light', 'dark']) {
     await page.reload();
     const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
     if (theme !== 'dark') failures.push(`flow: theme setting not applied (data-theme=${theme})`);
+  }
+  if (scheme === 'light') {
+    // Quick check-in from the + button lands on the new check-in.
+    await page.goto(`${base}/#/`);
+    await page.getByRole('button', { name: /new post/i }).click();
+    await page.getByRole('button', { name: /quick check-in/i }).click();
+    await page.waitForTimeout(300);
+    const onComposer = await page.evaluate(() => location.hash.startsWith('#/checkin'));
+    if (!onComposer) failures.push('flow: + › Quick check-in did not open the composer');
   }
   await ctx.close();
 }
