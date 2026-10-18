@@ -278,6 +278,9 @@
   color: var(--ink);
 }
 .owner-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   font-size: 0.6875rem;
   font-weight: 700;
   color: var(--ink-2);
@@ -973,23 +976,6 @@
 }
 .event-post__link {
   gap: 8px;
-}
-.host-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--surface-3);
-  color: var(--muted);
-  flex-shrink: 0;
-}
-.host-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 .host-kind {
   margin-left: 6px;

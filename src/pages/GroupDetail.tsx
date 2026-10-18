@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { FaceStack, PostCard } from '../components/cards';
 import { buysOf, BuyRow, clubById, clubPhoto, meetupsOf, memberCount, MeetupRow, PlanSheet, type PlanMode } from '../components/clubs';
-import { IconAction, ProfileHead } from '../components/discover';
+import { ProfileHead } from '../components/discover';
+import { ActionBar, IconButton, MainAction } from '../components/entity';
 import { ShareSheet } from '../components/share';
 import { HeroRow, useBoardContext } from '../components/helpful';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
@@ -70,6 +71,7 @@ export default function GroupDetail() {
       <PageHeader title={club.name} fallback="/clubs" />
       <main className="page page--with-header club-page">
         <ProfileHead
+          kind="club"
           cover={clubPhoto(club)}
           tone={club.tone}
           icon={<NamedGlyph name={club.glyph} size={30} duo live />}
@@ -95,9 +97,8 @@ export default function GroupDetail() {
           </p>
         </ProfileHead>
 
-        <nav className="icon-row" aria-label={t('clubs.actions')}>
-          <IconAction
-            primary
+        <ActionBar label={t('clubs.actions')}>
+          <MainAction
             pressed={joined}
             onClick={() => {
               if (joined) setConfirmLeave(true);
@@ -106,15 +107,15 @@ export default function GroupDetail() {
                 toast(t('clubs.joined', { name: club.name }));
               }
             }}
-            icon={joined ? <CheckGlyph size={18} /> : <UsersGlyph size={18} />}
+            icon={joined ? <CheckGlyph size={16} /> : <UsersGlyph size={16} />}
             label={joined ? t('clubs.action.joined') : t('clubs.action.join')}
           />
           {/* Planning a meetup or a group buy lives in those sections below, next to what's already planned. */}
-          <IconAction onClick={() => setShareOpen(true)} icon={<ShareGlyph size={17} />} label={t('clubs.action.invite')} />
+          <IconButton onClick={() => setShareOpen(true)} icon={<ShareGlyph size={17} />} label={t('clubs.action.invite')} />
           {club.admins[0] && club.admins[0] !== 'me' ? (
-            <IconAction to={`/messages/c-${club.admins[0]}`} icon={<ChatGlyph size={17} />} label={t('clubs.action.message')} ariaLabel={`Message ${person(club.admins[0]).name}`} />
+            <IconButton to={`/messages/c-${club.admins[0]}`} icon={<ChatGlyph size={17} />} label={`Message ${person(club.admins[0]).name}, an admin`} />
           ) : null}
-        </nav>
+        </ActionBar>
 
         <section className="dsec" aria-labelledby="club-meetups">
           <div className="dsec__head">

@@ -1663,6 +1663,10 @@ a.feed-post__name:hover {
   color: var(--accent);
   text-decoration: none;
 }
+.feed-post__club .entity-mark {
+  margin-right: 3px;
+  color: var(--accent);
+}
 .feed-post__club:hover {
   text-decoration: underline;
 }

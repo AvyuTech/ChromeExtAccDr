@@ -93,7 +93,6 @@ export const discover: Dict = {
   },
   'discover.owner.tag': { en: 'Owner · {name}', gu: 'માલિક · {name}', hi: 'मालिक · {name}' },
   'discover.owner.updated': { en: 'Updated by the owner · {when}', gu: 'માલિકે અપડેટ કર્યું · {when}', hi: 'मालिक ने अपडेट किया · {when}' },
-  'discover.owner.manageShort': { en: 'Manage', gu: 'સંભાળો', hi: 'सँभालें' },
   'discover.owner.seeChanges': { en: 'See what changed', gu: 'શું બદલાયું તે જુઓ', hi: 'क्या बदला, देखें' },
   'discover.owner.offers': { en: 'What they offer', gu: 'તેઓ શું આપે છે', hi: 'वे क्या देते हैं' },
   'discover.claim.yours': { en: 'Run by you', gu: 'તમે ચલાવો છો', hi: 'आप चलाते हैं' },

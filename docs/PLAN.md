@@ -24,13 +24,30 @@ Everything in Nearhood belongs to one of three things. There is nothing else to 
 
 Everything else is something one of them posts: posts and questions, check-ins, events, meetups and group buys. An event is a post by a person ("Riya shared an event"), a page ("Pickle & Play · beginners' social") or a club ("Thaltej Parents · kite workshop"), and it links out for details or tickets. A meetup or group buy is a post in a club and always shows which club it's from.
 
+## Telling them apart at a glance
+
+Pages and clubs work in similar ways (both have people who run them, both can post events), so they must *look* different everywhere they appear: headers, lists, search, feed tags and event hosts.
+
+| | Profile | Business page | Public place | Club |
+| --- | --- | --- | --- | --- |
+| Shape | Round | Square | Square | A stack of squares |
+| Mark | none | Shop front | Tree | People |
+| Label | name | *Business page* | *Public place* | *Club* |
+| Main action | Follow | Check in | Check in | Join |
+| You… | follow a person | visit and save it | visit and save it | join it |
+| Who posts | the person | only the people who run it: updates and events, two a week | nobody runs it; locals and guides keep it right | every member; admins pin and remove |
+| Who runs it | themselves | the owner who claimed it (plus staff later) | locals and guides | the admins who started it |
+| Events | can share one | posts its own | locals share them | members plan meetups and group buys |
+
+The rule of thumb: **a page is a place you go to; a club is people you join.**
+
 ## Pages: one template for everything
 
 Every page looks and works the same, whatever it is. No restaurant pages, sports pages or park pages with their own layouts. The order never changes; a section only hides when it has nothing in it:
 
 1. Cover, photo, *must try* %, locals, distance; name, what it is, area, price, open now.
 2. Who added it and how many locals confirmed it; who runs it (or *Claim it*, or *Public place*).
-3. Four icons: **Check in** (*Manage* if you run it), **Save** (saving is the same as *Want to try*), **Directions**, **Share** (send to friends, copy the link or another app; this replaced a separate Recommend). *Ask about it* sits on *What locals say*.
+3. One main button, **Check in** (*Manage page* if you run it), then three small icons: **Save** (saving is the same as *Want to try*), **Directions** and **Share** (send to friends, copy the link or another app; this replaced a separate Recommend). *Ask about it* sits on *What locals say*.
 4. Community verdict (Must try / Good / Skip from verified visits).
 5. Friends who've been.
 6. Most loved here: the dishes, sessions or things people pick most, with photos.
@@ -160,7 +177,9 @@ Explore is for finding pages, and everything on it is something people made: pag
 
 ## Profiles: the short version
 
-A profile shows who someone is at a glance: photo, check-ins, followers, following, name, area, work, one line for their level and verification, whether they run any pages, and their bio. Follow, Message and More. Tabs: Check-ins, Want to try, Lists. Everything else (verification details, rank, known for, ask me about, interests, taste match, clubs, member since) sits in **About**, one tap away.
+Followers are the number people care about, so it is the big number next to the photo; following and check-ins sit small beneath it. Then the name with a tick when fully verified and a small level pill, one line for work and area, *Runs …* if they run pages, and a two-line bio. One main action (Follow, or Edit profile on your own) and small icons (Message, Share, More). Tabs: Check-ins, Want to try, Lists. Everything else (verification details, helpful points and rank, known for, ask me about, interests, taste match, clubs, member since) sits in **About**.
+
+Because followers matter, only verified people count as followers, and followers can't be bought.
 
 ## Other cities
 

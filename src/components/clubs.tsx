@@ -12,6 +12,7 @@ import { useToast } from '../state/toast';
 import { Avatar, ClubTag, Cover, FaceStack, ShareButton, Votes } from './cards';
 import { useIdentity } from './identity';
 import { Sheet } from './ui';
+import { EntityPic } from './entity';
 
 /* ---------- Kinds ---------- */
 
@@ -70,7 +71,7 @@ export function ClubRow({ club, last }: { club: Group; last?: boolean }) {
   const next = meetupsOf(club, data)[0];
   return (
     <Link to={`/clubs/${club.id}`} className="club-row" style={last ? { borderBottom: 'none' } : undefined}>
-      <Cover src={clubPhoto(club)} glyph={club.glyph} tone={club.tone} className="club-row__thumb" />
+      <EntityPic kind="club" src={clubPhoto(club)} size={52} />
       <span className="club-row__body">
         <span className="club-row__name">{club.name}</span>
         <span className="meta">

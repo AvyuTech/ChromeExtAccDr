@@ -4,7 +4,7 @@ import { ownItemPhoto, photo, placePhoto } from '../assets/photos';
 import { AnswerCard, PlaceRow, PostCard } from '../components/cards';
 import { FriendVerdictRow, TrustSheet } from '../components/community';
 import { ShareSheet } from '../components/share';
-import { AwayLine, EventLinkRow, IconAction, OwnerReplyView, PageHistorySheet, PageUpdateRow, PlaceClaim, PlaceOriginLine, ProfileHead } from '../components/discover';
+import { AwayLine, EventLinkRow, OwnerReplyView, PageHistorySheet, PageUpdateRow, PlaceClaim, PlaceOriginLine, ProfileHead } from '../components/discover';
 import { CheckInCard, TasteMatchPill, VerdictBar, WantButton } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { EVENTS } from '../data/events';
@@ -18,6 +18,7 @@ import { ownerReplyFor, pageUpdates, runsPage, withOwnerEdits } from '../lib/pla
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
+import { ActionBar, IconButton, MainAction, placeKind } from '../components/entity';
 
 export default function PlaceDetail() {
   const { id = '' } = useParams();
@@ -87,6 +88,7 @@ export default function PlaceDetail() {
       <PageHeader title={place.name} fallback="/explore" />
       <main className="page page--with-header">
         <ProfileHead
+          kind={placeKind(place)}
           cover={edit?.cover ?? placePhoto(place.id)}
           coverBadge={
             place.isNew ? (
@@ -127,15 +129,15 @@ export default function PlaceDetail() {
           </div>
         </ProfileHead>
 
-        <nav className="icon-row" aria-label={t('discover.place.actions')}>
+        <ActionBar label={t('discover.place.actions')}>
           {mine ? (
             // People who run a page don't give it a verdict; they manage it.
-            <IconAction primary to={`/place/${place.id}/manage`} icon={<EditGlyph size={18} />} label={t('discover.owner.manageShort')} ariaLabel={t('discover.claim.manage')} />
+            <MainAction to={`/place/${place.id}/manage`} icon={<EditGlyph size={16} />} label={t('discover.claim.manage')} />
           ) : (
-            <IconAction primary to={checkInLink} icon={<CheckInGlyph size={19} />} label={t('discover.action.checkIn')} ariaLabel={t('community.checkInHere')} />
+            <MainAction to={checkInLink} icon={<CheckInGlyph size={17} />} label={t('discover.action.checkIn')} />
           )}
           {/* Save and Want to try are one thing: saving a page puts it on your Want to try list. */}
-          <IconAction
+          <IconButton
             pressed={kept}
             onClick={() => {
               if (kept) {
@@ -148,14 +150,13 @@ export default function PlaceDetail() {
                 toast(`Saved ${place.name} to Want to try`);
               }
             }}
-            icon={<SaveGlyph size={19} active={kept} />}
-            label={kept ? t('discover.action.saved') : t('discover.action.save')}
-            ariaLabel={kept ? 'Saved to Want to try' : 'Save to Want to try'}
+            icon={<SaveGlyph size={18} active={kept} />}
+            label={kept ? 'Saved to Want to try' : 'Save to Want to try'}
           />
-          <IconAction href={mapsUrl} icon={<NavigateGlyph size={19} />} label={t('discover.action.directions')} />
-          {/* Share holds every way to pass it on: send to friends (what was Recommend), copy the link, other apps. */}
-          <IconAction onClick={() => setShareOpen(true)} icon={<ShareGlyph size={18} />} label={t('common.share')} />
-        </nav>
+          <IconButton href={mapsUrl} icon={<NavigateGlyph size={18} />} label={t('discover.action.directions')} />
+          {/* Share holds every way to pass it on: send to friends, copy the link, other apps. */}
+          <IconButton onClick={() => setShareOpen(true)} icon={<ShareGlyph size={17} />} label={t('common.share')} />
+        </ActionBar>
 
         <section className="dsec" aria-labelledby="verdict-title">
           <div className="dsec__head">

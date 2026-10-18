@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Cover, PlaceRow } from '../components/cards';
+import { Avatar, PlaceRow } from '../components/cards';
 import { CityMap, NEIGHBOURHOOD_POS, PLACE_POS, type MapPin } from '../components/CityMap';
 import { FriendPickCard } from '../components/community';
 import { CollectionCard } from '../components/friends';
@@ -17,6 +17,7 @@ import { friendsMustTries, placeCommunity, profileInfo } from '../lib/friends';
 import { pageMatches, spotPhoto, spottedPlaces } from '../lib/places';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
+import { EntityPic, placeKind } from '../components/entity';
 
 /*
   Explore is for finding pages. Everything on it comes from what people make on
@@ -143,7 +144,7 @@ export default function Explore() {
           <div className="list explore-found" aria-live="polite">
             {found.listed.map((p) => (
               <Link key={p.id} to={`/place/${p.id}`} className="list-row">
-                <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="checkin-result__photo" />
+                <EntityPic kind={placeKind(p)} src={placePhoto(p.id)} size={40} fallback={<NamedGlyph name={p.glyph} size={18} />} />
                 <span className="list-row__body">
                   <span className="list-row__title">{p.name}</span>
                   <span className="list-row__meta">
@@ -164,7 +165,7 @@ export default function Explore() {
                   window.setTimeout(() => document.getElementById('new-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
                 }}
               >
-                <Cover src={spotPhoto(sp)} glyph={sp.glyph} tone={sp.tone} className="checkin-result__photo" />
+                <EntityPic kind="page" src={spotPhoto(sp)} size={40} fallback={<NamedGlyph name={sp.glyph} size={18} />} />
                 <span className="list-row__body">
                   <span className="list-row__title">{sp.name}</span>
                   <span className="list-row__meta">

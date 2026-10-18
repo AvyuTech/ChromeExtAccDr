@@ -24,6 +24,7 @@ import { useAppData, type AppData } from '../state/appData';
 import { useToast } from '../state/toast';
 import { useT } from '../i18n';
 import { LinkRow, Sheet, Tile } from './ui';
+import { EntityLine, EntityMark, type EntityKind } from './entity';
 
 /* ---------- Rows for live city results ---------- */
 
@@ -440,11 +441,14 @@ export function ProfileHead({
   title,
   sub,
   children,
+  kind,
 }: {
   cover?: string;
   coverBadge?: ReactNode;
   icon: ReactNode;
   tone: Tone;
+  /** A page or a club: sets the icon's shape and mark, and says which it is above the name. */
+  kind?: EntityKind;
   stats?: HeadStat[];
   eyebrow?: ReactNode;
   title: string;
@@ -463,7 +467,14 @@ export function ProfileHead({
       )}
       <section className="profile-head" aria-label={title}>
         <div className="profile-head__top">
-          <span className={`profile-head__icon tone-${tone}`}>{icon}</span>
+          <span className={`profile-head__icon tone-${tone}${kind ? ` profile-head__icon--${kind}` : ''}`}>
+            {icon}
+            {kind ? (
+              <span className="profile-head__mark" aria-hidden="true">
+                <EntityMark kind={kind} size={15} />
+              </span>
+            ) : null}
+          </span>
           {stats?.length ? (
             <dl className="profile-head__stats">
               {stats.map((st) => (
@@ -476,6 +487,7 @@ export function ProfileHead({
           ) : null}
         </div>
         {eyebrow ? <span className="eyebrow muted">{eyebrow}</span> : null}
+        {kind ? <EntityLine kind={kind} /> : null}
         <h1 className="profile-head__title">{title}</h1>
         {sub ? <p className="profile-head__sub">{sub}</p> : null}
         {children}

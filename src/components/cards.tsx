@@ -34,6 +34,7 @@ import { useIdentity } from './identity';
 import { eventHost } from '../lib/hosts';
 import { pagesRunBy } from '../lib/places';
 import { LevelTag } from './helpful';
+import { EntityMark, EntityPic, placeKind } from './entity';
 
 /* ---------- Avatar: a real photo when we have one, initials otherwise ---------- */
 export function Avatar({ who, size = 40, ring }: { who: Person; size?: number; ring?: boolean }) {
@@ -312,6 +313,7 @@ export function OwnerTag({ personId }: { personId: string }) {
   if (!pages.length) return null;
   return (
     <Link to={`/place/${pages[0].id}`} className="owner-tag" title={pages.map((p) => p.name).join(', ')}>
+      <EntityMark kind="page" size={11} />
       Runs {pages[0].name}
       {pages.length > 1 ? ` +${pages.length - 1}` : ''}
     </Link>
@@ -326,6 +328,7 @@ export function ClubTag({ club }: { club: Group }) {
         ›
       </span>
       <Link to={`/clubs/${club.id}`} className="feed-post__club">
+        <EntityMark kind="club" size={13} />
         {club.name}
       </Link>
     </>
@@ -538,7 +541,7 @@ export function PlaceRow({ place, last }: { place: Place; last?: boolean }) {
   const friends = community.friendIds;
   return (
     <Link to={`/place/${place.id}`} className="list-row glyph-host" style={last ? { borderBottom: 'none' } : undefined}>
-      <Cover src={placePhoto(place.id)} glyph={place.glyph} tone={place.tone} className="place-thumb" />
+      <EntityPic kind={placeKind(place)} src={placePhoto(place.id)} size={48} fallback={<NamedGlyph name={place.glyph} size={22} />} />
       <span className="list-row__body">
         <span className="list-row__title">{place.name}</span>
         <span className="list-row__meta">
@@ -576,7 +579,7 @@ export function GroupRow({ group }: { group: Group }) {
   const joined = has('joinedGroups', group.id);
   return (
     <div className="row group-row" style={{ gap: 12 }}>
-      <Cover src={groupPhoto(group.id)} glyph={group.glyph} tone={group.tone} className="place-thumb" />
+      <EntityPic kind="club" src={groupPhoto(group.id)} size={48} fallback={<NamedGlyph name={group.glyph} size={22} />} />
       <Link to={`/clubs/${group.id}`} className="stack grow" style={{ gap: 2, textDecoration: 'none', color: 'inherit', minWidth: 0 }}>
         <span className="strong" style={{ fontSize: '0.9688rem' }}>
           {group.name}

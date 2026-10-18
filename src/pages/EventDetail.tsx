@@ -18,6 +18,8 @@ import { eventHost, venuePage, type Host } from '../lib/hosts';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
+import { EntityLine, EntityPic, placeKind } from '../components/entity';
+import { placeById } from '../data/places';
 
 const CATEGORY_LABEL: Record<string, string> = {
   music: 'Live music',
@@ -44,17 +46,13 @@ function host(url: string) {
 
 /** "Pickle & Play · Pickleball courts · Thaltej · posted an event": who shared it. */
 function EventHostHead({ host }: { host: Host }) {
+  const kind = host.kind === 'page' ? (placeById(host.id) ? placeKind(placeById(host.id)!) : 'page') : host.kind;
+  const club = host.kind === 'club' ? groupById(host.id) : undefined;
   const icon =
     host.kind === 'person' ? (
       <Avatar who={person(host.id)} size={34} />
     ) : (
-      <span className="host-icon" aria-hidden="true">
-        {host.kind === 'page' ? (
-          placePhoto(host.id) ? <img src={placePhoto(host.id)} alt="" /> : <PinGlyph size={16} />
-        ) : groupById(host.id) ? (
-          <img src={clubPhoto(groupById(host.id)!)} alt="" />
-        ) : null}
-      </span>
+      <EntityPic kind={kind} size={34} src={host.kind === 'page' ? placePhoto(host.id) : club ? clubPhoto(club) : undefined} fallback={<PinGlyph size={16} />} />
     );
   return (
     <div className="feed-post__head">
@@ -66,7 +64,7 @@ function EventHostHead({ host }: { host: Host }) {
           <Link to={host.to} className="feed-post__name">
             {host.name}
           </Link>
-          <span className="host-kind">{host.kind === 'person' ? 'shared an event' : host.kind === 'page' ? 'Page' : 'Club'}</span>
+          <span className="host-kind">{host.kind === 'person' ? 'shared an event' : <EntityLine kind={kind} />}</span>
         </span>
         <span className="meta">{host.sub}</span>
       </div>
