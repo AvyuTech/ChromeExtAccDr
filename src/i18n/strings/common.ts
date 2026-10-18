@@ -22,6 +22,7 @@ export const common: Dict = {
   'common.join': { en: 'Join', gu: 'જોડાઓ', hi: 'जुड़ें' },
   'common.joined': { en: 'Joined', gu: 'જોડાયા', hi: 'जुड़ गए' },
   'common.replies': { en: '{n} replies', gu: '{n} જવાબો', hi: '{n} जवाब' },
+  'common.replies.one': { en: '1 reply', gu: '1 જવાબ', hi: '1 जवाब' },
   'common.verified': { en: 'Verified', gu: 'ચકાસાયેલ', hi: 'सत्यापित' },
   'common.free': { en: 'Free', gu: 'મફત', hi: 'मुफ़्त' },
   'common.going': { en: '{n} going', gu: '{n} જઈ રહ્યા છે', hi: '{n} जा रहे हैं' },

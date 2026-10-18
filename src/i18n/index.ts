@@ -12,7 +12,8 @@ export type { Dict, Lang };
 const DICT: Dict = { ...common, ...discover, ...city, ...settings, ...social };
 
 export function translate(lang: Lang, key: string, vars?: Record<string, string | number>) {
-  const entry = DICT[key];
+  // Singular forms live under `<key>.one` and apply when n is 1.
+  const entry = (vars?.n === 1 && DICT[`${key}.one`]) || DICT[key];
   let text = entry ? (entry[lang] ?? entry.en) : key;
   if (vars) for (const [k, v] of Object.entries(vars)) text = text.replaceAll(`{${k}}`, String(v));
   return text;

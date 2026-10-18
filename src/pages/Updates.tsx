@@ -1,11 +1,129 @@
-import { PageHeader } from '../components/ui';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { NOTIFICATION_META } from '../components/social';
+import { EmptyState, PageHeader } from '../components/ui';
+import type { AppNotification } from '../data/types';
+import { useT } from '../i18n';
+import { BellOffGlyph, NamedGlyph } from '../icons';
+import { visibleNotifications } from '../lib/selectors';
+import { useAppData } from '../state/appData';
+import { useSettings } from '../state/settings';
+import { useToast } from '../state/toast';
+
+type Filter = 'all' | 'replies' | 'city' | 'events' | 'reports';
+
+const FILTERS: Array<{ id: Filter; key: string; kinds: AppNotification['kind'][] | null }> = [
+  { id: 'all', key: 'social.filter.all', kinds: null },
+  { id: 'replies', key: 'social.filter.replies', kinds: ['reply', 'mention'] },
+  { id: 'city', key: 'social.filter.city', kinds: ['alert', 'system'] },
+  { id: 'events', key: 'social.filter.events', kinds: ['event', 'deal'] },
+  { id: 'reports', key: 'social.filter.reports', kinds: ['report'] },
+];
 
 export default function Updates() {
+  const t = useT();
+  const navigate = useNavigate();
+  const { settings } = useSettings();
+  const { data, add, markAllRead } = useAppData();
+  const toast = useToast();
+  const [filter, setFilter] = useState<Filter>('all');
+
+  const all = visibleNotifications(settings);
+  const kinds = FILTERS.find((f) => f.id === filter)?.kinds;
+  const shown = kinds ? all.filter((n) => kinds.includes(n.kind)) : all;
+  const unread = all.filter((n) => !data.readNotifications.includes(n.id));
+  const offCount = Object.values(settings.notifications.categories).filter((on) => !on).length;
+
+  const groups: Array<{ id: AppNotification['day']; key: string; items: AppNotification[] }> = [
+    { id: 'today', key: 'social.today', items: shown.filter((n) => n.day === 'today') },
+    { id: 'earlier', key: 'social.earlier', items: shown.filter((n) => n.day === 'earlier') },
+  ];
+
+  const open = (n: AppNotification) => {
+    add('readNotifications', n.id);
+    navigate(n.link);
+  };
+
   return (
     <>
-      <PageHeader title="Updates" />
+      <PageHeader
+        title={t('nav.updates')}
+        sub={unread.length ? t('social.unreadCount', { n: unread.length }) : undefined}
+        actions={
+          <button
+            type="button"
+            className="btn btn--ghost btn--sm"
+            style={{ color: 'var(--accent)', padding: '0 8px' }}
+            disabled={unread.length === 0}
+            onClick={() => {
+              markAllRead(all.map((n) => n.id));
+              toast(t('social.allMarkedRead'));
+            }}
+          >
+            {t('social.markAllRead')}
+          </button>
+        }
+      />
       <main className="page page--with-header">
-        <p className="muted">Coming together…</p>
+        <div className="chip-row" role="group" aria-label="Filter updates">
+          {FILTERS.map((f) => (
+            <button key={f.id} type="button" className="chip" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>
+              {t(f.key)}
+            </button>
+          ))}
+        </div>
+
+        {shown.length === 0 ? (
+          <EmptyState glyph="groups" title={t('social.allCaughtUp')} body={t('social.allCaughtUpBody')} />
+        ) : (
+          groups
+            .filter((g) => g.items.length)
+            .map((g) => (
+              <section key={g.id} className="section" aria-labelledby={`updates-${g.id}`} style={{ gap: 8 }}>
+                <h2 id={`updates-${g.id}`} className="notif-group-title">
+                  {t(g.key)}
+                </h2>
+                <div className="list">
+                  {g.items.map((n) => {
+                    const isUnread = !data.readNotifications.includes(n.id);
+                    const meta = NOTIFICATION_META[n.kind];
+                    return (
+                      <button
+                        key={n.id}
+                        type="button"
+                        className={`list-row notif-row glyph-host${isUnread ? ' notif-row--unread' : ''}`}
+                        onClick={() => open(n)}
+                        aria-label={`${isUnread ? `${t('social.unread')}: ` : ''}${n.title}. ${n.body}. ${n.ago}`}
+                      >
+                        <span className={`tile tone-${meta.tone}`}>
+                          <NamedGlyph name={meta.glyph} size={20} duo live={n.kind === 'alert' && isUnread} />
+                        </span>
+                        <span className="list-row__body" style={{ gap: 3 }}>
+                          <span className="notif-row__title">{n.title}</span>
+                          <span className="notif-row__body">{n.body}</span>
+                          <span className="meta">{n.ago}</span>
+                        </span>
+                        {isUnread ? <span className="unread-dot" aria-hidden="true" /> : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ))
+        )}
+
+        {offCount > 0 ? (
+          <Link to="/settings/notifications" className="notice" style={{ textDecoration: 'none', alignItems: 'center' }}>
+            <BellOffGlyph size={18} style={{ flexShrink: 0 }} />
+            <span className="grow">
+              {t('social.typesOff', { n: offCount })} · <b style={{ color: 'var(--accent)' }}>{t('social.notificationSettings')}</b>
+            </span>
+          </Link>
+        ) : (
+          <Link to="/settings/notifications" className="section__link" style={{ alignSelf: 'center', padding: '8px 0' }}>
+            {t('social.notificationSettings')}
+          </Link>
+        )}
       </main>
     </>
   );
