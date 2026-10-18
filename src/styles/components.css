@@ -1945,3 +1945,40 @@ a.feed-post__name:hover {
   background: var(--surface);
   color: var(--tone-ink);
 }
+
+/* ---------- Share sheet: friends to send to, then link options ---------- */
+.share-friends {
+  display: flex;
+  gap: 14px;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 2px var(--gutter) 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.share-friend {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  width: 56px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.share-friend .avatar {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color 0.15s ease;
+}
+.share-friend.is-on .avatar {
+  outline-color: var(--accent);
+}
+.share-friend.is-on span:last-child {
+  color: var(--accent);
+}
