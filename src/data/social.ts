@@ -200,6 +200,7 @@ export const POSTS: Post[] = [
     },
     seenInReels: 12,
     trending: true,
+    groupId: 'amdavad-foodies',
   },
   {
     id: 'water-timing',
@@ -258,6 +259,7 @@ export const POSTS: Post[] = [
     upvotes: 22,
     replyCount: 6,
     replies: [],
+    groupId: 'parents-thaltej',
   },
   {
     id: 'sg-signal',

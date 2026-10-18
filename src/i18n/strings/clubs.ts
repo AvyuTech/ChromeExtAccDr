@@ -115,4 +115,9 @@ export const clubs: Dict = {
   'clubs.new.human': { en: 'Clubs are run by people. No business pages or ads.', gu: 'ક્લબ લોકો ચલાવે છે. કોઈ બિઝનેસ પેજ કે જાહેરાત નહીં.', hi: 'क्लब लोग चलाते हैं। कोई बिज़नेस पेज या विज्ञापन नहीं।' },
   'clubs.new.create': { en: 'Start the club', gu: 'ક્લબ શરૂ કરો', hi: 'क्लब शुरू करें' },
   'clubs.new.created': { en: '{name} is live. Invite your people', gu: '{name} શરૂ થઈ. તમારા લોકોને બોલાવો', hi: '{name} शुरू हो गया। अपने लोगों को बुलाएँ' },
+  'clubs.post.meetup': { en: 'Planned a meetup', gu: 'મળવાનું ગોઠવ્યું', hi: 'मिलने का प्लान बनाया' },
+  'clubs.post.buy': { en: 'Started a group buy', gu: 'સાથે ખરીદી શરૂ કરી', hi: 'साथ में ख़रीदारी शुरू की' },
+  'clubs.post.enough': { en: 'enough people', gu: 'પૂરતા લોકો', hi: 'काफ़ी लोग' },
+  'clubs.post.open': { en: 'Open {club}', gu: '{club} ખોલો', hi: '{club} खोलें' },
+  'clubs.post.fine': { en: 'Nearhood only gathers people; the deal and payment happen outside the app.', gu: 'Nearhood ફક્ત લોકોને ભેગા કરે છે; સોદો અને ચુકવણી એપની બહાર થાય છે.', hi: 'Nearhood सिर्फ़ लोगों को जोड़ता है; सौदा और भुगतान ऐप के बाहर होता है।' },
 };

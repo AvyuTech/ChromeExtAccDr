@@ -68,11 +68,6 @@ export const common: Dict = {
   'discover.reels.sub': { en: 'Gathered from public reels, not reviews. Verdicts only come from people who went.', gu: 'જાહેર રીલ્સમાંથી, સમીક્ષા નહીં. ફેંસલો ફક્ત જનારા લોકોનો.', hi: 'सार्वजनिक रील्स से, समीक्षा नहीं। फ़ैसला सिर्फ़ जाने वालों का।' },
   'discover.reels.count': { en: '{n} reels', gu: '{n} રીલ્સ', hi: '{n} रील्स' },
   'home.weekendSub': { en: 'From organisers’ pages, ticket sites and reels. Nearhood links out; it doesn’t sell tickets.', gu: 'આયોજકોના પેજ, ટિકિટ સાઇટ અને રીલ્સમાંથી. Nearhood ટિકિટ વેચતું નથી, લિંક આપે છે.', hi: 'आयोजकों के पेज, टिकट साइट और रील्स से। Nearhood टिकट नहीं बेचता, लिंक देता है।' },
-  'home.clubs.week': { en: 'This week in your clubs', gu: 'આ અઠવાડિયે તમારા ક્લબમાં', hi: 'इस हफ़्ते आपके क्लब में' },
-  'home.clubs.join': { en: 'I’m in', gu: 'હું આવું છું', hi: 'मैं आऊँगा' },
-  'home.clubs.in': { en: 'You’re in', gu: 'તમે આવો છો', hi: 'आप आ रहे हैं' },
-  'home.clubs.buying': { en: 'Buying together', gu: 'સાથે ખરીદી', hi: 'साथ में ख़रीदारी' },
-  'home.clubs.buyProgress': { en: '{n} of {total} people in', gu: '{total}માંથી {n} લોકો જોડાયા', hi: '{total} में से {n} लोग जुड़े' },
   'home.pulse': { en: 'City pulse', gu: 'શહેરની નાડી', hi: 'शहर की नब्ज़' },
 
   'feed.forYou': { en: 'For you', gu: 'તમારા માટે', hi: 'आपके लिए' },

@@ -1640,6 +1640,20 @@ a.feed-post__name:hover {
 .feed-post__who .meta {
   font-size: 0.75rem;
 }
+.feed-post__in {
+  margin: 0 4px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.feed-post__club {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+}
+.feed-post__club:hover {
+  text-decoration: underline;
+}
 .feed-post__text {
   font-size: 0.9375rem;
   line-height: 1.45;

@@ -5,11 +5,12 @@ import { person } from '../data/core';
 import { GROUPS, groupById } from '../data/social';
 import type { ClubKind, Group, GroupBuy, Meetup, Tone } from '../data/types';
 import { useT } from '../i18n';
-import { CalendarGlyph, CheckGlyph, ChevronRightGlyph, NamedGlyph, UsersGlyph, type GlyphName } from '../icons';
+import { CalendarGlyph, CheckGlyph, ChevronRightGlyph, NamedGlyph, PinGlyph, ReplyGlyph, UsersGlyph, type GlyphName } from '../icons';
 import { compact } from '../lib/format';
 import { DEFAULT_APP_DATA, useAppData, type AppData } from '../state/appData';
 import { useToast } from '../state/toast';
-import { Cover, FaceStack } from './cards';
+import { Avatar, ClubTag, Cover, FaceStack } from './cards';
+import { useIdentity } from './identity';
 import { Sheet } from './ui';
 
 /* ---------- Kinds ---------- */
@@ -187,6 +188,131 @@ export function BuyRow({ buy, club, showClub }: { buy: GroupBuy; club: Group; sh
         <span>· {enough ? t('clubs.enough') : t('clubs.moreNeeded', { n: buy.target - ids.length })}</span>
       </span>
     </div>
+  );
+}
+
+/* ---------- Club plans as feed posts ---------- */
+
+/** Who posted it and in which club: "Karan M. › Sunday Cricket Club". */
+function PlanHead({ hostId, club, what }: { hostId: string; club: Group; what: string }) {
+  const host = person(hostId);
+  const work = useIdentity(hostId).work;
+  return (
+    <div className="feed-post__head">
+      <Link to={hostId === 'me' ? '/me' : `/people/${hostId}`} aria-label={host.name}>
+        <Avatar who={host} size={34} />
+      </Link>
+      <div className="feed-post__who">
+        <span className="feed-post__line">
+          <span className="feed-post__name">{hostId === 'me' ? 'You' : host.name}</span>
+          <ClubTag club={club} />
+        </span>
+        <span className="meta">
+          {work ? `${work.title} · ` : ''}
+          {what}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/** A meetup someone planned in a club, as it appears in the Home feed. */
+export function MeetupPost({ meetup, club }: { meetup: Meetup; club: Group }) {
+  const t = useT();
+  const toast = useToast();
+  const { data, toggle } = useAppData();
+  const mine = data.joinedMeetups.includes(meetup.id);
+  const ids = [...(mine ? ['me'] : []), ...meetup.going.filter((x) => x !== 'me')];
+  const left = meetup.spots ? meetup.spots - ids.length : undefined;
+  const [day, time] = splitWhen(meetup.when);
+  return (
+    <article className="feed-post plan-post">
+      <PlanHead hostId={meetup.hostId} club={club} what={t('clubs.post.meetup')} />
+      <Link to={`/clubs/${club.id}`} className="plan-post__card">
+        <span className={`meetup-row__when tone-${club.tone}`} aria-hidden="true">
+          <b>{day}</b>
+          {time ? <small>{time}</small> : null}
+        </span>
+        <span className="plan-post__body">
+          <span className="plan-post__title">{meetup.title}</span>
+          <span className="meta plan-post__where">
+            <PinGlyph size={12} />
+            {meetup.where}
+          </span>
+        </span>
+      </Link>
+      {meetup.note ? <p className="feed-post__text">{meetup.note}</p> : null}
+      <div className="feed-post__actions">
+        <button
+          type="button"
+          className={`chip club-chip${mine ? ' chip--soft' : ''}`}
+          aria-pressed={mine}
+          disabled={!mine && left !== undefined && left <= 0}
+          onClick={() => {
+            const on = toggle('joinedMeetups', meetup.id);
+            toast(on ? `${t('clubs.youreIn')}: ${meetup.title}` : `Not going to ${meetup.title}`);
+          }}
+        >
+          {mine ? <CheckGlyph size={13} /> : null}
+          {mine ? t('clubs.youreIn') : t('clubs.imIn')}
+        </button>
+        <span className="plan-post__who">
+          <FaceStack ids={ids} size={18} max={4} />
+          {t('clubs.goingCount', { n: ids.length })}
+          {left !== undefined ? ` · ${left > 0 ? t('clubs.spotsLeft', { n: left }) : t('clubs.full')}` : ''}
+        </span>
+        <span className="grow" />
+        <Link to={`/clubs/${club.id}`} className="feed-action" aria-label={t('clubs.post.open', { club: club.name })}>
+          <ReplyGlyph size={19} />
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+/** A group buy someone started in a club, as it appears in the Home feed. */
+export function BuyPost({ buy, club }: { buy: GroupBuy; club: Group }) {
+  const t = useT();
+  const toast = useToast();
+  const { data, toggle } = useAppData();
+  const mine = data.joinedBuys.includes(buy.id);
+  const ids = [...(mine ? ['me'] : []), ...buy.joined.filter((x) => x !== 'me')];
+  const n = Math.min(ids.length, buy.target);
+  const enough = ids.length >= buy.target;
+  return (
+    <article className="feed-post plan-post">
+      <PlanHead hostId={buy.hostId} club={club} what={`${t('clubs.post.buy')} · ${buy.ends}`} />
+      <span className="plan-post__title plan-post__title--lg">{buy.title}</span>
+      <p className="feed-post__text" style={{ marginTop: -4 }}>
+        {buy.note}
+      </p>
+      <div className="buy-row__progress" role="progressbar" aria-valuemin={0} aria-valuemax={buy.target} aria-valuenow={n} aria-label={t('clubs.progress', { n, target: buy.target })}>
+        <span style={{ width: `${(n / buy.target) * 100}%` }} className={enough ? 'is-done' : undefined} />
+      </div>
+      <div className="feed-post__actions">
+        <button
+          type="button"
+          className={`chip club-chip${mine ? ' chip--soft' : ''}`}
+          aria-pressed={mine}
+          onClick={() => {
+            const on = toggle('joinedBuys', buy.id);
+            toast(on ? `Counted in for ${buy.title}` : `Left ${buy.title}`);
+          }}
+        >
+          {mine ? <CheckGlyph size={13} /> : null}
+          {mine ? t('clubs.youreIn') : t('clubs.countMeIn')}
+        </button>
+        <span className="plan-post__who">
+          <FaceStack ids={ids} size={18} max={4} />
+          {t('clubs.progress', { n: ids.length, target: buy.target })} · {enough ? t('clubs.post.enough') : t('clubs.moreNeeded', { n: buy.target - ids.length })}
+        </span>
+        <span className="grow" />
+        <Link to={`/clubs/${club.id}`} className="feed-action" aria-label={t('clubs.post.open', { club: club.name })}>
+          <ReplyGlyph size={19} />
+        </Link>
+      </div>
+      <span className="plan-post__fine">{t('clubs.post.fine')}</span>
+    </article>
   );
 }
 

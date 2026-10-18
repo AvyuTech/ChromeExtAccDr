@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { eventPhoto, groupPhoto, personPhoto, placePhoto } from '../assets/photos';
 import { ALERT_KIND_META } from '../data/city';
 import { person, SOURCES } from '../data/core';
+import { groupById } from '../data/social';
 import type { CityAlert, CityEvent, Group, Person, Place, Post, SourceId, Tone } from '../data/types';
 import { useT } from '../i18n';
 import {
@@ -171,6 +172,8 @@ export function PostCard({ post }: { post: Post }) {
   const author = person(post.authorId);
   // What someone does helps judge an answer: a paediatrician on a fever question.
   const work = useIdentity(post.authorId).work;
+  // Posted in a club: name it, so the feed says where the conversation lives.
+  const club = post.groupId ? (data.myClubs.find((c) => c.id === post.groupId) ?? groupById(post.groupId)) : undefined;
   const up = has('upvoted', post.id);
   const saved = has('savedPosts', post.id);
   // Sample counts for posts upvoted in the seed data already include this person's vote.
@@ -188,7 +191,10 @@ export function PostCard({ post }: { post: Post }) {
           <Avatar who={author} size={34} />
         </Link>
         <div className="feed-post__who">
-          <span className="feed-post__name">{author.name}</span>
+          <span className="feed-post__line">
+            <span className="feed-post__name">{author.name}</span>
+            {club ? <ClubTag club={club} /> : null}
+          </span>
           <span className="meta">
             {work ? `${work.title} · ` : ''}
             {settings.privacy.showArea || post.authorId !== 'me' ? `${post.area} · ` : ''}
@@ -256,6 +262,20 @@ export function PostCard({ post }: { post: Post }) {
         </button>
       </div>
     </article>
+  );
+}
+
+/** "› Amdavad Foodies": the club a post or plan belongs to, linking to it. */
+export function ClubTag({ club }: { club: Group }) {
+  return (
+    <>
+      <span className="feed-post__in" aria-hidden="true">
+        ›
+      </span>
+      <Link to={`/clubs/${club.id}`} className="feed-post__club">
+        {club.name}
+      </Link>
+    </>
   );
 }
 
