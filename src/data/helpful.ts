@@ -73,6 +73,7 @@ export const EARN_RULES: EarnRule[] = [
   { id: 'reunited', what: 'Something lost goes home through your post or reply', points: 30 },
   { id: 'meetup', what: 'You host a club meetup and five or more people come', points: 20 },
   { id: 'buy', what: 'A group buy you started reaches its target', points: 15 },
+  { id: 'event', what: 'An event you shared gets 20 or more people going', points: 10 },
   { id: 'vouch', what: 'Someone you vouched for gets verified', points: 5 },
 ];
 

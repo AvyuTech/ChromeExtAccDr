@@ -651,3 +651,5 @@ export const StoreGlyph = g('store', <path d="M4.5 10v10h15V10M3.5 4.5h17l-1 4a2
 export const MinusGlyph = g('minus', <path d="M5 12h14" />);
 /** Four corners pointing out: open full screen. */
 export const ExpandGlyph = g('expand', <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />);
+/** A ticket stub: "I've got my ticket". */
+export const TicketGlyph = g('ticket', <path d="M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V10a2 2 0 0 0 0 4v2.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V14a2 2 0 0 0 0-4zM14 6v12" />);

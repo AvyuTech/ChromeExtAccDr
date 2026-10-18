@@ -59,6 +59,12 @@ export interface AppData {
   myPageUpdates: PageUpdate[];
   /** The one public reply a page's owner gave to a check-in, keyed by check-in id. */
   pageReplies: Record<string, string>;
+  /** Interested in or going to an event, keyed by event id. Never a ticket: just what you plan. */
+  eventStatus: Record<string, 'interested' | 'going'>;
+  /** Events you've told friends you have a ticket for. */
+  eventTickets: string[];
+  /** Events where you're going alone and would like company. */
+  eventCompany: string[];
 }
 
 export const DEFAULT_APP_DATA: AppData = {
@@ -100,6 +106,9 @@ export const DEFAULT_APP_DATA: AppData = {
   pageEdits: {},
   myPageUpdates: [],
   pageReplies: {},
+  eventStatus: { 'sufi-night': 'interested' },
+  eventTickets: [],
+  eventCompany: [],
 };
 
 type ListKey = {
@@ -145,6 +154,8 @@ interface AppDataContextValue {
   addPageUpdate: (update: PageUpdate) => void;
   removePageUpdate: (id: string) => void;
   replyToCheckIn: (checkInId: string, text: string) => void;
+  /** Set (or clear, with null) whether you're interested in or going to an event. */
+  setEventStatus: (eventId: string, status: 'interested' | 'going' | null) => void;
   reset: () => void;
 }
 
@@ -261,6 +272,23 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   );
   const addPageUpdate = useCallback((update: PageUpdate) => setData((d) => ({ ...d, myPageUpdates: [update, ...d.myPageUpdates] })), []);
   const removePageUpdate = useCallback((id: string) => setData((d) => ({ ...d, myPageUpdates: d.myPageUpdates.filter((u) => u.id !== id) })), []);
+  const setEventStatus = useCallback(
+    (eventId: string, status: 'interested' | 'going' | null) =>
+      setData((d) => {
+        const next = { ...d.eventStatus };
+        if (status) next[eventId] = status;
+        else delete next[eventId];
+        // Not going any more means no ticket and no looking for company.
+        const going = status === 'going';
+        return {
+          ...d,
+          eventStatus: next,
+          eventTickets: going ? d.eventTickets : d.eventTickets.filter((x) => x !== eventId),
+          eventCompany: going ? d.eventCompany : d.eventCompany.filter((x) => x !== eventId),
+        };
+      }),
+    [],
+  );
   const replyToCheckIn = useCallback((checkInId: string, text: string) => setData((d) => ({ ...d, pageReplies: { ...d.pageReplies, [checkInId]: text } })), []);
   const reset = useCallback(() => {
     removeKey(KEY);
@@ -298,9 +326,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       addPageUpdate,
       removePageUpdate,
       replyToCheckIn,
+      setEventStatus,
       reset,
     }),
-    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, editCollection, addSpot, addClub, addMeetup, addBuy, claimPage, vote, editPage, addPageUpdate, removePageUpdate, replyToCheckIn, reset],
+    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, editCollection, addSpot, addClub, addMeetup, addBuy, claimPage, vote, editPage, addPageUpdate, removePageUpdate, replyToCheckIn, setEventStatus, reset],
   );
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

@@ -139,6 +139,21 @@ export interface CityEvent {
   host?: { kind: 'page' | 'club' | 'person'; id: string };
   /** The venue's page, when it has one. */
   venueId?: string;
+  /*
+    The social side. Nearhood never sells tickets; these are people saying what
+    they plan to do, so friends can see it and plans can form around it.
+  */
+  /** People going we can name (friends show first); goingCount includes everyone. */
+  goingIds?: string[];
+  goingCount?: number;
+  interestedCount?: number;
+  upvotes?: number;
+  downvotes?: number;
+  /** Talk about it: questions, tips, "anyone want to share a cab?". */
+  replies?: Reply[];
+  replyCount?: number;
+  /** People going alone who'd like company. */
+  lookingForCompany?: string[];
 }
 
 export type PostType = 'question' | 'recommendation' | 'alert' | 'lostfound' | 'event' | 'giveaway';

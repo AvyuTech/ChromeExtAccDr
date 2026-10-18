@@ -21,6 +21,7 @@ import {
   TrustRing,
   UpvoteGlyph,
   DownvoteGlyph,
+  FireGlyph,
   PushPinGlyph,
   type GlyphName,
 } from '../icons';
@@ -32,6 +33,7 @@ import { useToast } from '../state/toast';
 import { RichText, Sheet } from './ui';
 import { useIdentity } from './identity';
 import { eventHost } from '../lib/hosts';
+import { eventSocial, trendRank } from '../lib/events';
 import { pagesRunBy } from '../lib/places';
 import { LevelTag } from './helpful';
 import { EntityMark, EntityPic, placeKind } from './entity';
@@ -445,8 +447,11 @@ export function eventSourceLine(event: CityEvent) {
 }
 
 export function EventTile({ event, width = 200 }: { event: CityEvent; width?: number }) {
+  const { data } = useAppData();
   const when = `${event.day} · ${event.time.split(' – ')[0]}`;
   const host = eventHost(event);
+  const social = eventSocial(event, data);
+  const rank = trendRank(event, data);
   return (
     <Link to={`/event/${event.id}`} className="photo-card" style={{ width }}>
       <Cover src={eventPhoto(event.id)} glyph={event.glyph} tone={event.tone} className="photo-card__media" alt="">
@@ -459,9 +464,20 @@ export function EventTile({ event, width = 200 }: { event: CityEvent; width?: nu
         <span className="meta">
           {event.area} · {price(event.price)}
         </span>
-        <span className="meta" style={{ color: event.confirmed ? 'var(--ink-2)' : 'var(--amber-ink)', fontWeight: 600 }}>
-          {event.confirmed ? (host ? `By ${host.name}` : eventSourceLine(event)) : (event.unconfirmedNote ?? 'Unconfirmed')}
-        </span>
+        {event.confirmed ? (
+          <span className="meta event-tile__social">
+            {rank ? (
+              <b className="trend-tag">
+                <FireGlyph size={11} />#{rank}
+              </b>
+            ) : null}
+            {compact(social.going)} going{social.friendsGoing.length ? ` · ${social.friendsGoing.length === 1 ? `${person(social.friendsGoing[0]).name.split(' ')[0]} too` : `${social.friendsGoing.length} friends`}` : host ? ` · by ${host.name}` : ''}
+          </span>
+        ) : (
+          <span className="meta" style={{ color: 'var(--amber-ink)', fontWeight: 600 }}>
+            {event.unconfirmedNote ?? 'Unconfirmed'}
+          </span>
+        )}
       </span>
     </Link>
   );

@@ -1,25 +1,25 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { eventPhoto, placePhoto } from '../assets/photos';
-import { Avatar, SourceChips } from '../components/cards';
+import { Avatar, SourceChips, Votes } from '../components/cards';
 import { clubPhoto } from '../components/clubs';
 import { ShareSheet } from '../components/share';
-import { downloadEventIcs, EventLinkRow, eventFriends, eventSourceLine, friendsLine } from '../components/discover';
-import { AvatarStack } from '../components/friends';
+import { downloadEventIcs, EventLinkRow, eventSourceLine } from '../components/discover';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { person } from '../data/core';
 import { EVENTS, eventById } from '../data/events';
 import { groupById } from '../data/social';
 import { useT } from '../i18n';
-import { AlertGlyph, CalendarGlyph, ExternalGlyph, FriendsGlyph, NavigateGlyph, PinGlyph, SaveGlyph, ShareGlyph, TrustRing } from '../icons';
+import { AlertGlyph, CalendarGlyph, ExternalGlyph, NavigateGlyph, PinGlyph, ReplyGlyph, ShareGlyph, TrustRing } from '../icons';
 import { km, price } from '../lib/format';
-import { isWanted } from '../lib/friends';
 import { eventHost, venuePage, type Host } from '../lib/hosts';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 import { EntityLine, EntityPic, placeKind } from '../components/entity';
 import { placeById } from '../data/places';
+import { EventTalk, GoingButtons, GoingLine, GoTogether, TrendBadge, WhoIsGoingSheet } from '../components/eventSocial';
+import { eventSocial, eventVoteId } from '../lib/events';
 
 const CATEGORY_LABEL: Record<string, string> = {
   music: 'Live music',
@@ -73,17 +73,18 @@ function EventHostHead({ host }: { host: Host }) {
 }
 
 /**
- * An event is a post by a person, a page or a club. Found on ticketing sites, organisers' pages, reels and news.
- * Nearhood doesn't sell tickets or take RSVPs: it links out, and shows which
- * friends want to go or went.
+ * An event is a post by a person, a page or a club. People say they're interested
+ * or going, vote on it, talk about it and find company; friends see who's going and
+ * popular events trend up the feeds. Nearhood never sells tickets: it links out.
  */
 export default function EventDetail() {
   const { id = '' } = useParams();
   const t = useT();
   const toast = useToast();
   const { settings } = useSettings();
-  const { data, toggleWant } = useAppData();
+  const { data } = useAppData();
   const [sendOpen, setSendOpen] = useState(false);
+  const [whoOpen, setWhoOpen] = useState(false);
   const event = eventById(id);
 
   if (!event) {
@@ -110,9 +111,7 @@ export default function EventDetail() {
   const similar = EVENTS.filter((e) => e.id !== event.id && (e.category === event.category || e.tags.some((tag) => event.tags.includes(tag)))).slice(0, 4);
   const when = `${DAY_NAME[event.day] ?? event.day}, ${event.time}`;
   const startTime = event.time.split(' – ')[0];
-  const { want, went } = eventFriends(event.id, data);
-  const wantItem = { id: `w-event-${event.id}`, kind: 'event' as const, refId: event.id, title: event.title, sub: `${event.day}, ${event.time}` };
-  const wanted = isWanted(data, wantItem);
+  const social = eventSocial(event, data);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.venue}, ${event.area}, Ahmedabad`)}`;
   const from = eventSourceLine(event);
   const hostInfo = eventHost(event);
@@ -128,6 +127,9 @@ export default function EventDetail() {
             {eventPhoto(event.id) ? <img src={eventPhoto(event.id)} alt="" /> : null}
             <span className="photo-pill event-post__when">
               {event.day === 'Today' ? `Tonight · ${startTime}` : `${event.day} · ${startTime}`}
+            </span>
+            <span className="event-post__trend">
+              <TrendBadge event={event} pill />
             </span>
           </figure>
           <h1 className="event-post__title">{event.title}</h1>
@@ -145,8 +147,11 @@ export default function EventDetail() {
               <span className="muted">, {event.area}</span>
             </span>
           </p>
+          {/* Your plans first: what friends see. Tickets stay a link out. */}
+          <GoingButtons event={event} />
+          <GoingLine event={event} onOpen={() => setWhoOpen(true)} />
           {event.link ? (
-            <a className="btn btn--primary btn--block event-post__link" href={event.link.url} target="_blank" rel="noopener noreferrer">
+            <a className="btn btn--outline btn--block event-post__link" href={event.link.url} target="_blank" rel="noopener noreferrer">
               {event.link.label}
               <ExternalGlyph size={15} />
             </a>
@@ -156,19 +161,14 @@ export default function EventDetail() {
             {t('discover.event.noTickets')}
           </p>
           <div className="feed-post__actions">
-            <button
-              type="button"
-              className="feed-action"
-              aria-pressed={wanted}
-              style={wanted ? { color: 'var(--accent)' } : undefined}
-              onClick={() => {
-                const added = toggleWant(wantItem);
-                toast(added ? `Added "${event.title}" to Want to try` : 'Removed from Want to try');
-              }}
-            >
-              <SaveGlyph size={20} active={wanted} />
-              {wanted ? t('discover.action.saved') : t('discover.action.save')}
-            </button>
+            <Votes id={eventVoteId(event.id)} up={event.upvotes ?? 0} down={event.downvotes} />
+            <a href="#talk" className="feed-action" aria-label={`${social.replies} comments`} onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('talk')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}>
+              <ReplyGlyph size={20} />
+              {social.replies}
+            </a>
             <button
               type="button"
               className="feed-action"
@@ -187,20 +187,11 @@ export default function EventDetail() {
           </div>
         </article>
 
-        <section className="friends-going" aria-label={t('community.friendsInterested')}>
-          {want.length || went.length ? (
-            <AvatarStack ids={[...went, ...want]} size={26} />
-          ) : (
-            <span className="tile tone-violet" style={{ width: 30, height: 30, borderRadius: 15 }}>
-              <FriendsGlyph size={16} duo />
-            </span>
-          )}
-          <span className="grow body-sm" style={{ minWidth: 0 }}>
-            {want.length || went.length
-              ? [friendsLine(went, { one: 'went', many: 'went' }), friendsLine(want, { one: 'wants to go', many: 'want to go' })].filter(Boolean).join(' · ')
-              : t('discover.event.noFriends')}
-          </span>
-        </section>
+        <GoTogether event={event} />
+
+        <div id="talk">
+          <EventTalk event={event} />
+        </div>
 
         <section className="dsec" aria-labelledby="trust-title">
           <div className="row" style={{ gap: 10 }}>
@@ -237,6 +228,7 @@ export default function EventDetail() {
           </section>
         ) : null}
       </main>
+      <WhoIsGoingSheet event={event} open={whoOpen} onClose={() => setWhoOpen(false)} />
       <ShareSheet open={sendOpen} onClose={() => setSendOpen(false)} title={event.title} path={`/event/${event.id}`} message={`${event.title}, ${event.day} ${event.time} in ${event.area}`} />
     </>
   );

@@ -34,6 +34,8 @@ import { enabledSources, useSettings } from '../state/settings';
 import { HeroRow, useBoardContext } from '../components/helpful';
 import { leaderboard } from '../lib/helpful';
 import { HelpfulInfo } from '../components/helpGuide';
+import { EventPost } from '../components/eventSocial';
+import { trendingEvents, trendScore } from '../lib/events';
 
 type Topic = 'all' | 'food' | 'events' | 'clubs' | 'alerts';
 type Show = 'latest' | 'trending' | 'questions';
@@ -91,9 +93,11 @@ export default function Home() {
       EVENTS.filter((e) => ['Sat', 'Sun', 'Sat–Sun'].includes(e.day))
         .filter((e) => e.confirmed || settings.sources.showUnconfirmed)
         .filter((e) => e.sources.some(enabledSources(settings)))
-        .sort((a, b) => b.sources.length - a.sources.length || a.distanceKm - b.distanceKm),
-    [settings],
+        // What's catching on first: votes, people going, friends going, talk.
+        .sort((a, b) => trendScore(b, data) - trendScore(a, data) || a.distanceKm - b.distanceKm),
+    [settings, data],
   );
+  const topEvent = useMemo(() => trendingEvents(data)[0], [data]);
   const tonightEvents = EVENTS.filter((e) => e.day === 'Today');
   const plansTonight = tonightEvents.length + weekendEvents.filter((e) => e.day === 'Sat' || e.day === 'Sat–Sun').length;
 
@@ -187,6 +191,8 @@ export default function Home() {
       // Plans from your clubs read like posts: who started them, in which club.
       if (i === 1 && tab === 'for-you' && clubMeetups[0]) feed.push(<MeetupPost key={`m-${clubMeetups[0].m.id}`} meetup={clubMeetups[0].m} club={clubMeetups[0].club} />);
       if (i === 2 && tab === 'for-you' && clubBuys[0]) feed.push(<BuyPost key={`b-${clubBuys[0].b.id}`} buy={clubBuys[0].b} club={clubBuys[0].club} />);
+      // The event catching on most this week, as a post you can plan around.
+      if (i === 2 && tab === 'for-you' && topEvent) feed.push(<EventPost key={`ev-${topEvent.id}`} event={topEvent} />);
       if (i === 4 && tab === 'for-you' && clubMeetups[1]) feed.push(<MeetupPost key={`m-${clubMeetups[1].m.id}`} meetup={clubMeetups[1].m} club={clubMeetups[1].club} />);
       if (i === 3 && tab === 'for-you' && friendCard) feed.push(<CheckInCard key={`friend-${friendCard.id}`} c={friendCard} />);
       if (i === 3 && tab === 'for-you') feed.push(<HelpfulThisMonth key="heroes" />);
@@ -230,7 +236,7 @@ export default function Home() {
           </div>
         </section>,
       );
-    feed.push(weekendSection);
+    trendingEvents(data).forEach((e) => feed.push(<EventPost key={`ev-${e.id}`} event={e} />));
   } else if (topic === 'clubs') {
     clubMeetups.forEach(({ club, m }) => feed.push(<MeetupPost key={`m-${m.id}`} meetup={m} club={club} />));
     clubBuys.forEach(({ club, b }) => feed.push(<BuyPost key={`b-${b.id}`} buy={b} club={club} />));

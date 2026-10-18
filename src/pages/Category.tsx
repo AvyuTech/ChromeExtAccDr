@@ -2,18 +2,20 @@ import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { categoryPhoto, eventPhoto } from '../assets/photos';
 import { Cover, PlaceRow } from '../components/cards';
-import { eventFriends } from '../components/discover';
+import { person } from '../data/core';
 import { EmptyState, PageHeader, Segmented } from '../components/ui';
 import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
 import type { CityEvent, Place, Tone } from '../data/types';
 import { useT } from '../i18n';
 import { ChevronRightGlyph, NamedGlyph, PlusGlyph, type GlyphName } from '../icons';
-import { price } from '../lib/format';
+import { compact, price } from '../lib/format';
 import { placeCommunity } from '../lib/friends';
 import { eventHost } from '../lib/hosts';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
+import { TrendBadge } from '../components/eventSocial';
+import { eventSocial, trendScore } from '../lib/events';
 
 type Sort = 'popular' | 'nearest' | 'top';
 
@@ -107,13 +109,9 @@ export default function Category() {
     const test = EVENT_CHIPS.find((c) => c.id === chip)?.test ?? (() => true);
     // Only events a person, page or club posted; nothing gathered from elsewhere.
     const list = EVENTS.filter((e) => eventHost(e) && (e.confirmed || settings.sources.showUnconfirmed)).filter(test);
-    // "Popular" means popular with your friends first; "Soonest" means today, then the weekend.
-    const keen = (e: CityEvent) => {
-      const f = eventFriends(e.id, data);
-      return f.want.length + f.went.length;
-    };
+    // "Trending" weighs votes, people going (friends most) and talk; "Soonest" means today, then the weekend.
     return [...list].sort((a, b) =>
-      sort === 'nearest' ? a.distanceKm - b.distanceKm : sort === 'top' ? DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day) : keen(b) - keen(a) || a.distanceKm - b.distanceKm,
+      sort === 'nearest' ? a.distanceKm - b.distanceKm : sort === 'top' ? DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day) : trendScore(b, data) - trendScore(a, data) || a.distanceKm - b.distanceKm,
     );
   }, [category, chip, sort, settings.sources.showUnconfirmed, data]);
 
@@ -172,7 +170,7 @@ export default function Category() {
           value={sort}
           onChange={setSort}
           options={[
-            { value: 'popular', label: category === 'events' ? t('discover.sort.friends') : t('discover.sort.popular') },
+            { value: 'popular', label: category === 'events' ? 'Trending' : t('discover.sort.popular') },
             { value: 'nearest', label: t('discover.sort.nearest') },
             { value: 'top', label: category === 'events' ? 'Soonest' : t('community.mostMust') },
           ]}
@@ -216,6 +214,8 @@ export default function Category() {
 
 /** An event as one row, labelled with who posted it: a person, a page or a club. */
 function PostedEventRow({ event }: { event: CityEvent }) {
+  const { data } = useAppData();
+  const social = eventSocial(event, data);
   const host = eventHost(event)!;
   const by = host.kind === 'page' ? `Posted by the page ${host.name}` : host.kind === 'club' ? `Posted in ${host.name}` : `Shared by ${host.name}`;
   return (
@@ -227,6 +227,11 @@ function PostedEventRow({ event }: { event: CityEvent }) {
           {event.day}, {event.time} · {event.area} · {event.price === 0 ? 'Free' : price(event.price)}
         </span>
         <span className="list-row__meta posted-by">{event.confirmed ? by : `${by} · not confirmed yet`}</span>
+        <span className="list-row__meta event-row__social">
+          <TrendBadge event={event} />
+          {compact(social.going)} going · {compact(social.interested)} interested
+          {social.friendsGoing.length ? ` · ${social.friendsGoing.length === 1 ? `${person(social.friendsGoing[0]).name.split(' ')[0]} going` : `${social.friendsGoing.length} friends going`}` : ''}
+        </span>
       </span>
       <ChevronRightGlyph size={16} />
     </Link>

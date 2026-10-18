@@ -39,7 +39,7 @@ export const common: Dict = {
   'home.alerts': { en: 'alerts', gu: 'ચેતવણી', hi: 'अलर्ट' },
   'home.tonight': { en: 'tonight', gu: 'આજે રાત્રે', hi: 'आज रात' },
   'home.deals': { en: 'deals', gu: 'ડીલ્સ', hi: 'डील' },
-  'home.weekend': { en: 'Around the city this weekend', gu: 'આ સપ્તાહાંતે શહેરમાં', hi: 'इस वीकेंड शहर में' },
+  'home.weekend': { en: 'Trending this weekend', gu: 'આ સપ્તાહાંતે ટ્રેન્ડિંગ', hi: 'इस वीकेंड ट्रेंडिंग' },
   'home.cityAlert': { en: 'City update', gu: 'શહેર અપડેટ', hi: 'शहर अपडेट' },
   'home.deal': { en: 'Deal', gu: 'ડીલ', hi: 'डील' },
   'home.empty': { en: 'Nothing here yet', gu: 'હજુ અહીં કંઈ નથી', hi: 'अभी यहाँ कुछ नहीं है' },
@@ -69,7 +69,7 @@ export const common: Dict = {
   'discover.reels.title': { en: 'Seen on reels this week', gu: 'આ અઠવાડિયે રીલ્સમાં', hi: 'इस हफ़्ते रील्स में' },
   'discover.reels.sub': { en: 'Gathered from public reels, not reviews. Verdicts only come from people who went.', gu: 'જાહેર રીલ્સમાંથી, સમીક્ષા નહીં. ફેંસલો ફક્ત જનારા લોકોનો.', hi: 'सार्वजनिक रील्स से, समीक्षा नहीं। फ़ैसला सिर्फ़ जाने वालों का।' },
   'discover.reels.count': { en: '{n} reels', gu: '{n} રીલ્સ', hi: '{n} रील्स' },
-  'home.weekendSub': { en: 'From organisers’ pages, ticket sites and reels. Nearhood links out; it doesn’t sell tickets.', gu: 'આયોજકોના પેજ, ટિકિટ સાઇટ અને રીલ્સમાંથી. Nearhood ટિકિટ વેચતું નથી, લિંક આપે છે.', hi: 'आयोजकों के पेज, टिकट साइट और रील्स से। Nearhood टिकट नहीं बेचता, लिंक देता है।' },
+  'home.weekendSub': { en: 'What people here are going to, most talked about first. Tickets are a link out.', gu: 'અહીંના લોકો જ્યાં જાય છે, સૌથી ચર્ચિત પહેલા. ટિકિટ માટે લિંક.', hi: 'यहाँ के लोग जहाँ जा रहे हैं, सबसे चर्चित पहले। टिकट के लिए लिंक।' },
   'home.pulse': { en: 'City pulse', gu: 'શહેરની નાડી', hi: 'शहर की नब्ज़' },
 
   'feed.forYou': { en: 'For you', gu: 'તમારા માટે', hi: 'आपके लिए' },

@@ -24,6 +24,17 @@ Everything in Nearhood belongs to one of three things. There is nothing else to 
 
 Everything else is something one of them posts: posts and questions, check-ins, events, meetups and group buys. An event is a post by a person ("Riya shared an event"), a page ("Pickle & Play · beginners' social") or a club ("Thaltej Parents · kite workshop"), and it links out for details or tickets. A meetup or group buy is a post in a club and always shows which club it's from.
 
+## Events: social, never sold
+
+Nearhood doesn't sell or book tickets, but events are social, so plans can form around them:
+
+- **Interested / Going:** one tap each. Interested saves it to *Want to try*; Going tells friends you'll be there (unless you hide it in Settings ▸ Privacy). Counts show on every event: *46 going · 128 interested · Riya and Aditi going*; tap for who's going, friends first.
+- **Votes and talk:** events take ▲ ▼ like any post, and every event has *Talk about it*: threaded questions and tips ("where to park?", "anyone going alone?").
+- **Go together:** once you're going, say *I've got my ticket* so friends know, or *Going alone? Find company*, which lists you with others going solo and a *Say hi* that opens a chat.
+- **Trending:** an event's pull is its votes, people going (friends count most), people interested and talk, weighted towards sooner dates. The top three carry a *#1 trending* tag; the most trending event appears in the Home feed as a post, *Trending this weekend* orders the weekend row, and the Events list sorts by Trending by default.
+- **Tickets:** a clear *Tickets on BookMyShow* (or the organiser's page) link out; Nearhood never takes payment.
+- **Helpful points:** sharing an event that gets 20 or more people going earns +10.
+
 ## Telling them apart at a glance
 
 Pages and clubs work in similar ways (both have people who run them, both can post events), so they must *look* different everywhere they appear: headers, lists, search, feed tags and event hosts.
@@ -98,7 +109,7 @@ In the prototype, Jay Mehta runs **Brew Lab** (a café) and **Pickle & Play** (p
 | **Clubs** | Any verified resident. | Club rules and admins are visible; members are real people. |
 | **Meetups** | Club members, inside their club (Sunday cricket, founders' breakfast). | Just who's in and where. No tickets, no payments. |
 | **Group buys** | Club members ("buying an SUV, 3+ cars gets a fleet discount"). | Nearhood only gathers people; the deal and the money happen outside the app. |
-| **Events** | Posted by a person, a page (the venue) or a club; many are shared from public sources (ticket sites, organisers' pages, reels, news). | Labelled with who posted them and where they were seen; link out for details and tickets. Friends' "want to go" is the social signal. |
+| **Events** | Posted by a person, a page (the venue) or a club; many are shared from public sources (ticket sites, organisers' pages, reels, news). | Labelled with who posted them and where they were seen. People vote, say Interested or Going, and talk about them; tickets always link out. |
 | **Alerts** | Official feeds (police, AMC, utilities, IMD) and verified neighbours. | Marked verified or unconfirmed. |
 
 ## Knowing who people are
@@ -202,7 +213,7 @@ Kept simple: when friends check in on a trip, it shows in your friends feed tagg
 
 ## Out of Phase 1 (cut)
 
-Bill payments and city services, deals and coupons, booking or ticketing, RSVPs with counts for city events, movie listings, public transport (bus, BRTS, metro), any payment flow, ads or business posts in the Home feed (a claimed page's updates stay on its page and reach people who saved it).
+Bill payments and city services, deals and coupons, selling or booking tickets (events link out), movie listings, public transport (bus, BRTS, metro), any payment flow, ads or business posts in the Home feed (a claimed page's updates stay on its page and reach people who saved it).
 
 ## Phase 2 (later, only if Phase 1 works)
 
