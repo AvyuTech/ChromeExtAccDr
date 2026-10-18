@@ -16,9 +16,9 @@ body {
   background: var(--backdrop);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 500;
-  line-height: 1.45;
+  line-height: 1.42;
   -webkit-font-smoothing: antialiased;
 }
 

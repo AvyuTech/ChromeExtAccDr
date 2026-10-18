@@ -275,9 +275,10 @@
   bottom: -70px;
 }
 .detail-hero--photo {
-  height: 248px;
+  height: 280px;
+  margin: -4px calc(var(--gutter) * -1) 0;
+  border-radius: 0;
   background: var(--surface-3);
-  box-shadow: var(--shadow-photo);
 }
 .detail-hero--photo > img {
   position: absolute;

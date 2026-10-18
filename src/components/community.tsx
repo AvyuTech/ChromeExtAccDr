@@ -5,7 +5,7 @@ import { placeById } from '../data/places';
 import type { CheckIn, WantItem } from '../data/types';
 import { useT } from '../i18n';
 import { eventPhoto, itemPhoto, placePhoto } from '../assets/photos';
-import { ChevronRightGlyph, FriendsGlyph, HeartGlyph, NamedGlyph, SendGlyph, type GlyphName } from '../icons';
+import { ChevronRightGlyph, HeartGlyph, NamedGlyph, SendGlyph, type GlyphName } from '../icons';
 import { profileInfo, VERDICT_LABEL } from '../lib/friends';
 import { nowTime } from '../lib/format';
 import { useAppData } from '../state/appData';
@@ -24,7 +24,7 @@ export function FriendPickCard({ c }: { c: CheckIn }) {
   const liked = has('likedCheckIns', c.id);
   const src = itemPhoto(c.items[0], c.placeId, c.eventId);
   return (
-    <article className="card pick-card">
+    <article className="pick-card">
       <Link to={`/checkin/${c.id}`} className="pick-card__link" aria-label={`${who.name}: ${c.items.join(', ')} at ${c.placeName}, ${VERDICT_LABEL[c.verdict][c.kind]}`}>
         <span className={`pick-card__photo tone-${place?.tone ?? VERDICT_META[c.verdict].tone}`}>
           {src ? (
@@ -33,7 +33,7 @@ export function FriendPickCard({ c }: { c: CheckIn }) {
             <NamedGlyph name={(place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events')) as GlyphName} size={34} duo />
           )}
           <span className="pick-card__who">
-            <Avatar who={{ ...who, verified: false }} size={32} />
+            <Avatar who={{ ...who, verified: false }} size={26} />
           </span>
         </span>
         <span className="pick-card__body">
@@ -46,8 +46,8 @@ export function FriendPickCard({ c }: { c: CheckIn }) {
           </span>
         </span>
       </Link>
-      <button type="button" className="photo-action" style={{ top: 10, right: 10 }} aria-pressed={liked} aria-label={liked ? 'Unlike' : 'Like'} onClick={() => toggle('likedCheckIns', c.id)}>
-        <HeartGlyph size={20} active={liked} style={{ color: liked ? 'var(--red)' : undefined }} />
+      <button type="button" className="photo-action photo-action--sm" style={{ top: 8, right: 8 }} aria-pressed={liked} aria-label={liked ? 'Unlike' : 'Like'} onClick={() => toggle('likedCheckIns', c.id)}>
+        <HeartGlyph size={17} active={liked} style={{ color: liked ? 'var(--red)' : undefined }} />
       </button>
     </article>
   );
@@ -62,15 +62,10 @@ export function PlanTogetherCard({ plans }: { plans: Array<{ personId: string; i
   const t = useT();
   if (!plans.length) return null;
   return (
-    <section className="card plan-card" aria-labelledby="plan-title">
-      <div className="row">
-        <span className="tile tone-mint">
-          <FriendsGlyph size={20} duo live />
-        </span>
-        <h2 className="section__title grow" id="plan-title">
-          {t('feed.friends.planTogether')}
-        </h2>
-      </div>
+    <section className="section plan-card" aria-labelledby="plan-title">
+      <h2 className="section__title" id="plan-title">
+        {t('feed.friends.planTogether')}
+      </h2>
       <div className="list" style={{ border: 'none', background: 'transparent' }}>
         {plans.slice(0, 3).map(({ personId, item }) => {
           const who = person(personId);

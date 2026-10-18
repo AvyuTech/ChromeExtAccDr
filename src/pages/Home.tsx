@@ -156,17 +156,16 @@ export default function Home() {
   } else if (topic === 'all') {
     posts.forEach((p, i) => {
       feed.push(<PostCard key={p.id} post={p} />);
-      if (i === 0 && alerts[0]) feed.push(<AlertCard key={`alert-${alerts[0].id}`} alert={alerts[0]} />);
+      if (i === 0 && alerts[0])
+        feed.push(
+          <div key={`alert-${alerts[0].id}`}>
+            <AlertCard alert={alerts[0]} />
+          </div>,
+        );
       if (i === 0 && tab === 'for-you' && mustTriesSection) feed.push(mustTriesSection);
       if (i === 1 && tab === 'for-you') feed.push(weekendSection);
       if (i === 2 && tab === 'for-you') feed.push(<DealCard key="deal" deal={DEALS[0]} />);
-      if (i === 3 && tab === 'for-you' && friendCard)
-        feed.push(
-          <div key={`friend-${friendCard.id}`} className="stack" style={{ gap: 8 }}>
-            <span className="eyebrow muted">{t('feed.friends.fromFriend')}</span>
-            <CheckInCard c={friendCard} />
-          </div>,
-        );
+      if (i === 3 && tab === 'for-you' && friendCard) feed.push(<CheckInCard key={`friend-${friendCard.id}`} c={friendCard} />);
       if (i === 4 && tab === 'for-you' && plans.length) feed.push(<PlanTogetherCard key="plans" plans={plans} />);
       if (i === 5 && tab === 'for-you')
         feed.push(
@@ -226,7 +225,13 @@ export default function Home() {
           }
         />,
       );
-    alerts.forEach((a) => feed.push(<AlertCard key={a.id} alert={a} />));
+    alerts.forEach((a) =>
+      feed.push(
+        <div key={a.id}>
+          <AlertCard alert={a} />
+        </div>,
+      ),
+    );
   }
 
   return (
@@ -234,16 +239,16 @@ export default function Home() {
       <main className="page home">
         <header className="home-header">
           <Link to="/" className="home-brand" aria-label="Nearhood home">
-            <Logo size={36} />
-            <Wordmark size={25} />
+            <Logo size={30} />
+            <Wordmark size={22} />
           </Link>
           <span className="grow" />
           <Link to="/updates" className="icon-btn" aria-label={`${t('nav.updates')}${unread ? `, ${unread} unread` : ''}`}>
-            <BellGlyph size={21} ringing={unread > 0} />
+            <BellGlyph size={19} ringing={unread > 0} />
             {unread > 0 ? <span className="dot-badge" /> : null}
           </Link>
           <Link to="/messages" className="icon-btn" aria-label={`${t('nav.messages')}${unreadChats ? `, ${unreadChats} unread` : ''}`}>
-            <ChatGlyph size={21} typing={unreadChats > 0} />
+            <ChatGlyph size={19} typing={unreadChats > 0} />
           </Link>
         </header>
         <button type="button" className="home-location" onClick={() => setPlaceSheet(true)} aria-label={`Neighbourhood: ${homeName}, ${settings.location.city}. Change`}>
@@ -254,15 +259,15 @@ export default function Home() {
 
         <h1 className="hero-title">
           {t('home.hero')}
-          <SparkleMark size={26} className="hero-title__spark" />
+          <SparkleMark size={22} className="hero-title__spark" />
         </h1>
 
         <form onSubmit={onAsk} role="search">
           <label className="ask-field" htmlFor="ask">
-            <SparkGlyph size={22} />
+            <SparkGlyph size={19} />
             <input id="ask" type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('home.askAnything')} autoComplete="off" enterKeyHint="search" />
-            <button type="submit" className="icon-btn icon-btn--accent" style={{ width: 44, height: 44 }} aria-label={t('common.search')}>
-              <ArrowRightGlyph size={20} />
+            <button type="submit" className="icon-btn icon-btn--accent" style={{ width: 38, height: 38, borderRadius: 12 }} aria-label={t('common.search')}>
+              <ArrowRightGlyph size={18} />
             </button>
           </label>
         </form>
@@ -271,10 +276,10 @@ export default function Home() {
 
         <section className="card today-card" aria-label={todayLabel()}>
           <Link to="/city" className="today-card__main">
-            <WeatherGlyph condition={pulse.weather.condition} size={38} />
-            <span className="stack" style={{ gap: 2 }}>
+            <WeatherGlyph condition={pulse.weather.condition} size={30} />
+            <span className="stack" style={{ gap: 0 }}>
               <span className="meta">{todayLabel()}</span>
-              <span className="display" style={{ fontSize: '1.1875rem', fontWeight: 800 }}>
+              <span className="display" style={{ fontSize: '1rem', fontWeight: 800 }}>
                 {CONDITION_LABEL[pulse.weather.condition]} · {pulse.weather.temp}°
               </span>
             </span>
@@ -294,7 +299,7 @@ export default function Home() {
             ))}
           </div>
           <button type="button" className="icon-btn icon-btn--ghost home-tabs__filter" aria-label={t('home.filter')} aria-haspopup="dialog" onClick={() => setFilterSheet(true)}>
-            <SlidersGlyph size={22} />
+            <SlidersGlyph size={20} />
             {filtered ? <span className="dot-badge" style={{ top: 8, right: 8 }} /> : null}
           </button>
         </div>
@@ -314,7 +319,7 @@ export default function Home() {
           </div>
         ) : null}
 
-        {feed.length ? feed : <EmptyState glyph="question" title={t('home.empty')} body="Ask a question and neighbours will chip in." />}
+        {feed.length ? <div className="feed">{feed}</div> : <EmptyState glyph="question" title={t('home.empty')} body="Ask a question and neighbours will chip in." />}
       </main>
 
       <Sheet open={filterSheet} onClose={() => setFilterSheet(false)} title={t('home.filter')}>

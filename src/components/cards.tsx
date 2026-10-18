@@ -189,74 +189,70 @@ export function PostCard({ post }: { post: Post }) {
   const open = () => navigate(`/post/${post.id}`);
 
   return (
-    <article className="card post-card">
-      <div className="row" style={{ gap: 12 }}>
+    <article className="feed-post">
+      <div className="feed-post__head">
         <Link to={post.authorId === 'me' ? '/me' : `/people/${post.authorId}`} aria-label={author.name}>
-          <Avatar who={author} size={44} />
+          <Avatar who={author} size={34} />
         </Link>
-        <div className="grow" style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <span className="strong" style={{ fontSize: '0.9688rem' }}>
-            {author.name}
-          </span>
+        <div className="feed-post__who">
+          <span className="feed-post__name">{author.name}</span>
           <span className="meta">
             {settings.privacy.showArea || post.authorId !== 'me' ? `${post.area} · ` : ''}
             {post.ago}
           </span>
         </div>
-        <span className={`badge tone-${TOPIC_TONE[post.type]}`}>{post.topic}</span>
+        <span className={`badge badge--sm tone-${TOPIC_TONE[post.type]}`}>{post.topic}</span>
         <PostMenu post={post} />
       </div>
-      <p className="post-card__text" onClick={open}>
+      <p className="feed-post__text" onClick={open}>
         {post.text}
       </p>
       {showAnswer && post.answer ? (
         <Link to={`/post/${post.id}`} className="answer-inline" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <span className="row" style={{ gap: 8, alignItems: 'flex-start' }}>
-            <SparkGlyph size={20} style={{ color: 'var(--accent)', marginTop: 1 }} />
-            <span className="stack" style={{ gap: 4 }}>
-              <span className="answer-inline__label">{t('answer.label')}</span>
-              <span className="answer-text" style={{ fontSize: '0.9375rem' }}>
-                <RichText text={post.answer.text} />
-              </span>
-            </span>
+          <span className="answer-inline__label">
+            <SparkGlyph size={15} />
+            {t('answer.label')}
           </span>
-          <span className="row" style={{ gap: 8, paddingLeft: 28 }}>
-            {repliers.length ? <FaceStack ids={repliers} size={24} /> : null}
+          <span className="answer-text">
+            <RichText text={post.answer.text} />
+          </span>
+          <span className="row" style={{ gap: 6 }}>
+            {repliers.length ? <FaceStack ids={repliers} size={18} /> : null}
             <span className="meta">Based on {post.answer.basis.replace(/^from /, '')}</span>
           </span>
         </Link>
       ) : helpful ? (
         <Link to={`/post/${post.id}`} className="post-card__reply">
-          <Avatar who={person(helpful.authorId)} size={30} />
+          <Avatar who={person(helpful.authorId)} size={22} />
           <span className="body-sm">
             <b>{person(helpful.authorId).name}</b> {helpful.text}
           </span>
         </Link>
       ) : null}
-      <div className="row post-card__actions">
+      <div className="feed-post__actions">
         <button
           type="button"
-          className="btn btn--ghost btn--sm"
+          className="feed-action"
           aria-pressed={up}
           aria-label={`Upvote, ${upCount}`}
-          style={{ color: up ? 'var(--accent)' : 'var(--muted)', fontWeight: up ? 800 : 600 }}
+          style={up ? { color: 'var(--accent)' } : undefined}
           onClick={() => toggle('upvoted', post.id)}
         >
-          <UpvoteGlyph size={19} active={up} />
+          <UpvoteGlyph size={20} active={up} />
           {upCount}
         </button>
-        <Link to={`/post/${post.id}`} className="btn btn--ghost btn--sm" aria-label={t('common.replies', { n: post.replyCount + myReplies })} style={{ color: 'var(--muted)', fontWeight: 600 }}>
-          <ReplyGlyph size={19} />
+        <Link to={`/post/${post.id}`} className="feed-action" aria-label={t('common.replies', { n: post.replyCount + myReplies })}>
+          <ReplyGlyph size={20} />
           {post.replyCount + myReplies}
         </Link>
+        {post.seenInReels ? <span className="feed-post__note">Seen in {post.seenInReels} reels</span> : null}
         <span className="grow" />
-        {post.seenInReels ? <span className="badge tone-mint">Seen in {post.seenInReels} reels</span> : null}
         <button
           type="button"
-          className="icon-btn icon-btn--ghost"
+          className="feed-action"
           aria-pressed={saved}
           aria-label={saved ? t('common.saved') : t('common.save')}
-          style={{ width: 40, height: 40, color: saved ? 'var(--accent)' : 'var(--ink)' }}
+          style={saved ? { color: 'var(--accent)' } : undefined}
           onClick={() => {
             const on = toggle('savedPosts', post.id);
             toast(on ? 'Saved to your list' : 'Removed from saved');
@@ -319,7 +315,7 @@ function PostMenu({ post }: { post: Post }) {
         className="icon-btn icon-btn--ghost post-card__menu"
         aria-label="Post options"
         aria-haspopup="dialog"
-        style={{ width: 34, height: 40, marginRight: -10, color: 'var(--muted)' }}
+        style={{ width: 28, height: 32, marginRight: -8, color: 'var(--muted)' }}
         onClick={() => setOpen(true)}
       >
         <KebabGlyph size={20} />
@@ -379,13 +375,13 @@ export function eventStatus(e: CityEvent): { text: string; tone: 'mint' | 'muted
   return { text: `${compact(e.interested ?? 0)} interested`, tone: 'muted' };
 }
 
-export function EventTile({ event, width = 240 }: { event: CityEvent; width?: number }) {
+export function EventTile({ event, width = 200 }: { event: CityEvent; width?: number }) {
   const status = eventStatus(event);
   const when = `${event.day} · ${event.time.split(' – ')[0]}`;
   return (
-    <Link to={`/event/${event.id}`} className="card photo-card" style={{ width }}>
+    <Link to={`/event/${event.id}`} className="photo-card" style={{ width }}>
       <Cover src={eventPhoto(event.id)} glyph={event.glyph} tone={event.tone} className="photo-card__media" alt="">
-        <span className="photo-pill" style={{ top: 12, left: 12 }}>
+        <span className="photo-pill" style={{ top: 8, left: 8 }}>
           {when}
         </span>
       </Cover>
@@ -396,7 +392,7 @@ export function EventTile({ event, width = 240 }: { event: CityEvent; width?: nu
         </span>
         <span
           className="row"
-          style={{ gap: 7, fontSize: '0.8125rem', fontWeight: 700, color: status.tone === 'mint' ? 'var(--mint-ink)' : status.tone === 'amber' ? 'var(--amber-ink)' : 'var(--muted)' }}
+          style={{ gap: 6, fontSize: '0.75rem', fontWeight: 700, color: status.tone === 'mint' ? 'var(--mint-ink)' : status.tone === 'amber' ? 'var(--amber-ink)' : 'var(--muted)' }}
         >
           <span className={`live-dot${status.tone === 'muted' ? ' live-dot--muted' : status.tone === 'amber' ? ' live-dot--amber' : ''}`} />
           {status.text}
@@ -411,10 +407,10 @@ export function EventRow({ event }: { event: CityEvent }) {
   const allowed = enabledSources(settings);
   const agree = event.sources.filter(allowed).length;
   return (
-    <Link to={`/event/${event.id}`} className={`card media-row${event.confirmed ? '' : ' media-row--unconfirmed'}`}>
+    <Link to={`/event/${event.id}`} className={`media-row${event.confirmed ? '' : ' media-row--unconfirmed'}`}>
       <Cover src={eventPhoto(event.id)} glyph={event.glyph} tone={event.tone} className="media-row__thumb" />
       <span className="stack grow" style={{ gap: 5, minWidth: 0 }}>
-        <span className="strong" style={{ fontSize: '0.9688rem', lineHeight: 1.3 }}>
+        <span className="strong" style={{ fontSize: '0.9063rem', lineHeight: 1.3 }}>
           {event.title}
         </span>
         <span className="meta">
@@ -451,18 +447,18 @@ export function AlertCard({ alert }: { alert: CityAlert }) {
     <Link to={`/city/alerts/${alert.id}`} className={`city-update tone-${tone} glyph-host`}>
       <span className="city-update__icon">
         {alert.kind === 'safety' ? (
-          <ShieldGlyph size={22} duo />
+          <ShieldGlyph size={19} duo />
         ) : alert.severity === 'info' ? (
-          <NamedGlyph name={meta.glyph} size={22} duo />
+          <NamedGlyph name={meta.glyph} size={19} duo />
         ) : (
-          <AlertGlyph size={22} live={alert.active} duo />
+          <AlertGlyph size={19} live={alert.active} duo />
         )}
       </span>
       <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
         <span className="eyebrow" style={{ color: 'var(--tone-ink)' }}>
           {t('home.cityAlert')} · {alert.ago}
         </span>
-        <span className="strong" style={{ fontSize: '0.9688rem', lineHeight: 1.35 }}>
+        <span className="strong" style={{ fontSize: '0.875rem', lineHeight: 1.35 }}>
           {alert.title}
         </span>
         <span className="meta">
@@ -479,7 +475,7 @@ export function AlertCard({ alert }: { alert: CityAlert }) {
 export function DealCard({ deal }: { deal: Deal }) {
   const t = useT();
   return (
-    <Link to={`/deals/${deal.id}`} className="card media-row glyph-host">
+    <Link to={`/deals/${deal.id}`} className="media-row glyph-host">
       <Cover src={deal.placeId ? placePhoto(deal.placeId) : undefined} glyph={deal.glyph} tone={deal.tone} className="media-row__thumb media-row__thumb--sm">
         <span className="deal-ribbon">{deal.discount}</span>
       </Cover>
@@ -487,7 +483,7 @@ export function DealCard({ deal }: { deal: Deal }) {
         <span className="eyebrow" style={{ color: 'var(--accent)' }}>
           {t('home.deal')} · {deal.ends}
         </span>
-        <span className="strong" style={{ fontSize: '0.9688rem', lineHeight: 1.3 }}>
+        <span className="strong" style={{ fontSize: '0.9063rem', lineHeight: 1.3 }}>
           {deal.title}
         </span>
         <span className="meta">
@@ -545,7 +541,7 @@ export function GroupRow({ group }: { group: Group }) {
   const toast = useToast();
   const joined = has('joinedGroups', group.id);
   return (
-    <div className="card card--tight row" style={{ gap: 12 }}>
+    <div className="row group-row" style={{ gap: 12 }}>
       <Cover src={groupPhoto(group.id)} glyph={group.glyph} tone={group.tone} className="place-thumb" />
       <Link to={`/groups/${group.id}`} className="stack grow" style={{ gap: 2, textDecoration: 'none', color: 'inherit', minWidth: 0 }}>
         <span className="strong" style={{ fontSize: '0.9688rem' }}>

@@ -164,60 +164,27 @@ export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { 
   if (!canSee(data, c)) return null;
 
   const hero = layout === 'hero';
-  const header = (
-    <div className="row" style={{ alignItems: 'flex-start' }}>
-      <Link to={c.authorId === 'me' ? '/me' : `/people/${c.authorId}`} aria-label={author.name} style={{ textDecoration: 'none' }}>
-        <Avatar who={author} size={hero ? 46 : 40} />
-      </Link>
-      <div className="grow stack" style={{ gap: 1 }}>
-        <span style={{ fontSize: hero ? '0.96875rem' : '0.90625rem' }}>
-          <Link to={c.authorId === 'me' ? '/me' : `/people/${c.authorId}`} className="strong checkin-card__link">
-            {c.authorId === 'me' ? 'You' : author.name}
-          </Link>{' '}
-          <span className="muted">{showPlace ? verb : c.kind === 'ate' ? 'had' : 'did'}</span>
-          {showPlace ? (
-            <>
-              {' '}
-              {c.placeId ? (
-                <Link to={`/place/${c.placeId}`} className="strong checkin-card__link">
-                  {c.placeName}
-                </Link>
-              ) : c.eventId ? (
-                <Link to={`/event/${c.eventId}`} className="strong checkin-card__link">
-                  {c.placeName}
-                </Link>
-              ) : (
-                <b>{c.placeName}</b>
-              )}
-            </>
-          ) : null}
-        </span>
-        <span className="meta">
-          {friend && c.authorId !== 'me' ? 'Friend · ' : ''}
-          {c.ago}
-          {c.audience === 'friends' ? ' · Friends only' : ''}
-        </span>
-      </div>
-      {hero ? null : <VerdictBadge verdict={c.verdict} kind={c.kind} />}
-    </div>
-  );
-  const plateInner = (
+  const profile = c.authorId === 'me' ? '/me' : `/people/${c.authorId}`;
+  const spend = c.spend === undefined ? undefined : c.spend === 0 ? 'Free' : `~${rupees(c.spend)} pp`;
+  const facts = [
+    c.invited ? 'Invited · not counted' : undefined,
+    spend,
+    c.withIds?.length ? `With ${c.withIds.map((w) => person(w).name.split(' ')[0]).join(', ')}` : undefined,
+    ...c.tags.filter((t) => t.toLowerCase() !== spend?.toLowerCase()).slice(0, 3),
+  ].filter(Boolean);
+
+  const media = (
     <>
       {photoSrc ? (
-        <img className="checkin-card__photo" src={photoSrc} alt="" loading={hero ? undefined : 'lazy'} decoding="async" />
+        <img src={photoSrc} alt="" loading={hero ? undefined : 'lazy'} decoding="async" />
       ) : (
-        <span className="checkin-card__glyph">
-          <NamedGlyph name={glyph} size={hero ? 48 : 30} duo />
+        <span className="feed-post__glyph">
+          <NamedGlyph name={glyph} size={hero ? 48 : 36} duo />
         </span>
       )}
-      {hero ? (
-        <span className="checkin-card__verdict">
-          <VerdictBadge verdict={c.verdict} kind={c.kind} />
-        </span>
-      ) : null}
-      <span className="checkin-card__items">
+      <span className="feed-post__tags">
         {c.items.map((i) => (
-          <span key={i} className="checkin-card__item">
+          <span key={i} className="feed-post__tag">
             {i}
           </span>
         ))}
@@ -226,67 +193,89 @@ export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { 
   );
 
   return (
-    <article className={`card checkin-card${hero ? ' checkin-card--hero' : ''}`}>
-      {hero ? (
-        <div className={`checkin-card__plate tone-${tone}`} role="img" aria-label={`${c.items.join(', ')} at ${c.placeName}`}>
-          {plateInner}
+    <article className={`feed-post${hero ? ' feed-post--hero' : ''}`}>
+      <div className="feed-post__head">
+        <Link to={profile} aria-label={author.name} style={{ textDecoration: 'none' }}>
+          <Avatar who={author} size={34} />
+        </Link>
+        <div className="feed-post__who">
+          <span className="feed-post__line">
+            <Link to={profile} className="feed-post__name">
+              {c.authorId === 'me' ? 'You' : author.name}
+            </Link>{' '}
+            <span className="muted">{showPlace ? verb : c.kind === 'ate' ? 'had' : 'did'}</span>
+            {showPlace ? (
+              <>
+                {' '}
+                {c.placeId ? (
+                  <Link to={`/place/${c.placeId}`} className="feed-post__name">
+                    {c.placeName}
+                  </Link>
+                ) : c.eventId ? (
+                  <Link to={`/event/${c.eventId}`} className="feed-post__name">
+                    {c.placeName}
+                  </Link>
+                ) : (
+                  <b>{c.placeName}</b>
+                )}
+              </>
+            ) : null}
+          </span>
+          <span className="meta">
+            {friend && c.authorId !== 'me' ? 'Friend · ' : ''}
+            {c.ago}
+            {c.audience === 'friends' ? ' · Friends only' : ''}
+          </span>
         </div>
-      ) : (
-        header
-      )}
-      {hero ? (
-        header
-      ) : (
-        <button type="button" className={`checkin-card__plate tone-${tone}`} onClick={() => navigate(`/checkin/${c.id}`)} aria-label={`Open check-in: ${c.items.join(', ')}`}>
-          {plateInner}
-        </button>
-      )}
-
-      {c.note ? (
-        <p className={hero ? 'checkin-card__note' : 'body'} style={hero ? undefined : { fontSize: '0.9375rem' }}>
-          {c.note}
-        </p>
-      ) : null}
-
-      <div className="row row--wrap" style={{ gap: 6 }}>
-        {c.verifiedVisit ? (
-          <span className="badge badge--sm tone-mint" title="Confirmed at the venue">
-            <ShieldGlyph size={12} />
-            Verified visit
-          </span>
-        ) : (
-          <span className="badge badge--sm">Unverified</span>
-        )}
-        {c.invited ? <span className="badge badge--sm tone-amber">Invited · not counted</span> : null}
-        {c.spend !== undefined ? <span className="badge badge--sm">{c.spend === 0 ? 'Free' : `~${rupees(c.spend)} pp`}</span> : null}
-        {c.withIds?.length ? <span className="badge badge--sm">With {c.withIds.map((w) => person(w).name.split(' ')[0]).join(', ')}</span> : null}
-        {c.tags.slice(0, 3).map((t) => (
-          <span key={t} className="badge badge--sm">
-            {t}
-          </span>
-        ))}
+        <VerdictBadge verdict={c.verdict} kind={c.kind} size="sm" />
       </div>
 
-      <div className="row" style={{ gap: 2, color: 'var(--muted)' }}>
+      {hero ? (
+        <div className={`feed-post__media tone-${tone}`} role="img" aria-label={`${c.items.join(', ')} at ${c.placeName}`}>
+          {media}
+        </div>
+      ) : (
+        <button type="button" className={`feed-post__media tone-${tone}`} onClick={() => navigate(`/checkin/${c.id}`)} aria-label={`Open check-in: ${c.items.join(', ')}`}>
+          {media}
+        </button>
+      )}
+
+      <div className="feed-post__actions">
         <button
           type="button"
-          className="btn btn--ghost btn--sm"
+          className="feed-action"
           aria-pressed={liked}
           aria-label={`Like, ${likes}`}
-          style={{ color: liked ? 'var(--red)' : 'var(--muted)', padding: '0 10px', gap: 6, fontWeight: liked ? 700 : 500 }}
+          style={liked ? { color: 'var(--red)' } : undefined}
           onClick={() => toggle('likedCheckIns', c.id)}
         >
-          <HeartGlyph size={18} active={liked} />
+          <HeartGlyph size={21} active={liked} />
           {likes}
         </button>
-        <Link to={`/checkin/${c.id}`} className="btn btn--ghost btn--sm" style={{ color: 'var(--muted)', padding: '0 10px', gap: 6, fontWeight: 500 }}>
-          <ReplyGlyph size={18} />
+        <Link to={`/checkin/${c.id}`} className="feed-action" aria-label={`Comments, ${comments}`}>
+          <ReplyGlyph size={20} />
           {comments}
         </Link>
         <span className="grow" />
         {c.authorId !== 'me' ? <WantButton item={wantFromCheckIn(c)} variant="icon" /> : null}
         <ShareButton title={`${author.name}: ${c.items.join(', ')} at ${c.placeName}`} path={`/checkin/${c.id}`} />
       </div>
+
+      {c.note ? <p className={hero ? 'feed-post__text feed-post__text--lg' : 'feed-post__text'}>{c.note}</p> : null}
+
+      <p className="feed-post__facts">
+        {c.verifiedVisit ? (
+          <span className="feed-post__verified" title="Confirmed at the venue">
+            <ShieldGlyph size={13} />
+            Verified visit
+          </span>
+        ) : (
+          <span>Unverified</span>
+        )}
+        {facts.map((f) => (
+          <span key={f}>{f}</span>
+        ))}
+      </p>
       {footer}
     </article>
   );
@@ -358,7 +347,7 @@ export function FriendStrip() {
           aria-label={`${person(p.id).name}: ${p.latest.items.join(', ')} at ${p.latest.placeName}${p.seen ? '' : ', new'}`}
         >
           <span className={`friend-strip__ring${p.seen ? ' is-seen' : ''}`}>
-            <Avatar who={{ ...person(p.id), verified: false }} size={54} />
+            <Avatar who={{ ...person(p.id), verified: false }} size={49} />
             {p.seen ? null : <span className="friend-strip__online" aria-hidden="true" />}
           </span>
           <span className="friend-strip__name">{person(p.id).name.split(' ')[0]}</span>

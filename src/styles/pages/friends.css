@@ -119,10 +119,10 @@
 /* Friends strip */
 .friend-strip {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   overflow-x: auto;
-  margin: 0 -18px;
-  padding: 4px 18px 4px 18px;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 2px var(--gutter);
   scrollbar-width: none;
 }
 .friend-strip::-webkit-scrollbar {
@@ -133,8 +133,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
-  width: 64px;
+  gap: 5px;
+  width: 58px;
   padding: 0;
   border: none;
   background: none;
@@ -143,9 +143,9 @@
 }
 .friend-strip__ring {
   position: relative;
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
+  width: 58px;
+  height: 58px;
+  border-radius: 29px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -192,11 +192,11 @@
   border: 3px solid var(--ground);
 }
 .friend-strip__name {
-  max-width: 64px;
+  max-width: 58px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.8125rem;
+  font-size: 0.7188rem;
   font-weight: 600;
 }
 
