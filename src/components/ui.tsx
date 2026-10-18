@@ -154,7 +154,7 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
     };
   }, [open, onClose]);
   if (!open) return null;
-  // Portalled to <body> so no page-level stacking context can trap it under the tab bar.
+  // Portalled to the overlay layer (inside the phone frame on desktop) so no page stacking context traps it.
   return createPortal(
     <div className="sheet-backdrop" onClick={onClose}>
       <div
@@ -176,7 +176,7 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
         {children}
       </div>
     </div>,
-    document.body,
+    document.getElementById('overlay-root') ?? document.body,
   );
 }
 

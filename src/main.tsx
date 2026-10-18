@@ -7,6 +7,7 @@ import './styles/components.css';
 import './icons/icons.css';
 import './styles/pages/home.css';
 import './styles/pages/discover.css';
+import './styles/pages/explore.css';
 import './styles/pages/city.css';
 import './styles/pages/settings.css';
 import './styles/pages/social.css';

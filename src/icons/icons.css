@@ -30,22 +30,10 @@
 }
 
 /* ----- Logo ----- */
-.logo--animated .logo__arch {
-  stroke-dasharray: 46;
-  animation: logo-arch 0.7s ease-out both;
-}
 .logo--animated .logo__dot {
   transform-box: fill-box;
   transform-origin: center;
   animation: logo-drop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
-}
-@keyframes logo-arch {
-  from {
-    stroke-dashoffset: 46;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
 }
 @keyframes logo-drop {
   from {
@@ -993,4 +981,55 @@
   from {
     stroke-dashoffset: 12;
   }
+}
+
+/* ===== v2: solid tab icons when selected ===== */
+.glyph .g-dot {
+  fill: var(--g-dot, var(--dot));
+}
+.nav-item .glyph.is-active .g-tint {
+  opacity: 1;
+}
+.nav-item .glyph.is-active .g-inner {
+  stroke: var(--accent-tint);
+}
+.nav-item .glyph.is-active .g-inner-fill {
+  fill: var(--accent-tint);
+}
+.nav-item .glyph--city.is-active .city__win {
+  fill: var(--accent-tint);
+}
+.nav-item .glyph--me.is-active .g-tint {
+  opacity: 1;
+}
+
+/* Wordmark + logo */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: var(--ink);
+}
+.logo--animated .logo__arch {
+  stroke-dasharray: 64;
+  animation: logo-arch 0.8s cubic-bezier(0.6, 0, 0.3, 1) both;
+}
+@keyframes logo-arch {
+  from {
+    stroke-dashoffset: 64;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.sparkle-mark {
+  display: inline-block;
+  vertical-align: 0.05em;
+  animation: twinkle 3.2s ease-in-out infinite;
+  transform-origin: center;
+}
+.squiggle-mark {
+  display: inline-block;
 }

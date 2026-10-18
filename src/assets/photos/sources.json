@@ -1,0 +1,329 @@
+{
+ "person-me": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1527980965255-d3b416303d12",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-riya": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1488426862026-3ee34a7d66df",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-karan": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1500648767791-00dcc994a43e",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-aditi": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1567532939604-b6b5b0db2604",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-nikhil": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1557862921-37829c790f19",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-farah": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1544005313-94ddf0286df2",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-meera": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1607746882042-944635dfe10e",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-harsh": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1547425260-76bcadfb4f2c",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-sana": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1494790108377-be9c29b29330",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-dev": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1544723795-3fb6469f5b39",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-kavya": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1580489944761-15a19d654956",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-arjun": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1507003211169-0a1dd7228f2d",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-zoya": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1517841905240-472988babdf9",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "person-priyank": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1564564321837-a57b7070ac4f",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "place-quiet-cup": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1554118811-1e0d58224f24",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "place-corner-table": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1555396273-367ea4eb4db5",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "place-brew-lab": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1442512595331-e89e73853f31",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "place-seoul-bowl": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1557872943-16a5ac26437e",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "place-spice-courtyard": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1546833999-b9f581a1996d",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "place-pickle-play": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1595435934249-5df7ed86e1c0",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "place-manek-chowk": {
+  "source": "Flickr",
+  "url": "https://www.flickr.com/photos/21124414@N00/4350714949",
+  "license": "CC BY-SA 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "credit": "“pav bhaji” by ezola"
+ },
+ "place-vastrapur-lake": {
+  "source": "Flickr",
+  "url": "https://www.flickr.com/photos/107852214@N04/12527395655",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+  "credit": "“Vastrapur Lake” by Odaklar Odaklar"
+ },
+ "place-clay-studio": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1493106641515-6b5631de4bb9",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "place-law-garden": {
+  "source": "Flickr",
+  "url": "https://www.flickr.com/photos/10934572@N00/3341968992",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+  "credit": "“Colourful Law Garden Road” by Sudhamshu"
+ },
+ "place-adalaj": {
+  "source": "Flickr",
+  "url": "https://www.flickr.com/photos/8078844@N07/23509020716",
+  "license": "CC BY-SA 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "credit": "“Adalaj Stepwell, Adalaj, Gujarat” by ddasedEn"
+ },
+ "place-polo-forest": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1441974231531-c6227db76b6e",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "event-sufi-night": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1517457373958-b7bdd4587205",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "event-flea-market": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1533900298318-6b8da08a523e",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "event-open-mic": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1475721027785-f74eccf877e2",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "event-heritage-walk": {
+  "source": "Flickr",
+  "url": "https://www.flickr.com/photos/17155762@N00/19654773",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+  "credit": "“Haveli with 60 rooms” by Saad.Akhtar"
+ },
+ "event-food-trucks": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1555939594-58d7cb561ad1",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "event-pottery": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1610701596007-11502861dcfa",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "event-kite-workshop": {
+  "source": "Flickr",
+  "url": "https://www.flickr.com/photos/52575979@N02/8477483683",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+  "credit": "“Kite Festival in Gujarat” by Gujarat Tourist Guide"
+ },
+ "event-pickleball-social": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1622279457486-62dcc4a431d6",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "event-sunrise-yoga": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1544367567-0f2fcb009e0b",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "event-rooftop-acoustic": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1510915361894-db8b60106cb1",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-cold-brew": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1461023058943-07fcbe16d735",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-egg-toast": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1525351484163-7529414344d8",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-avocado-toast": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1541519227354-08fa5d50c44d",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-iced-latte": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1517701604599-bb29b565090c",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-latte-art": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1509042239860-f550ce710b93",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-spicy-ramen": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1569718212165-3a8278d5f624",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-bibimbap": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1590301157890-4810ed352733",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-dosa": {
+  "source": "Flickr",
+  "url": "https://www.flickr.com/photos/8078844@N07/23508992346",
+  "license": "CC BY-SA 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+  "credit": "“Cheese Dosa @ Manek Chowk, Ahmedabad” by ddasedEn"
+ },
+ "dish-pav-bhaji": {
+  "source": "Flickr",
+  "url": "https://www.flickr.com/photos/70522326@N00/506322127",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0/",
+  "credit": "“Pav Bhaji (Spicy mashed vegetables)” by rovingI"
+ },
+ "dish-samosa": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1601050690597-df0568f70950",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "dish-curry": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1585937421612-70a008356fbe",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "scene-friends": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1529156069898-49953e39b3ac",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "scene-sunset-friends": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1511632765486-a01980e01a18",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "scene-table": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1466978913421-dad2ebd01d17",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "scene-concert": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1470229722913-7c0e2dbbafd3",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ },
+ "scene-promenade": {
+  "source": "Wikimedia",
+  "url": "https://commons.wikimedia.org/w/index.php?curid=23814412",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+  "credit": "“Ahmedabad Riverfront” by Vrajesh jani"
+ },
+ "scene-lake": {
+  "source": "Unsplash",
+  "url": "https://unsplash.com/photos/1439066615861-d1af74d74000",
+  "license": "Unsplash License",
+  "credit": "Photo from Unsplash"
+ }
+}

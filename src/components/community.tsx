@@ -4,7 +4,8 @@ import { person } from '../data/core';
 import { placeById } from '../data/places';
 import type { CheckIn, WantItem } from '../data/types';
 import { useT } from '../i18n';
-import { ChevronRightGlyph, FriendsGlyph, NamedGlyph, SendGlyph, type GlyphName } from '../icons';
+import { itemPhoto } from '../assets/photos';
+import { ChevronRightGlyph, FriendsGlyph, HeartGlyph, NamedGlyph, SendGlyph, type GlyphName } from '../icons';
 import { profileInfo, VERDICT_LABEL } from '../lib/friends';
 import { nowTime } from '../lib/format';
 import { useAppData } from '../state/appData';
@@ -17,28 +18,38 @@ import { Sheet } from './ui';
 
 /** Compact card for a friend's must-try: who, what, where. */
 export function FriendPickCard({ c }: { c: CheckIn }) {
-  const place = c.placeId ? placeById(c.placeId) : undefined;
+  const { has, toggle } = useAppData();
   const who = person(c.authorId);
-  const meta = VERDICT_META[c.verdict];
+  const place = c.placeId ? placeById(c.placeId) : undefined;
+  const liked = has('likedCheckIns', c.id);
+  const src = itemPhoto(c.items[0], c.placeId, c.eventId);
   return (
-    <Link to={`/checkin/${c.id}`} className="card pick-card glyph-host" aria-label={`${who.name}: ${c.items.join(', ')} at ${c.placeName}, ${VERDICT_LABEL[c.verdict][c.kind]}`}>
-      <span className={`pick-card__plate tone-${place?.tone ?? meta.tone}`}>
-        <NamedGlyph name={(place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events')) as GlyphName} size={30} duo />
-        <span className="pick-card__who">
-          <Avatar who={{ ...who, verified: false }} size={28} />
+    <article className="card pick-card">
+      <Link to={`/checkin/${c.id}`} className="pick-card__link" aria-label={`${who.name}: ${c.items.join(', ')} at ${c.placeName}, ${VERDICT_LABEL[c.verdict][c.kind]}`}>
+        <span className={`pick-card__photo tone-${place?.tone ?? VERDICT_META[c.verdict].tone}`}>
+          {src ? (
+            <img src={src} alt="" loading="lazy" decoding="async" />
+          ) : (
+            <NamedGlyph name={(place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events')) as GlyphName} size={34} duo />
+          )}
+          <span className="pick-card__who">
+            <Avatar who={{ ...who, verified: false }} size={32} />
+          </span>
         </span>
-      </span>
-      <span className="stack" style={{ gap: 3, padding: '16px 12px 12px', minWidth: 0 }}>
-        <span className="meta strong" style={{ color: 'var(--ink-3)' }}>
-          {who.name.split(' ')[0]} · {c.ago}
+        <span className="pick-card__body">
+          <span className="pick-card__item">{c.items[0]}</span>
+          <span className="meta pick-card__place">
+            {who.name.split(' ')[0]} at {c.placeName}
+          </span>
+          <span style={{ marginTop: 4 }}>
+            <VerdictBadge verdict={c.verdict} kind={c.kind} size="sm" />
+          </span>
         </span>
-        <span className="strong pick-card__item">{c.items[0]}</span>
-        <span className="meta pick-card__place">at {c.placeName}</span>
-        <span style={{ marginTop: 4 }}>
-          <VerdictBadge verdict={c.verdict} kind={c.kind} size="sm" />
-        </span>
-      </span>
-    </Link>
+      </Link>
+      <button type="button" className="photo-action" style={{ top: 10, right: 10 }} aria-pressed={liked} aria-label={liked ? 'Unlike' : 'Like'} onClick={() => toggle('likedCheckIns', c.id)}>
+        <HeartGlyph size={20} active={liked} style={{ color: liked ? 'var(--red)' : undefined }} />
+      </button>
+    </article>
   );
 }
 

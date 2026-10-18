@@ -1,49 +1,102 @@
-/* Home: "Today in your city" band */
-.home-today {
+/* Home header: logo + wordmark, bell and chat */
+.home {
+  gap: 18px;
+}
+.home-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: -14px;
+}
+.home-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ink);
+  text-decoration: none;
+}
+.home-header .icon-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+}
+.home-location {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0 4px 2px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.home-location .glyph {
+  color: var(--accent);
+}
+.home .hero-title {
+  margin: -2px 0 0;
+  font-size: 1.625rem;
+}
+
+/* "Sunday, 18 Oct · Sunny · 31°" with the plans-tonight pill */
+.today-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px 12px 16px;
+}
+.today-card__main {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px;
-  border-radius: var(--radius-xl);
-  background: var(--accent-fill);
-  color: #ffffff;
-}
-.home-today__main {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
   flex-grow: 1;
   min-width: 0;
-  color: inherit;
+  color: var(--ink);
   text-decoration: none;
 }
-.home-today__label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #d9d3fa;
+.today-card__main .glyph {
+  color: #f2a516;
+  flex-shrink: 0;
 }
-.home-today__stat {
-  min-width: 58px;
-  background: var(--accent-deep);
-  color: #ffffff;
+.today-card__plans {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  height: 40px;
+  padding: 0 10px 0 14px;
+  border-radius: 20px;
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 800;
   text-decoration: none;
+  white-space: nowrap;
 }
-.home-today__stat-label {
-  font-size: 0.6875rem;
-  color: #d9d3fa;
-}
-.home-today__stat--mint {
-  background: var(--mint);
-  color: var(--mint-deep);
-}
-@media (max-width: 370px) {
-  .home-today {
-    flex-direction: column;
-    align-items: stretch;
+@media (max-width: 360px) {
+  .today-card {
+    flex-wrap: wrap;
   }
-  .home-today .stat {
-    flex: 1;
-  }
+}
+
+/* For you / Friends / Nearby + filter */
+.home-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-top: 4px;
+}
+.home-tabs__filter {
+  position: relative;
+  margin-bottom: 4px;
+  color: var(--ink);
 }
 
 /* Glyph gallery (/about/glyphs) */
@@ -87,36 +140,56 @@
   width: 100%;
 }
 
-/* Friends' must-try cards */
+/* Friends' must-try cards: photo with the friend's face, then the dish */
 .pick-card {
+  position: relative;
   flex-shrink: 0;
-  width: 168px;
+  width: 176px;
   padding: 0;
   overflow: hidden;
+}
+.pick-card__link {
   display: flex;
   flex-direction: column;
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
 }
-.pick-card__plate {
+.pick-card__photo {
   position: relative;
-  height: 84px;
+  height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--tone-bg);
   color: var(--tone-ink);
 }
+.pick-card__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .pick-card__who {
   position: absolute;
   left: 10px;
-  bottom: -14px;
+  bottom: -16px;
+  z-index: 1;
   border-radius: 999px;
   border: 3px solid var(--surface);
   display: inline-flex;
 }
+.pick-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 22px 12px 12px;
+}
 .pick-card__item {
-  font-size: 0.9375rem;
+  font-family: var(--font-display);
+  font-size: 0.9688rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   line-height: 1.25;
 }
 .pick-card__place {

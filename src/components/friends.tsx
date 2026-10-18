@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { person } from '../data/core';
+import { itemPhoto, placePhoto } from '../assets/photos';
 import { placeById } from '../data/places';
 import type { CheckIn, Collection, Tone, Verdict, WantItem } from '../data/types';
 import { CheckGlyph, HeartGlyph, NamedGlyph, PlusGlyph, ReplyGlyph, ShieldGlyph, WantGlyph, type GlyphName } from '../icons';
@@ -159,6 +160,7 @@ export function CheckInCard({ c, showPlace = true, footer }: { c: CheckIn; showP
   const tone = place?.tone ?? (c.kind === 'ate' ? 'peach' : 'teal');
   const glyph: GlyphName = place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events');
   const friend = data.following.includes(c.authorId);
+  const photoSrc = itemPhoto(c.items[0], c.placeId, c.eventId);
   if (!canSee(data, c)) return null;
 
   return (
@@ -200,9 +202,13 @@ export function CheckInCard({ c, showPlace = true, footer }: { c: CheckIn; showP
       </div>
 
       <button type="button" className={`checkin-card__plate tone-${tone}`} onClick={() => navigate(`/checkin/${c.id}`)} aria-label={`Open check-in: ${c.items.join(', ')}`}>
-        <span className="checkin-card__glyph">
-          <NamedGlyph name={glyph} size={26} duo />
-        </span>
+        {photoSrc ? (
+          <img className="checkin-card__photo" src={photoSrc} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <span className="checkin-card__glyph">
+            <NamedGlyph name={glyph} size={30} duo />
+          </span>
+        )}
         <span className="checkin-card__items">
           {c.items.map((i) => (
             <span key={i} className="checkin-card__item">
@@ -271,9 +277,9 @@ export function FriendStrip() {
     <nav aria-label="Friends today" className="friend-strip">
       <Link to="/checkin" className="friend-strip__item">
         <span className="friend-strip__ring friend-strip__ring--me">
-          <Avatar who={{ ...person('me'), verified: false }} size={52} />
+          <PlusGlyph size={22} />
           <span className="friend-strip__plus" aria-hidden="true">
-            <PlusGlyph size={12} />
+            <PlusGlyph size={11} />
           </span>
         </span>
         <span className="friend-strip__name">Check in</span>
@@ -290,10 +296,8 @@ export function FriendStrip() {
           aria-label={`${person(p.id).name}: ${p.latest.items.join(', ')} at ${p.latest.placeName}${p.seen ? '' : ', new'}`}
         >
           <span className={`friend-strip__ring${p.seen ? ' is-seen' : ''}`}>
-            <Avatar who={{ ...person(p.id), verified: false }} size={52} />
-            <span className={`friend-strip__verdict tone-${VERDICT_META[p.latest.verdict].tone}`} aria-hidden="true">
-              <NamedGlyph name={VERDICT_META[p.latest.verdict].glyph} size={12} />
-            </span>
+            <Avatar who={{ ...person(p.id), verified: false }} size={54} />
+            {p.seen ? null : <span className="friend-strip__online" aria-hidden="true" />}
           </span>
           <span className="friend-strip__name">{person(p.id).name.split(' ')[0]}</span>
         </button>
@@ -332,18 +336,21 @@ export function CollectionCard({ col }: { col: Collection }) {
   const places = col.placeIds.map((id) => placeById(id)).filter(Boolean);
   return (
     <Link to={`/lists/${col.id}`} className="card collection-card glyph-host">
-      <span className="collection-card__tiles" aria-hidden="true">
+      <span className={`collection-card__mosaic collection-card__mosaic--${Math.min(places.length, 3)}`} aria-hidden="true">
         {places.slice(0, 3).map((p) => (
-          <span key={p!.id} className={`tile tone-${p!.tone}`}>
-            <NamedGlyph name={p!.glyph} size={20} duo />
+          <span key={p!.id} className={`tone-${p!.tone}`}>
+            {placePhoto(p!.id) ? <img src={placePhoto(p!.id)} alt="" loading="lazy" decoding="async" /> : <NamedGlyph name={p!.glyph} size={24} duo />}
           </span>
         ))}
       </span>
-      <span className="strong" style={{ fontSize: '0.96875rem', lineHeight: 1.3 }}>
-        {col.title}
-      </span>
-      <span className="meta">
-        by {col.ownerId === 'me' ? 'you' : owner.name} · {places.length} places · {compact(col.followers)} followers
+      <span className="collection-card__body">
+        <span className="photo-card__title">{col.title}</span>
+        <span className="row" style={{ gap: 8 }}>
+          <Avatar who={{ ...owner, verified: false }} size={22} />
+          <span className="meta">
+            {col.ownerId === 'me' ? 'You' : owner.name.split(' ')[0]} · {places.length} places · {compact(col.followers)} followers
+          </span>
+        </span>
       </span>
     </Link>
   );

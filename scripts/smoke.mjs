@@ -65,6 +65,11 @@ const failures = [];
 for (const scheme of ['light', 'dark']) {
   const ctx = await browser.newContext({ viewport: { width: 375, height: 812 }, colorScheme: scheme });
   await ctx.addInitScript(() => {
+    try {
+      sessionStorage.setItem('nearhood.splash.v2', '1');
+    } catch {
+      /* ignore */
+    }
     if (!location.hash.includes('onboarding')) {
       try {
         const s = JSON.parse(localStorage.getItem('nearhood.settings.v1') || '{}');

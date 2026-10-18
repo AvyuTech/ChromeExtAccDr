@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { CheckGlyph } from '../icons';
 
 interface Toast {
@@ -24,27 +25,30 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className="toast-host" role="status" aria-live="polite">
-        {toasts.map((t) => (
-          <div key={t.id} className="toast">
-            <CheckGlyph size={18} />
-            <span className="grow">{t.message}</span>
-            {t.action ? (
-              <button
-                type="button"
-                className="btn btn--sm btn--ghost"
-                style={{ color: 'var(--mint)', height: 30, padding: '0 6px' }}
-                onClick={() => {
-                  t.action?.onClick();
-                  setToasts((all) => all.filter((x) => x.id !== t.id));
-                }}
-              >
-                {t.action.label}
-              </button>
-            ) : null}
-          </div>
-        ))}
-      </div>
+      {createPortal(
+        <div className="toast-host" role="status" aria-live="polite">
+          {toasts.map((t) => (
+            <div key={t.id} className="toast">
+              <CheckGlyph size={18} />
+              <span className="grow">{t.message}</span>
+              {t.action ? (
+                <button
+                  type="button"
+                  className="btn btn--sm btn--ghost"
+                  style={{ color: 'var(--mint)', height: 30, padding: '0 6px' }}
+                  onClick={() => {
+                    t.action?.onClick();
+                    setToasts((all) => all.filter((x) => x.id !== t.id));
+                  }}
+                >
+                  {t.action.label}
+                </button>
+              ) : null}
+            </div>
+          ))}
+        </div>,
+        document.getElementById('overlay-root') ?? document.body,
+      )}
     </ToastContext.Provider>
   );
 }

@@ -270,9 +270,40 @@ export function downloadEventIcs(e: CityEvent): boolean {
 }
 
 /** Big tone block used at the top of detail screens. */
-export function DetailHero({ tone, glyph, children, badge }: { tone: Tone; glyph: Parameters<typeof NamedGlyph>[0]['name']; children?: ReactNode; badge?: ReactNode }) {
+/**
+ * Top-of-page hero for places, events, deals and groups. With a photo it is a
+ * rounded photo card with a soft scrim; without one, a tinted panel with the glyph.
+ */
+export function DetailHero({
+  tone,
+  glyph,
+  src,
+  children,
+  badge,
+  height,
+}: {
+  tone: Tone;
+  glyph: Parameters<typeof NamedGlyph>[0]['name'];
+  src?: string;
+  children?: ReactNode;
+  badge?: ReactNode;
+  height?: number;
+}) {
+  if (src) {
+    return (
+      <div className="detail-hero detail-hero--photo" style={height ? { height } : undefined}>
+        <img src={src} alt="" />
+        {badge ? (
+          <span className="photo-pill" style={{ top: 14, left: 14 }}>
+            {badge}
+          </span>
+        ) : null}
+        {children}
+      </div>
+    );
+  }
   return (
-    <div className={`detail-hero tone-${tone}`}>
+    <div className={`detail-hero tone-${tone}`} style={height ? { height } : undefined}>
       <NamedGlyph name={glyph} size={64} duo={tone !== 'night'} live />
       {badge ? <span className="detail-hero__badge">{badge}</span> : null}
       {children}

@@ -1,27 +1,43 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertCard, DealCard, EventTile, GroupRow, PlaceRow, PostCard } from '../components/cards';
+import { CONDITION_LABEL } from '../components/city';
 import { FriendPickCard, PlanTogetherCard } from '../components/community';
 import { CheckInCard, FriendStrip } from '../components/friends';
-import { SectionHead, Sheet, EmptyState } from '../components/ui';
+import { EmptyState, SectionHead, Segmented, Sheet } from '../components/ui';
 import { NEIGHBOURHOODS, neighbourhoodName } from '../data/core';
 import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
 import { DEALS, GROUPS, POSTS } from '../data/social';
 import type { Post } from '../data/types';
 import { useT } from '../i18n';
-import { BellGlyph, ChatGlyph, CheckGlyph, ChevronDownGlyph, Logo, PinGlyph, SearchGlyph, SparkGlyph, WeatherGlyph } from '../icons';
+import {
+  ArrowRightGlyph,
+  BellGlyph,
+  ChatGlyph,
+  CheckGlyph,
+  ChevronDownGlyph,
+  ChevronRightGlyph,
+  Logo,
+  PinGlyph,
+  SlidersGlyph,
+  SparkGlyph,
+  SparkleMark,
+  WeatherGlyph,
+  Wordmark,
+} from '../icons';
 import { friendFeed, friendsMustTries, planTogether } from '../lib/friends';
 import { unreadMessageCount, unreadNotificationCount, visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
 import { useLiveCity } from '../state/live';
 import { enabledSources, useSettings } from '../state/settings';
 
-type Chip = 'weekend' | 'food' | 'events' | 'deals' | 'alerts';
-type FeedTab = 'for-you' | 'friends' | 'near' | 'trending' | 'questions';
+type Topic = 'all' | 'food' | 'events' | 'deals' | 'alerts';
+type Show = 'latest' | 'trending' | 'questions';
+type FeedTab = 'for-you' | 'friends' | 'near';
 
-const CHIPS: Array<{ id: Chip; key: string }> = [
-  { id: 'weekend', key: 'chip.weekend' },
+const TOPICS: Array<{ id: Topic; key: string }> = [
+  { id: 'all', key: 'home.everything' },
   { id: 'food', key: 'chip.food' },
   { id: 'events', key: 'chip.events' },
   { id: 'deals', key: 'chip.deals' },
@@ -31,12 +47,15 @@ const CHIPS: Array<{ id: Chip; key: string }> = [
 const TABS: Array<{ id: FeedTab; key: string }> = [
   { id: 'for-you', key: 'feed.forYou' },
   { id: 'friends', key: 'feed.friends.tab' },
-  { id: 'near', key: 'feed.nearMe' },
-  { id: 'trending', key: 'feed.trending' },
-  { id: 'questions', key: 'feed.questions' },
+  { id: 'near', key: 'home.nearby' },
 ];
 
 const FOOD_TOPICS = ['Food', 'New place'];
+
+function todayLabel() {
+  const d = new Date();
+  return `${d.toLocaleDateString('en-GB', { weekday: 'long' })}, ${d.getDate()} ${d.toLocaleDateString('en-GB', { month: 'short' })}`;
+}
 
 export default function Home() {
   const t = useT();
@@ -44,15 +63,18 @@ export default function Home() {
   const { settings, update } = useSettings();
   const { data } = useAppData();
   const pulse = useLiveCity();
-  const [chip, setChip] = useState<Chip>('weekend');
+  const [topic, setTopic] = useState<Topic>('all');
+  const [show, setShow] = useState<Show>('latest');
   const [tab, setTab] = useState<FeedTab>('for-you');
   const [query, setQuery] = useState('');
   const [placeSheet, setPlaceSheet] = useState(false);
+  const [filterSheet, setFilterSheet] = useState(false);
 
   const homeName = neighbourhoodName(settings.location.home);
   const alerts = visibleAlerts(settings, data);
   const unread = unreadNotificationCount(settings, data);
   const unreadChats = unreadMessageCount(data);
+  const filtered = topic !== 'all' || show !== 'latest';
 
   const weekendEvents = useMemo(
     () =>
@@ -62,22 +84,18 @@ export default function Home() {
         .sort((a, b) => b.going - a.going),
     [settings],
   );
-  const tonight = EVENTS.filter((e) => e.day === 'Today').length + weekendEvents.filter((e) => e.day === 'Sat' || e.day === 'Sat–Sun').length;
+  const tonightEvents = EVENTS.filter((e) => e.day === 'Today');
+  const plansTonight = tonightEvents.length + weekendEvents.filter((e) => e.day === 'Sat' || e.day === 'Sat–Sun').length;
 
   const posts = useMemo(() => {
     const all: Post[] = [...data.myPosts, ...POSTS];
     const interestRank = (p: Post) => (settings.interests.some((i) => p.topic.toLowerCase().includes(i) || (i === 'food' && FOOD_TOPICS.includes(p.topic))) ? 1 : 0);
-    switch (tab) {
-      case 'near':
-        return all.filter((p) => p.area === homeName || NEIGHBOURHOODS.find((n) => n.name === p.area)?.zone === 'West');
-      case 'trending':
-        return all.filter((p) => p.trending || p.upvotes > 40).sort((a, b) => b.upvotes - a.upvotes);
-      case 'questions':
-        return all.filter((p) => p.type === 'question');
-      default:
-        return [...all].sort((a, b) => Number(b.authorId === 'me') - Number(a.authorId === 'me') || interestRank(b) - interestRank(a));
-    }
-  }, [tab, data.myPosts, homeName, settings.interests]);
+    let list = tab === 'near' ? all.filter((p) => p.area === homeName || NEIGHBOURHOODS.find((n) => n.name === p.area)?.zone === 'West') : all;
+    if (show === 'trending') list = list.filter((p) => p.trending || p.upvotes > 40).sort((a, b) => b.upvotes - a.upvotes);
+    else if (show === 'questions') list = list.filter((p) => p.type === 'question');
+    else list = [...list].sort((a, b) => Number(b.authorId === 'me') - Number(a.authorId === 'me') || interestRank(b) - interestRank(a));
+    return list;
+  }, [tab, show, data.myPosts, homeName, settings.interests]);
 
   const friendsCheckIns = useMemo(() => [...data.myCheckIns, ...friendFeed(data)], [data]);
   const mustTries = useMemo(() => friendsMustTries(data), [data]);
@@ -91,7 +109,7 @@ export default function Home() {
 
   const weekendSection = (
     <section aria-labelledby="weekend-title" className="section" key="weekend">
-      <SectionHead id="weekend-title" title={t('home.weekend')} to={`/ask?q=${encodeURIComponent("What's happening this weekend?")}`} linkLabel={t('common.seeAllN', { n: weekendEvents.length })} />
+      <SectionHead id="weekend-title" title={t('home.weekend')} to={`/ask?q=${encodeURIComponent("What's happening this weekend?")}`} linkLabel={t('common.seeAll')} />
       <div className="hscroll">
         {weekendEvents.map((e) => (
           <EventTile key={e.id} event={e} />
@@ -100,9 +118,6 @@ export default function Home() {
     </section>
   );
 
-  // Interleave posts with city cards the way the design does: post, alert, events, post, deal…
-  const feed: ReactNode[] = [];
-  const firstDeal = DEALS[0];
   const mustTriesSection =
     mustTries.length > 0 ? (
       <section key="must-tries" className="section" aria-labelledby="must-title">
@@ -114,10 +129,12 @@ export default function Home() {
         </div>
       </section>
     ) : null;
-  // A friend's check-in that is not already in the must-tries row, for variety further down the feed.
+
+  // A friend's check-in that is not already in the must-tries row, for variety further down.
   const friendCard = friendFeed(data).find((c) => c.verdict !== 'must') ?? friendFeed(data)[0];
 
-  if (chip === 'weekend' && tab === 'friends') {
+  const feed: ReactNode[] = [];
+  if (tab === 'friends') {
     if (friendsCheckIns.length === 0) {
       feed.push(
         <EmptyState
@@ -136,14 +153,14 @@ export default function Home() {
       if (plans.length) feed.push(<PlanTogetherCard key="plans" plans={plans} />);
       friendsCheckIns.forEach((c) => feed.push(<CheckInCard key={c.id} c={c} />));
     }
-  } else if (chip === 'weekend') {
+  } else if (topic === 'all') {
     posts.forEach((p, i) => {
       feed.push(<PostCard key={p.id} post={p} />);
       if (i === 0 && alerts[0]) feed.push(<AlertCard key={`alert-${alerts[0].id}`} alert={alerts[0]} />);
       if (i === 0 && tab === 'for-you' && mustTriesSection) feed.push(mustTriesSection);
-      if (i === 0 && tab === 'for-you') feed.push(weekendSection);
-      if (i === 1 && tab === 'for-you') feed.push(<DealCard key="deal" deal={firstDeal} />);
-      if (i === 2 && tab === 'for-you' && friendCard)
+      if (i === 1 && tab === 'for-you') feed.push(weekendSection);
+      if (i === 2 && tab === 'for-you') feed.push(<DealCard key="deal" deal={DEALS[0]} />);
+      if (i === 3 && tab === 'for-you' && friendCard)
         feed.push(
           <div key={`friend-${friendCard.id}`} className="stack" style={{ gap: 8 }}>
             <span className="eyebrow muted">{t('feed.friends.fromFriend')}</span>
@@ -151,7 +168,7 @@ export default function Home() {
           </div>,
         );
       if (i === 4 && tab === 'for-you' && plans.length) feed.push(<PlanTogetherCard key="plans" plans={plans} />);
-      if (i === 3 && tab === 'for-you')
+      if (i === 5 && tab === 'for-you')
         feed.push(
           <section key="groups" className="section" aria-labelledby="groups-title">
             <SectionHead id="groups-title" title="Groups near you" to="/groups" />
@@ -163,7 +180,7 @@ export default function Home() {
           </section>,
         );
     });
-  } else if (chip === 'food') {
+  } else if (topic === 'food') {
     feed.push(
       <section key="food-places" className="section" aria-labelledby="food-title">
         <SectionHead id="food-title" title="Locals are talking about" to="/explore/food" />
@@ -176,31 +193,32 @@ export default function Home() {
         </div>
       </section>,
     );
+    if (mustTriesSection) feed.push(mustTriesSection);
     DEALS.filter((d) => d.category === 'food' || d.category === 'cafe').forEach((d) => feed.push(<DealCard key={d.id} deal={d} />));
     posts.filter((p) => FOOD_TOPICS.includes(p.topic)).forEach((p) => feed.push(<PostCard key={p.id} post={p} />));
-  } else if (chip === 'events') {
-    feed.push(weekendSection);
-    EVENTS.filter((e) => e.day === 'Today' || e.day === 'Tomorrow').length > 0 &&
+  } else if (topic === 'events') {
+    if (tonightEvents.length)
       feed.push(
-        <section key="soon" className="section" aria-labelledby="soon-title">
-          <SectionHead id="soon-title" title="Today & tomorrow" to="/explore/events" />
+        <section key="tonight" className="section" aria-labelledby="tonight-title">
+          <SectionHead id="tonight-title" title="Tonight" to="/explore/events" />
           <div className="hscroll">
-            {EVENTS.filter((e) => e.day === 'Today' || e.day === 'Tomorrow').map((e) => (
+            {tonightEvents.map((e) => (
               <EventTile key={e.id} event={e} />
             ))}
           </div>
         </section>,
       );
-  } else if (chip === 'deals') {
+    feed.push(weekendSection);
+  } else if (topic === 'deals') {
     DEALS.forEach((d) => feed.push(<DealCard key={d.id} deal={d} />));
-  } else if (chip === 'alerts') {
+  } else if (topic === 'alerts') {
     if (alerts.length === 0)
       feed.push(
         <EmptyState
           key="none"
           glyph="alert"
           title="All quiet near you"
-          body="No alerts match your settings right now."
+          body="No city updates match your settings right now."
           action={
             <Link className="btn btn--soft btn--sm" to="/settings/alerts">
               Alert settings
@@ -213,99 +231,116 @@ export default function Home() {
 
   return (
     <>
-      <main className="page">
-        <header className="row" style={{ height: 44 }}>
-          <Logo title="Nearhood" />
-          <div className="grow" style={{ display: 'flex', flexDirection: 'column' }}>
-            <span className="display strong" style={{ fontSize: '1.3125rem', letterSpacing: '-0.03em', lineHeight: 1 }}>
-              nearhood
-            </span>
-            <button
-              type="button"
-              onClick={() => setPlaceSheet(true)}
-              className="row"
-              style={{ all: 'unset', display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.78125rem', color: 'var(--muted)', marginTop: 4, cursor: 'pointer' }}
-              aria-label={`Neighbourhood: ${homeName}, ${settings.location.city}. Change`}
-            >
-              <PinGlyph size={12} style={{ color: 'var(--accent)' }} />
-              {homeName}, {settings.location.city}
-              <ChevronDownGlyph size={12} />
-            </button>
-          </div>
+      <main className="page home">
+        <header className="home-header">
+          <Link to="/" className="home-brand" aria-label="Nearhood home">
+            <Logo size={36} />
+            <Wordmark size={25} />
+          </Link>
+          <span className="grow" />
           <Link to="/updates" className="icon-btn" aria-label={`${t('nav.updates')}${unread ? `, ${unread} unread` : ''}`}>
-            <BellGlyph size={20} ringing={unread > 0} />
-            {unread > 0 ? <span className="count-badge">{unread}</span> : null}
+            <BellGlyph size={21} ringing={unread > 0} />
+            {unread > 0 ? <span className="dot-badge" /> : null}
           </Link>
           <Link to="/messages" className="icon-btn" aria-label={`${t('nav.messages')}${unreadChats ? `, ${unreadChats} unread` : ''}`}>
-            <ChatGlyph size={20} typing={unreadChats > 0} />
+            <ChatGlyph size={21} typing={unreadChats > 0} />
           </Link>
         </header>
+        <button type="button" className="home-location" onClick={() => setPlaceSheet(true)} aria-label={`Neighbourhood: ${homeName}, ${settings.location.city}. Change`}>
+          <PinGlyph size={15} />
+          {homeName}, {settings.location.city}
+          <ChevronDownGlyph size={14} />
+        </button>
+
+        <h1 className="hero-title">
+          {t('home.hero')}
+          <SparkleMark size={26} className="hero-title__spark" />
+        </h1>
 
         <form onSubmit={onAsk} role="search">
           <label className="ask-field" htmlFor="ask">
-            <SparkGlyph size={20} />
-            <input id="ask" type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('home.ask')} autoComplete="off" enterKeyHint="search" />
-            <button type="submit" className="icon-btn icon-btn--accent" style={{ width: 42, height: 42 }} aria-label={t('common.search')}>
-              <SearchGlyph size={18} />
+            <SparkGlyph size={22} />
+            <input id="ask" type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('home.askAnything')} autoComplete="off" enterKeyHint="search" />
+            <button type="submit" className="icon-btn icon-btn--accent" style={{ width: 44, height: 44 }} aria-label={t('common.search')}>
+              <ArrowRightGlyph size={20} />
             </button>
           </label>
         </form>
 
         <FriendStrip />
 
-        <div className="chip-row" role="group" aria-label="Filter your feed">
-          {CHIPS.map((c) => (
-            <button key={c.id} type="button" className="chip" aria-pressed={chip === c.id} onClick={() => setChip(c.id)}>
-              {t(c.key)}
-            </button>
-          ))}
-        </div>
-
-        <section
-          aria-label={t('home.today', { city: settings.location.city })}
-          className="home-today"
-        >
-          <Link to="/city" className="home-today__main">
-            <span className="home-today__label">{t('home.today', { city: settings.location.city })}</span>
-            <span className="row display strong" style={{ gap: 6, fontSize: '1.0625rem' }}>
-              <WeatherGlyph condition={pulse.weather.condition} size={22} />
-              {pulse.weather.condition === 'sunny' ? 'Sunny' : 'Clear'}, {pulse.weather.temp}°
+        <section className="card today-card" aria-label={todayLabel()}>
+          <Link to="/city" className="today-card__main">
+            <WeatherGlyph condition={pulse.weather.condition} size={38} />
+            <span className="stack" style={{ gap: 2 }}>
+              <span className="meta">{todayLabel()}</span>
+              <span className="display" style={{ fontSize: '1.1875rem', fontWeight: 800 }}>
+                {CONDITION_LABEL[pulse.weather.condition]} · {pulse.weather.temp}°
+              </span>
             </span>
           </Link>
-          <div className="row" style={{ gap: 8 }}>
-            <Link to="/city/alerts" className="stat home-today__stat">
-              <span className="num" style={{ fontSize: '1.0625rem' }}>
-                {alerts.length}
-              </span>
-              <span className="home-today__stat-label">{t('home.alerts')}</span>
-            </Link>
-            <Link to={`/ask?q=${encodeURIComponent('Things to do tonight')}`} className="stat home-today__stat">
-              <span className="num" style={{ fontSize: '1.0625rem' }}>
-                {tonight}
-              </span>
-              <span className="home-today__stat-label">{t('home.tonight')}</span>
-            </Link>
-            <Link to="/deals" className="stat home-today__stat home-today__stat--mint">
-              <span className="num" style={{ fontSize: '1.0625rem' }}>
-                {DEALS.length}
-              </span>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 600 }}>{t('home.deals')}</span>
-            </Link>
-          </div>
+          <Link to={`/ask?q=${encodeURIComponent('Things to do tonight')}`} className="today-card__plans">
+            {t('home.plansTonight', { n: plansTonight })}
+            <ChevronRightGlyph size={16} />
+          </Link>
         </section>
 
-        {chip === 'weekend' ? (
-          <div className="tabs" role="tablist" aria-label="Feed">
+        <div className="home-tabs">
+          <div className="tabs grow" role="tablist" aria-label="Feed">
             {TABS.map((x) => (
               <button key={x.id} type="button" role="tab" className="tab" aria-selected={tab === x.id} onClick={() => setTab(x.id)}>
                 {t(x.key)}
               </button>
             ))}
           </div>
+          <button type="button" className="icon-btn icon-btn--ghost home-tabs__filter" aria-label={t('home.filter')} aria-haspopup="dialog" onClick={() => setFilterSheet(true)}>
+            <SlidersGlyph size={22} />
+            {filtered ? <span className="dot-badge" style={{ top: 8, right: 8 }} /> : null}
+          </button>
+        </div>
+
+        {filtered && tab !== 'friends' ? (
+          <div className="row row--wrap" style={{ gap: 8 }}>
+            {topic !== 'all' ? (
+              <button type="button" className="chip chip--soft" onClick={() => setTopic('all')}>
+                {t(TOPICS.find((x) => x.id === topic)!.key)} ×
+              </button>
+            ) : null}
+            {show !== 'latest' ? (
+              <button type="button" className="chip chip--soft" onClick={() => setShow('latest')}>
+                {show === 'trending' ? t('feed.trending') : t('feed.questions')} ×
+              </button>
+            ) : null}
+          </div>
         ) : null}
 
         {feed.length ? feed : <EmptyState glyph="question" title={t('home.empty')} body="Ask a question and neighbours will chip in." />}
       </main>
+
+      <Sheet open={filterSheet} onClose={() => setFilterSheet(false)} title={t('home.filter')}>
+        <span className="field__label">{t('home.topic')}</span>
+        <div className="chip-wrap">
+          {TOPICS.map((c) => (
+            <button key={c.id} type="button" className="chip" aria-pressed={topic === c.id} onClick={() => setTopic(c.id)}>
+              {t(c.key)}
+            </button>
+          ))}
+        </div>
+        <span className="field__label">{t('home.show')}</span>
+        <Segmented
+          label={t('home.show')}
+          value={show}
+          onChange={setShow}
+          options={[
+            { value: 'latest', label: t('home.latest') },
+            { value: 'trending', label: t('feed.trending') },
+            { value: 'questions', label: t('feed.questions') },
+          ]}
+        />
+        <button type="button" className="btn btn--primary btn--block" onClick={() => setFilterSheet(false)}>
+          {t('common.done')}
+        </button>
+      </Sheet>
 
       <Sheet open={placeSheet} onClose={() => setPlaceSheet(false)} title="Your neighbourhood">
         <p className="body-sm muted">Nearhood shows alerts, events and posts around this area first.</p>

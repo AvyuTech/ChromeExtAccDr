@@ -607,3 +607,40 @@ export const AirGlyph = g(
     <path d="M3 9h11a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 17h7" />
   </>,
 );
+
+/* ---------- v2 additions ---------- */
+export const ArrowRightGlyph = g('arrow-right', <path d="M5 12h14M13 6l6 6-6 6" />, 2.3);
+export const KebabGlyph = g(
+  'kebab',
+  <>
+    <circle cx="12" cy="5.5" r="1.5" className="g-fill" stroke="none" />
+    <circle cx="12" cy="12" r="1.5" className="g-fill" stroke="none" />
+    <circle cx="12" cy="18.5" r="1.5" className="g-fill" stroke="none" />
+  </>,
+);
+export const LocateGlyph = g(
+  'locate',
+  <>
+    <circle cx="12" cy="12" r="6.5" />
+    <circle className="g-fill" cx="12" cy="12" r="2.4" stroke="none" />
+    <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3" />
+  </>,
+);
+
+/** The lime four-point sparkle that punctuates headlines. */
+export function SparkleMark({ size = 22, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" className={`sparkle-mark ${className ?? ''}`} aria-hidden="true">
+      <path d="M12 1.5c.9 5.6 4.9 9.6 10.5 10.5-5.6.9-9.6 4.9-10.5 10.5C11.1 16.9 7.1 12.9 1.5 12 7.1 11.1 11.1 7.1 12 1.5z" fill="var(--lime-strong)" />
+    </svg>
+  );
+}
+
+/** The lime squiggle under "favourite". */
+export function SquiggleMark({ width = 34, className }: { width?: number; className?: string }) {
+  return (
+    <svg width={width} height={(width * 14) / 40} viewBox="0 0 40 14" className={`squiggle-mark ${className ?? ''}`} aria-hidden="true">
+      <path d="M2 9c4-6 8-6 10 0s6 6 9 0 7-6 10 0 5 4 7 1" fill="none" stroke="var(--lime-strong)" strokeWidth="3.6" strokeLinecap="round" />
+    </svg>
+  );
+}

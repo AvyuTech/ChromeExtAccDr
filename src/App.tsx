@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { BottomNav } from './components/BottomNav';
+import { Splash, StageCaption, StatusBar } from './components/Device';
 import AlertDetail from './pages/AlertDetail';
 import Alerts from './pages/Alerts';
 import Ask from './pages/Ask';
@@ -50,54 +51,70 @@ function Shell() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    document.getElementById('scroller')?.scrollTo(0, 0);
   }, [pathname]);
 
   if (!settings.onboarded && pathname !== '/onboarding') return <Navigate to="/onboarding" replace />;
 
   const showNav = !NO_NAV.some((r) => r.test(pathname));
   return (
-    <div className="app-frame">
-      <div className="app-column">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/ask" element={<Ask />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/explore/:category" element={<Category />} />
-          <Route path="/deals" element={<Deals />} />
-          <Route path="/deals/:id" element={<DealDetail />} />
-          <Route path="/place/:id" element={<PlaceDetail />} />
-          <Route path="/event/:id" element={<EventDetail />} />
-          <Route path="/groups" element={<Groups />} />
-          <Route path="/groups/:id" element={<GroupDetail />} />
-          <Route path="/post/:id" element={<PostDetail />} />
-          <Route path="/compose" element={<Compose />} />
-          <Route path="/checkin" element={<CheckIn />} />
-          <Route path="/checkin/:id" element={<CheckInDetail />} />
-          <Route path="/friends" element={<Friends />} />
-          <Route path="/people/:id" element={<Profile />} />
-          <Route path="/lists/:id" element={<ListDetail />} />
-          <Route path="/updates" element={<Updates />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/messages/:id" element={<Chat />} />
-          <Route path="/city" element={<City />} />
-          <Route path="/city/alerts" element={<Alerts />} />
-          <Route path="/city/alerts/:id" element={<AlertDetail />} />
-          <Route path="/city/transit" element={<Transit />} />
-          <Route path="/city/report" element={<Report />} />
-          <Route path="/city/reports" element={<Reports />} />
-          <Route path="/city/reports/:id" element={<ReportDetail />} />
-          <Route path="/city/services" element={<Services />} />
-          <Route path="/city/safety" element={<Safety />} />
-          <Route path="/me" element={<Me />} />
-          <Route path="/me/saved" element={<Saved />} />
-          <Route path="/settings" element={<SettingsHome />} />
-          <Route path="/settings/:section" element={<SettingsSection />} />
-          <Route path="/about/glyphs" element={<Glyphs />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        {showNav ? <BottomNav /> : null}
+    <div className="device-stage">
+      <StageCaption side="left" />
+      <div className="device">
+        <div className="device__screen">
+          <StatusBar />
+          <span className="device__island" aria-hidden="true" />
+          <div className="device__scroll" id="scroller">
+            <div className="app-frame">
+              <div className="app-column">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/onboarding" element={<Onboarding />} />
+                  <Route path="/ask" element={<Ask />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/explore/:category" element={<Category />} />
+                  <Route path="/deals" element={<Deals />} />
+                  <Route path="/deals/:id" element={<DealDetail />} />
+                  <Route path="/place/:id" element={<PlaceDetail />} />
+                  <Route path="/event/:id" element={<EventDetail />} />
+                  <Route path="/groups" element={<Groups />} />
+                  <Route path="/groups/:id" element={<GroupDetail />} />
+                  <Route path="/post/:id" element={<PostDetail />} />
+                  <Route path="/compose" element={<Compose />} />
+                  <Route path="/checkin" element={<CheckIn />} />
+                  <Route path="/checkin/:id" element={<CheckInDetail />} />
+                  <Route path="/friends" element={<Friends />} />
+                  <Route path="/people/:id" element={<Profile />} />
+                  <Route path="/lists/:id" element={<ListDetail />} />
+                  <Route path="/updates" element={<Updates />} />
+                  <Route path="/messages" element={<Messages />} />
+                  <Route path="/messages/:id" element={<Chat />} />
+                  <Route path="/city" element={<City />} />
+                  <Route path="/city/alerts" element={<Alerts />} />
+                  <Route path="/city/alerts/:id" element={<AlertDetail />} />
+                  <Route path="/city/transit" element={<Transit />} />
+                  <Route path="/city/report" element={<Report />} />
+                  <Route path="/city/reports" element={<Reports />} />
+                  <Route path="/city/reports/:id" element={<ReportDetail />} />
+                  <Route path="/city/services" element={<Services />} />
+                  <Route path="/city/safety" element={<Safety />} />
+                  <Route path="/me" element={<Me />} />
+                  <Route path="/me/saved" element={<Saved />} />
+                  <Route path="/settings" element={<SettingsHome />} />
+                  <Route path="/settings/:section" element={<SettingsSection />} />
+                  <Route path="/about/glyphs" element={<Glyphs />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                {showNav ? <BottomNav /> : null}
+              </div>
+            </div>
+          </div>
+          <div id="overlay-root" />
+          <Splash />
+          <span className="device__home" aria-hidden="true" />
+        </div>
       </div>
+      <StageCaption side="right" />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import type { CheckIn, Collection, CommunityBase, ProfileInfo, WantItem } from '
 
 /** What people usually order or do at each place: the one-tap choices in a check-in. */
 export const PLACE_ITEMS: Record<string, string[]> = {
-  'quiet-cup': ['Cold brew', 'Avocado toast', 'Shakshuka', 'Hazelnut latte', 'Banana bread'],
+  'quiet-cup': ['Cold brew', 'Avocado toast', 'Fried egg toast', 'Hazelnut latte', 'Banana bread'],
   'corner-table': ['Filter coffee', 'Masala omelette', 'Cheese chilli toast', 'Iced tea'],
   'brew-lab': ['Pour-over', 'Cappuccino', 'Banana bread', 'Almond croissant'],
   'seoul-bowl': ['Spicy ramen', 'Kimchi pancake', 'Bibimbap', 'Korean fried chicken', 'Bubble tea'],
@@ -30,7 +30,7 @@ export const COMMUNITY_BASE: Record<string, CommunityBase> = {
     items: [
       { name: 'Cold brew', count: 18, mustPct: 72 },
       { name: 'Avocado toast', count: 14, mustPct: 64 },
-      { name: 'Shakshuka', count: 9, mustPct: 78 },
+      { name: 'Fried egg toast', count: 9, mustPct: 78 },
       { name: 'Hazelnut latte', count: 7, mustPct: 43 },
     ],
   },
@@ -116,9 +116,9 @@ export const CHECKINS: CheckIn[] = [
     placeId: 'quiet-cup',
     placeName: 'The Quiet Cup',
     area: 'Prahlad Nagar',
-    items: ['Cold brew', 'Shakshuka'],
+    items: ['Cold brew', 'Fried egg toast'],
     verdict: 'must',
-    note: 'Got the window table and three hours of work done. Shakshuka is the sleeper hit.',
+    note: 'Got the window table and three hours of work done. The fried egg toast is the sleeper hit.',
     spend: 480,
     tags: ['Work-friendly', 'Quiet'],
     audience: 'friends',
