@@ -25,6 +25,23 @@ body {
   min-height: 100dvh;
 }
 
+/* Paint the status-bar band so content never scrolls visibly under it. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 40;
+  background: var(--ground);
+}
+
+/* Installed app (viewport-fit=cover): keep content clear of the notch. */
+@media (display-mode: standalone) {
+  #root {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+
 h1,
 h2,
 h3,

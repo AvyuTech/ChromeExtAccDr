@@ -443,10 +443,11 @@ export const SosGlyph = g(
 export const PotholeGlyph = g(
   'pothole',
   <>
-    <path d="M2.5 9.5h19M2.5 19.5h19" />
-    <path className="g-tint" d="M7 14.5c0-1.4 2.2-2.5 5-2.5s5 1.1 5 2.5-2.2 2.5-5 2.5-5-1.1-5-2.5z" />
-    <path d="M7 14.5c0-1.4 2.2-2.5 5-2.5s5 1.1 5 2.5-2.2 2.5-5 2.5-5-1.1-5-2.5z" />
-    <path d="M9.5 13.2l1.2 1.4 1.3-.9 1.4 1.3" strokeWidth="1.3" />
+    <path className="g-tint" d="M8.2 3.5h7.6L21 20.5H3z" />
+    <path d="M8.2 3.5 3 20.5M15.8 3.5l5.2 17" />
+    <path d="M12 4v2.4M12 17.6v2.4" strokeWidth="1.6" />
+    <path d="M7.6 12.4c.5-1.2 2.2-1.9 4.4-1.9s3.9.7 4.4 1.9c.4 1.1-.7 2.5-2.2 2.7-1.1.1-1.5-.5-2.4-.4-1.1.1-1.8.7-2.8.3-1.1-.4-1.8-1.5-1.4-2.6z" />
+    <circle className="g-dot" cx="17.6" cy="16.4" r="1.1" />
   </>,
 );
 export const BinGlyph = g(

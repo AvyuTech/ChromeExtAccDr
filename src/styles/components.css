@@ -23,7 +23,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 18px 16px calc(var(--nav-height) + 28px) 16px;
+  padding: 18px 16px calc(var(--nav-height) + 28px + env(safe-area-inset-bottom, 0px)) 16px;
   animation: page-in 0.28s ease-out both;
 }
 
@@ -49,7 +49,7 @@
 /* ---------- Headers ---------- */
 .page-header {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 20;
   display: flex;
   align-items: center;
@@ -822,8 +822,8 @@ button.list-row:active {
   z-index: 30;
   transform: translateX(-50%);
   width: min(100%, var(--column));
-  height: var(--nav-height);
-  padding: 8px 10px 22px 10px;
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+  padding: 8px 10px calc(22px + env(safe-area-inset-bottom, 0px)) 10px;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -929,7 +929,7 @@ button.list-row:active {
 .toast-host {
   position: fixed;
   left: 50%;
-  bottom: calc(var(--nav-height) + 14px);
+  bottom: calc(var(--nav-height) + 14px + env(safe-area-inset-bottom, 0px));
   z-index: 80;
   transform: translateX(-50%);
   width: min(calc(100% - 32px), calc(var(--column) - 32px));

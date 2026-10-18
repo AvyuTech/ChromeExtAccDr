@@ -13,6 +13,7 @@ import Deals from './pages/Deals';
 import EventDetail from './pages/EventDetail';
 import Explore from './pages/Explore';
 import GroupDetail from './pages/GroupDetail';
+import Glyphs from './pages/Glyphs';
 import Groups from './pages/Groups';
 import Home from './pages/Home';
 import Me from './pages/Me';
@@ -82,6 +83,7 @@ function Shell() {
           <Route path="/me/saved" element={<Saved />} />
           <Route path="/settings" element={<SettingsHome />} />
           <Route path="/settings/:section" element={<SettingsSection />} />
+          <Route path="/about/glyphs" element={<Glyphs />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         {showNav ? <BottomNav /> : null}
