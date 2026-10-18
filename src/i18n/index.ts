@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useSettings } from '../state/settings';
 import { city } from './strings/city';
+import { clubs } from './strings/clubs';
 import { common } from './strings/common';
 import { discover } from './strings/discover';
 import { friendsCreate } from './strings/friendsCreate';
@@ -12,7 +13,7 @@ import type { Dict, Lang } from './types';
 
 export type { Dict, Lang };
 
-const DICT: Dict = { ...common, ...discover, ...city, ...settings, ...social, ...friendsCreate, ...friendsPeople, ...friendsFeed };
+const DICT: Dict = { ...common, ...discover, ...city, ...settings, ...social, ...friendsCreate, ...friendsPeople, ...friendsFeed, ...clubs };
 
 export function translate(lang: Lang, key: string, vars?: Record<string, string | number>) {
   // Singular forms live under `<key>.one` and apply when n is 1.

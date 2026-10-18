@@ -1,0 +1,364 @@
+/* ---------- Clubs hub ---------- */
+.clubs {
+  gap: 14px;
+}
+.clubs-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.clubs-head .hero-title {
+  font-size: 1.5rem;
+}
+.clubs-head .icon-btn {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+/* The map runs edge to edge with a quiet caption under it */
+.clubs-map {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 calc(var(--gutter) * -1);
+}
+.clubs-map .city-map {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+}
+.clubs-map__note {
+  padding: 0 var(--gutter);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Flat sections split by a full-width hairline */
+.clubs-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 14px var(--gutter) 0;
+  border-top: 1px solid var(--divider);
+}
+.clubs-sec .hscroll {
+  margin-top: 2px;
+}
+.clubs-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+.clubs-note {
+  margin-top: -4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ---------- Rows ---------- */
+.club-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--divider);
+  color: inherit;
+  text-decoration: none;
+}
+.club-row__thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+.club-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex-grow: 1;
+  min-width: 0;
+}
+.club-row__name {
+  font-size: 0.9063rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.club-row__next {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.club-chip {
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 11px;
+  font-size: 0.75rem;
+}
+.club-chip:disabled {
+  opacity: 0.5;
+}
+
+/* Meetup: a date block, what and where, who's in */
+.meetup-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.meetup-row:last-child,
+.club-row:last-child,
+.buy-row:last-child {
+  border-bottom: none;
+}
+.meetup-row__when {
+  flex-shrink: 0;
+  width: 54px;
+  min-height: 52px;
+  padding: 7px 4px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  background: var(--tone-bg);
+  color: var(--tone-ink);
+  text-align: center;
+  line-height: 1.15;
+}
+.meetup-row__when b {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.meetup-row__when small {
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+.meetup-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-grow: 1;
+  min-width: 0;
+}
+.meetup-row__title {
+  font-size: 0.9063rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.meetup-row__club {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+.meetup-row__note {
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+.meetup-row__who {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--mint-ink);
+}
+.meetup-row .club-chip {
+  margin-top: 2px;
+}
+
+/* Group buy: what, who started it, how close it is */
+.buy-row {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 11px 0 12px;
+  border-bottom: 1px solid var(--divider);
+}
+.buy-row__top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.buy-row__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+}
+.buy-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex-grow: 1;
+  min-width: 0;
+}
+.buy-row__title {
+  font-size: 0.9063rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.buy-row__note {
+  padding-left: 46px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.buy-row__progress {
+  height: 5px;
+  margin-left: 46px;
+  border-radius: 3px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.buy-row__progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent-fill);
+  transition: width 0.3s ease;
+}
+.buy-row__progress > span.is-done {
+  background: var(--mint-strong);
+}
+.buy-row__count {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  padding-left: 46px;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.buy-row__count b {
+  color: var(--ink);
+}
+
+/* Discovery tiles: the photo is the tile */
+.club-tile {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 168px;
+  color: inherit;
+  text-decoration: none;
+}
+.club-tile__photo {
+  height: 112px;
+  margin-bottom: 6px;
+  border-radius: 14px;
+}
+.club-tile__name {
+  font-family: var(--font-display);
+  font-size: 0.9063rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+/* ---------- Club page ---------- */
+.club-admins {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.club-people {
+  display: flex;
+  gap: 12px;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 0 var(--gutter) 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.club-people::-webkit-scrollbar {
+  display: none;
+}
+.club-person {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 52px;
+  color: var(--ink);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.club-person > span:last-child {
+  max-width: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.club-person--more {
+  color: var(--muted);
+}
+.club-person__count {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.club-page .feed {
+  margin-top: -6px;
+}
+.club-leave {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--red);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+/* ---------- Forms (start a club, plan, buy together) ---------- */
+.club-form {
+  gap: 14px;
+}
+.club-new__set {
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+.club-new__set legend {
+  margin-bottom: 7px;
+  padding: 0;
+}

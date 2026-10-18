@@ -14,6 +14,7 @@ import './styles/pages/social.css';
 import './styles/pages/friends.css';
 import './styles/pages/checkin.css';
 import './styles/pages/people.css';
+import './styles/pages/clubs.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
