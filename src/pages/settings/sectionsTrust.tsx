@@ -339,7 +339,7 @@ export function DataSection() {
           G={WifiGlyph}
           tone="teal"
           title={t('settings.data.saver')}
-          meta="Pauses live city updates and moving icons to save mobile data."
+          meta="Pauses live city updates to save mobile data."
           checked={d.dataSaver}
           onChange={(v) => update('data', { dataSaver: v })}
         />

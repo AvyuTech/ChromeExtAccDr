@@ -31,7 +31,6 @@ export interface Settings {
   appearance: {
     theme: ThemeChoice;
     textScale: number;
-    compactCards: boolean;
   };
   language: Language;
   accessibility: {
@@ -111,7 +110,7 @@ export const DEFAULT_SETTINGS: Settings = {
     returnAt: '18:30',
   },
   interests: ['food', 'events', 'music', 'sports', 'heritage'],
-  appearance: { theme: 'system', textScale: 1, compactCards: false },
+  appearance: { theme: 'system', textScale: 1 },
   language: 'en',
   accessibility: { reduceMotion: false, highContrast: false, largeTargets: false, readAnswersAloud: false },
   notifications: {

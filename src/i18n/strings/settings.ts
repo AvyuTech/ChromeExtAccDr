@@ -53,6 +53,7 @@ export const settings: Dict = {
   'settings.account.verified': { en: 'Verified resident', gu: 'ચકાસાયેલ રહેવાસી', hi: 'सत्यापित निवासी' },
   'settings.account.danger': { en: 'Danger zone', gu: 'જોખમી વિભાગ', hi: 'जोखिम क्षेत्र' },
   'settings.account.delete': { en: 'Delete account', gu: 'એકાઉન્ટ કાઢી નાખો', hi: 'खाता हटाएँ' },
+  'settings.account.deleteShort': { en: 'Delete', gu: 'કાઢી નાખો', hi: 'हटाएँ' },
   'settings.account.deleteTitle': { en: 'Delete your account?', gu: 'તમારું એકાઉન્ટ કાઢી નાખવું છે?', hi: 'अपना खाता हटाएँ?' },
   'settings.account.deleteBody': {
     en: 'This removes your profile, settings, saved items, posts and reports from this device. It cannot be undone.',
@@ -235,6 +236,7 @@ export const settings: Dict = {
   'me.inProgress': { en: 'In progress', gu: 'ચાલુ છે', hi: 'जारी' },
   'me.neighboursHelped': { en: 'Neighbours helped', gu: 'મદદ મળેલા પડોશીઓ', hi: 'मदद पाए पड़ोसी' },
   'me.nextBadge': { en: 'Next badge: {badge}', gu: 'આગળનો બેજ: {badge}', hi: 'अगला बैज: {badge}' },
+  'me.champion': { en: 'City champion', gu: 'શહેર ચેમ્પિયન', hi: 'शहर चैंपियन' },
   'me.more': { en: 'More', gu: 'વધુ', hi: 'और' },
   'me.unread': { en: '{n} unread', gu: '{n} વાંચ્યા વગર', hi: '{n} अनपढ़े' },
 

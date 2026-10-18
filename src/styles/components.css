@@ -24,7 +24,8 @@
   flex-direction: column;
   gap: 16px;
   padding: 18px 16px calc(var(--nav-height) + 28px + env(safe-area-inset-bottom, 0px)) 16px;
-  animation: page-in 0.28s ease-out both;
+  /* no fill-mode: once finished, the page keeps no transform or stacking context */
+  animation: page-in 0.28s ease-out;
 }
 
 .page--with-header {
@@ -1073,5 +1074,5 @@ button.list-row:active {
   border-radius: 14px;
 }
 .fade-up {
-  animation: page-in 0.3s ease-out both;
+  animation: page-in 0.3s ease-out;
 }

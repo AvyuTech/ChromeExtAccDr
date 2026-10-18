@@ -43,7 +43,7 @@ function trailFor(id: SectionId, s: Settings, t: (k: string, v?: Record<string, 
     case 'data':
       return s.data.dataSaver ? t('settings.data.saver') : '';
     case 'safety':
-      return String(s.safety.contacts.filter((c) => c.name || c.phone).length);
+      return String(s.safety.contacts.filter((c) => c.name || c.phone).length || '');
     case 'about':
       return APP_VERSION;
     default:

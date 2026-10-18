@@ -139,6 +139,7 @@ export default function Ask() {
 
   return (
     <main className="page">
+      <h1 className="sr-only">{q ? `${t('answer.label')}: ${q}` : t('answer.label')}</h1>
       <form className="row" style={{ gap: 8 }} onSubmit={onSubmit} role="search">
         <button
           type="button"

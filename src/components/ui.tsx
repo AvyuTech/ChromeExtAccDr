@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { useT } from '../i18n';
 import { BackGlyph, ChevronRightGlyph, CloseGlyph, NamedGlyph, type GlyphName } from '../icons';
@@ -153,7 +154,8 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
     };
   }, [open, onClose]);
   if (!open) return null;
-  return (
+  // Portalled to <body> so no page-level stacking context can trap it under the tab bar.
+  return createPortal(
     <div className="sheet-backdrop" onClick={onClose}>
       <div
         ref={panel}
@@ -173,7 +175,8 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -182,7 +185,7 @@ export function EmptyState({ glyph, title, body, action }: { glyph: GlyphName; t
   return (
     <div className="empty">
       <Tile glyph={glyph} tone="violet" size="lg" live />
-      <p className="empty__title">{title}</p>
+      <h2 className="empty__title">{title}</h2>
       {body ? <p className="body-sm muted">{body}</p> : null}
       {action}
     </div>

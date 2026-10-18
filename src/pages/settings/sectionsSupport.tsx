@@ -40,30 +40,34 @@ export function SafetySection() {
                 {(c.name.replace(/[[\]]/g, '').trim()[0] ?? '?').toUpperCase()}
               </span>
               <div className="set-contact__fields">
-                <label className="sr-only" htmlFor={`${baseId}-n${i}`}>
-                  {t('settings.safety.contactName')} {i + 1}
-                </label>
-                <input
-                  id={`${baseId}-n${i}`}
-                  className="input"
-                  value={c.name}
-                  placeholder={t('settings.safety.contactName')}
-                  autoComplete="off"
-                  onChange={(e) => setContact(i, { name: e.target.value })}
-                />
-                <label className="sr-only" htmlFor={`${baseId}-p${i}`}>
-                  {t('settings.safety.contactPhone')} {i + 1}
-                </label>
-                <input
-                  id={`${baseId}-p${i}`}
-                  className="input"
-                  type="tel"
-                  inputMode="tel"
-                  value={c.phone}
-                  placeholder="+91 98765 43210"
-                  autoComplete="off"
-                  onChange={(e) => setContact(i, { phone: e.target.value })}
-                />
+                <div>
+                  <label className="sr-only" htmlFor={`${baseId}-n${i}`}>
+                    {t('settings.safety.contactName')} {i + 1}
+                  </label>
+                  <input
+                    id={`${baseId}-n${i}`}
+                    className="input"
+                    value={c.name}
+                    placeholder={t('settings.safety.contactName')}
+                    autoComplete="off"
+                    onChange={(e) => setContact(i, { name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="sr-only" htmlFor={`${baseId}-p${i}`}>
+                    {t('settings.safety.contactPhone')} {i + 1}
+                  </label>
+                  <input
+                    id={`${baseId}-p${i}`}
+                    className="input"
+                    type="tel"
+                    inputMode="tel"
+                    value={c.phone}
+                    placeholder="+91 98765 43210"
+                    autoComplete="off"
+                    onChange={(e) => setContact(i, { phone: e.target.value })}
+                  />
+                </div>
               </div>
               <button
                 type="button"

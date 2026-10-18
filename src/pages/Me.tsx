@@ -143,7 +143,7 @@ export default function Me() {
           </div>
           <div className="stack" style={{ gap: 6 }}>
             <div className="row row--between">
-              <span className="body-sm strong">{t('me.nextBadge', { badge: 'City champion' })}</span>
+              <span className="body-sm strong">{t('me.nextBadge', { badge: t('me.champion') })}</span>
               <span className="meta">
                 {Math.min(fixed, CHAMPION_AT)}/{CHAMPION_AT}
               </span>

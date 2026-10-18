@@ -170,8 +170,8 @@ export function AccountSection() {
             <span className="list-row__title">{t('settings.account.delete')}</span>
             <span className="list-row__meta">Removes everything Nearhood keeps on this device.</span>
           </span>
-          <button type="button" className="btn btn--sm btn--danger" onClick={() => setConfirmDelete(true)}>
-            {t('settings.account.delete')}
+          <button type="button" className="btn btn--sm btn--danger" aria-label={t('settings.account.delete')} onClick={() => setConfirmDelete(true)}>
+            {t('settings.account.deleteShort')}
           </button>
         </div>
       </Group>
@@ -247,7 +247,7 @@ export function LocationSection() {
         <RangeRow label={t('settings.location.radius')} value={loc.radiusKm} min={1} max={20} onChange={(v) => update('location', { radiusKm: v })} format={(v) => `${v} km`} />
       </Group>
 
-      <Group title={t('settings.location.commute')} note="Used for commute-only alerts and the Leaving soon card in City.">
+      <Group title={t('settings.location.commute')} note="Used for commute-only alerts and to suggest the quickest way around the city.">
         <StackRow label={t('settings.location.mode')}>
           <ChoiceTiles
             label={t('settings.location.mode')}

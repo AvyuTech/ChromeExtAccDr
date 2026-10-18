@@ -498,7 +498,7 @@ button.list-row:disabled {
   padding: 10px 12px;
   border-radius: 16px;
 }
-@media (max-width: 360px) {
+@media (max-width: 340px) {
   .interest-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
