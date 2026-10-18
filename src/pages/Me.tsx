@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { itemPhoto, placePhoto } from '../assets/photos';
 import { Cover } from '../components/cards';
 import { AvatarStack, CheckInCard, CheckInGrid, CollectionCard } from '../components/friends';
-import { DoneRing, ProfileHero, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
+import { DoneRing, ProfileAction, ProfileHero, shareOrCopy, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
 import { EmptyState, Sheet } from '../components/ui';
 import { REPORTS } from '../data/city';
 import { PEOPLE, neighbourhoodName } from '../data/core';
@@ -14,6 +14,7 @@ import {
   BellGlyph,
   ChatGlyph,
   CheckGlyph,
+  EditGlyph,
   FriendsGlyph,
   GroupsGlyph,
   HelpGlyph,
@@ -23,6 +24,7 @@ import {
   PlusGlyph,
   ReportGlyph,
   SaveGlyph,
+  ShareGlyph,
   ShieldGlyph,
   SlidersGlyph,
   StepRing,
@@ -119,6 +121,12 @@ export default function Me() {
     }
   };
 
+  const shareProfile = async () => {
+    const res = await shareOrCopy(`${profile.name} on Nearhood`, `${window.location.origin}${window.location.pathname}#/people/me`);
+    if (res === 'copied') toast('Profile link copied');
+    else if (res === 'failed') toast('Could not share right now');
+  };
+
   const createList = (e: FormEvent) => {
     e.preventDefault();
     if (!listTitle.trim()) return;
@@ -144,18 +152,17 @@ export default function Me() {
   return (
     <>
       <main className="page">
-        <header className="row row--between" style={{ minHeight: 44 }}>
-          <h1 className="page-title">{t('nav.me')}</h1>
-          <div className="row" style={{ gap: 8 }}>
-            <Link to="/friends" className="icon-btn" aria-label={t('people.friends')}>
-              <FriendsGlyph size={20} />
+        <header className="row row--between" style={{ minHeight: 40, marginBottom: -4 }}>
+          <h1 className="page-title" style={{ fontSize: '1.375rem' }}>
+            {t('nav.me')}
+          </h1>
+          <div className="row" style={{ gap: 0, marginRight: -8 }}>
+            <Link to="/friends" className="icon-btn icon-btn--ghost" aria-label={t('people.friends')}>
+              <FriendsGlyph size={21} />
             </Link>
-            <Link to="/updates" className="icon-btn" aria-label={`${t('nav.updates')}${unread ? `, ${t('me.unread', { n: unread })}` : ''}`}>
-              <BellGlyph size={20} ringing={unread > 0} />
+            <Link to="/updates" className="icon-btn icon-btn--ghost" aria-label={`${t('nav.updates')}${unread ? `, ${t('me.unread', { n: unread })}` : ''}`}>
+              <BellGlyph size={21} ringing={unread > 0} />
               {unread > 0 ? <span className="count-badge">{unread}</span> : null}
-            </Link>
-            <Link to="/settings" className="icon-btn" aria-label={t('common.settings')}>
-              <SlidersGlyph size={20} />
             </Link>
           </div>
         </header>
@@ -184,13 +191,21 @@ export default function Me() {
           bio={profile.bio || undefined}
           actions={
             <>
-              <Link to="/settings/account" className="btn btn--outline btn--sm">
-                {t('me.editProfile')}
-              </Link>
-              <Link to="/checkin" className="btn btn--primary btn--sm">
-                <PlusGlyph size={14} />
-                Check in
-              </Link>
+              <ProfileAction to="/checkin" label="Check in" primary>
+                <PlusGlyph size={19} />
+              </ProfileAction>
+              <ProfileAction to="/settings/account" label={t('me.editProfile')}>
+                <EditGlyph size={18} />
+              </ProfileAction>
+              <ProfileAction label={t('common.share')} onClick={shareProfile}>
+                <ShareGlyph size={18} />
+              </ProfileAction>
+              <ProfileAction to="/me/saved" label={t('me.saved')}>
+                <SaveGlyph size={18} />
+              </ProfileAction>
+              <ProfileAction to="/settings" label={t('common.settings')}>
+                <SlidersGlyph size={18} />
+              </ProfileAction>
             </>
           }
           stats={stats.map((st) => ({
@@ -205,7 +220,7 @@ export default function Me() {
           }))}
           footer={
             <Link to="/friends?tab=following" className="me-friends-row">
-              <AvatarStack ids={data.following.filter((id) => isFriend(data, id)).slice(0, 4)} size={26} max={4} />
+              <AvatarStack ids={data.following.filter((id) => isFriend(data, id)).slice(0, 4)} size={22} max={4} />
               <span className="grow">
                 <b>{friends}</b> {friends === 1 ? 'friend' : 'friends'} · following {data.following.length}
               </span>
@@ -234,17 +249,25 @@ export default function Me() {
           ]}
         />
 
-        <div id="me-panel" role="tabpanel" aria-labelledby={`me-tab-${tab}`} className="stack stack--lg">
+        <div id="me-panel" role="tabpanel" aria-labelledby={`me-tab-${tab}`} className="stack">
           {tab === 'checkins' ? (
             data.myCheckIns.length ? (
               <>
-                <div className="row row--between">
+                <div className="row row--between checkin-count">
                   <span className="meta strong">
                     {data.myCheckIns.length} {data.myCheckIns.length === 1 ? 'check-in' : 'check-ins'}
                   </span>
                   <ViewToggle value={view} onChange={setView} />
                 </div>
-                {view === 'grid' ? <CheckInGrid items={data.myCheckIns} /> : data.myCheckIns.map((c) => <CheckInCard key={c.id} c={c} />)}
+                {view === 'grid' ? (
+                  <CheckInGrid items={data.myCheckIns} />
+                ) : (
+                  <div className="feed">
+                    {data.myCheckIns.map((c) => (
+                      <CheckInCard key={c.id} c={c} />
+                    ))}
+                  </div>
+                )}
               </>
             ) : (
               <section className="first-checkin" aria-labelledby="first-ci">
@@ -258,8 +281,8 @@ export default function Me() {
                     {t('people.firstCheckin')}
                   </h2>
                   <p className="body-sm muted">{t('people.firstCheckinBody')}</p>
-                  <Link to="/checkin" className="btn btn--primary btn--sm" style={{ alignSelf: 'flex-start' }}>
-                    <PlusGlyph size={14} />
+                  <Link to="/checkin" className="btn btn--primary btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
+                    <PlusGlyph size={13} />
                     Check in
                   </Link>
                 </div>
@@ -270,7 +293,7 @@ export default function Me() {
           {tab === 'want' ? (
             <>
               <div className="row">
-                <DoneRing done={wantDone.length} total={want.length} />
+                <DoneRing done={wantDone.length} total={want.length} size={40} />
                 <div className="stack grow" style={{ gap: 2 }}>
                   <span className="strong">{t('people.doneOf', { done: wantDone.length, total: want.length })}</span>
                   <Link to="/settings/privacy" className="meta row" style={{ gap: 5, textDecoration: 'none' }}>
@@ -280,7 +303,7 @@ export default function Me() {
                 </div>
               </div>
 
-              <form className="card want-add" onSubmit={addItem} aria-label={t('people.addToList')}>
+              <form className="want-add" onSubmit={addItem} aria-label={t('people.addToList')}>
                 <label className="field" style={{ flex: '0 0 auto' }}>
                   <span className="sr-only">{t('people.kind')}</span>
                   <select className="select want-add__kind" value={kind} onChange={(e) => setKind(e.target.value as WantItem['kind'])} aria-label={t('people.kind')}>
@@ -295,7 +318,7 @@ export default function Me() {
                   <span className="sr-only">{t('people.addToList')}</span>
                   <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t('people.addPlaceholder')} maxLength={80} />
                 </label>
-                <button type="submit" className="btn btn--primary" disabled={!title.trim()}>
+                <button type="submit" className="btn btn--primary btn--sm" disabled={!title.trim()}>
                   {t('people.add')}
                 </button>
               </form>
@@ -361,7 +384,7 @@ export default function Me() {
           ) : null}
 
           {tab === 'impact' ? (
-            <section className="card stack" aria-labelledby="impact-title">
+            <section className="stack me-impact-flat" aria-labelledby="impact-title">
               <div className="row row--between">
                 <h2 className="section__title" id="impact-title">
                   {t('me.impact')}

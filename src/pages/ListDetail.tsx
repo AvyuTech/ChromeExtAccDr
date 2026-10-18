@@ -91,7 +91,7 @@ export default function ListDetail() {
         }
       />
       <main className="page page--with-header">
-        <section className="card list-hero" aria-labelledby="list-title">
+        <section className="list-hero" aria-labelledby="list-title">
           <div className={`list-hero__mosaic list-hero__mosaic--${Math.min(Math.max(places.length, 1), 4)} tone-${col.tone}`} aria-hidden="true">
             {places.length ? (
               places.slice(0, 4).map((p) => (
@@ -110,21 +110,21 @@ export default function ListDetail() {
             </span>
           </div>
           <div className="list-hero__content">
-          <h1 className="list-hero__title" id="list-title">
-            {col.title}
-          </h1>
-          {col.description ? <p className="list-hero__body">{col.description}</p> : null}
-          <div className="row row--wrap" style={{ gap: 10 }}>
-            <Link to={own ? '/me' : `/people/${col.ownerId}`} className="list-hero__owner">
-              <Avatar who={{ ...owner, verified: false }} size={26} />
-              {own ? 'Your list' : t('people.by', { name: owner.name })}
-            </Link>
-            <span className="list-hero__meta">{compact(col.followers + (followed ? 1 : 0))} followers</span>
-          </div>
+            <h1 className="list-hero__title" id="list-title">
+              {col.title}
+            </h1>
+            {col.description ? <p className="list-hero__body">{col.description}</p> : null}
+            <div className="row row--wrap" style={{ gap: 10 }}>
+              <Link to={own ? '/me' : `/people/${col.ownerId}`} className="list-hero__owner">
+                <Avatar who={{ ...owner, verified: false }} size={22} />
+                {own ? 'Your list' : t('people.by', { name: owner.name })}
+              </Link>
+              <span className="list-hero__meta">{compact(col.followers + (followed ? 1 : 0))} followers</span>
+            </div>
           </div>
         </section>
 
-        <div className="row row--wrap" style={{ gap: 8 }}>
+        <div className="row row--wrap list-actions" style={{ gap: 6 }}>
           {own ? null : (
             <button
               type="button"
@@ -139,7 +139,7 @@ export default function ListDetail() {
             </button>
           )}
           <button type="button" className="btn btn--soft" onClick={addAll} disabled={places.length === 0}>
-            <WantGlyph size={18} />
+            <WantGlyph size={16} />
             {t('people.addAll')}
           </button>
         </div>
@@ -150,14 +150,14 @@ export default function ListDetail() {
               const c = placeCommunity(p.id, data, settings);
               const note = col.notes?.[p.id];
               return (
-                <li key={p.id} className="card list-place glyph-host">
+                <li key={p.id} className="list-place glyph-host">
                   <Link to={`/place/${p.id}`} className="row grow" style={{ textDecoration: 'none', color: 'inherit', alignItems: 'flex-start', minWidth: 0, gap: 12 }}>
                     <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="list-place__photo">
                       <span className="list-place__num" aria-hidden="true">
                         {i + 1}
                       </span>
                     </Cover>
-                    <span className="stack grow" style={{ gap: 4, minWidth: 0 }}>
+                    <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
                       <span className="list-place__name">{p.name}</span>
                       <span className="meta">
                         {p.kind} · {p.area} · {km(p.distanceKm)}
@@ -167,29 +167,29 @@ export default function ListDetail() {
                           <b>{own ? 'Your note' : owner.name.split(' ')[0]}:</b> {note}
                         </span>
                       ) : null}
-                      <span className="row row--wrap" style={{ gap: 6 }}>
-                        {c.total ? (
-                          <span className="badge badge--sm tone-mint" style={{ gap: 4 }}>
-                            <NamedGlyph name="must" size={12} duo />
-                            {c.mustPct}% must try
-                          </span>
-                        ) : null}
-                        {c.friendIds.length ? (
-                          <span className="badge badge--sm tone-violet">
-                            {c.friendIds.length === 1 ? '1 friend has been' : `${c.friendIds.length} friends have been`}
-                          </span>
-                        ) : null}
-                      </span>
+                      {c.total || c.friendIds.length ? (
+                        <span className="list-place__facts">
+                          {c.total ? (
+                            <span className="row" style={{ gap: 3, color: 'var(--mint-ink)' }}>
+                              <NamedGlyph name="must" size={12} duo />
+                              {c.mustPct}% must try
+                            </span>
+                          ) : null}
+                          {c.friendIds.length ? (
+                            <span style={{ color: 'var(--accent)' }}>{c.friendIds.length === 1 ? '1 friend has been' : `${c.friendIds.length} friends have been`}</span>
+                          ) : null}
+                        </span>
+                      ) : null}
                     </span>
                   </Link>
-                  <span className="stack" style={{ gap: 2 }}>
+                  <span className="stack" style={{ gap: 0 }}>
                     <WantButton item={wantFor(p)} variant="icon" />
                     {own ? (
                       <button
                         type="button"
                         className="icon-btn icon-btn--ghost"
                         aria-label={`${t('people.remove')}: ${p.name}`}
-                        style={{ width: 38, height: 38, color: 'var(--muted)' }}
+                        style={{ width: 32, height: 32, color: 'var(--muted)' }}
                         onClick={() => {
                           save(col.id, { placeIds: col.placeIds.filter((x) => x !== p.id) });
                           toast(`Removed ${p.name}`, {
@@ -198,7 +198,7 @@ export default function ListDetail() {
                           });
                         }}
                       >
-                        <TrashGlyph size={18} />
+                        <TrashGlyph size={17} />
                       </button>
                     ) : null}
                   </span>

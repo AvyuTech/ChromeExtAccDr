@@ -91,7 +91,8 @@ export function TasteMatchPill({ personId }: { personId: string }) {
 }
 
 /* ---------- Follow ---------- */
-export function FollowButton({ personId, size = 'sm' }: { personId: string; size?: 'sm' | 'md' }) {
+/** Follow state for one person and a toggle that says what happened. */
+export function useFollow(personId: string) {
   const { data, toggle } = useAppData();
   const toast = useToast();
   const following = data.following.includes(personId);
@@ -99,16 +100,17 @@ export function FollowButton({ personId, size = 'sm' }: { personId: string; size
   const followsMe = profileInfo(personId).followsMe;
   const name = person(personId).name.split(' ')[0];
   const label = following ? (friend ? 'Friends' : 'Following') : followsMe ? 'Follow back' : 'Follow';
+  const flip = () => {
+    const on = toggle('following', personId);
+    toast(on ? `You're following ${name}` : `Unfollowed ${name}`);
+  };
+  return { following, friend, label, flip };
+}
+
+export function FollowButton({ personId, size = 'sm' }: { personId: string; size?: 'sm' | 'md' }) {
+  const { following, friend, label, flip } = useFollow(personId);
   return (
-    <button
-      type="button"
-      className={`btn ${size === 'sm' ? 'btn--sm' : ''} ${following ? 'btn--secondary' : 'btn--primary'}`}
-      aria-pressed={following}
-      onClick={() => {
-        const on = toggle('following', personId);
-        toast(on ? `You're following ${name}` : `Unfollowed ${name}`);
-      }}
-    >
+    <button type="button" className={`btn ${size === 'sm' ? 'btn--sm' : ''} ${following ? 'btn--secondary' : 'btn--primary'}`} aria-pressed={following} onClick={flip}>
       {friend ? <CheckGlyph size={14} /> : null}
       {label}
     </button>
@@ -134,8 +136,8 @@ export function WantButton({ item, variant = 'chip' }: { item: WantItem; variant
   };
   if (variant === 'icon') {
     return (
-      <button type="button" className="icon-btn icon-btn--ghost" aria-pressed={on} aria-label={on ? 'On your Want to try list' : 'Add to Want to try'} onClick={click} style={{ width: 38, height: 38, color: on ? 'var(--accent)' : 'var(--muted)' }}>
-        <WantGlyph size={18} active={on} />
+      <button type="button" className="icon-btn icon-btn--ghost" aria-pressed={on} aria-label={on ? 'On your Want to try list' : 'Add to Want to try'} onClick={click} style={{ width: 32, height: 32, color: on ? 'var(--accent)' : 'var(--ink)' }}>
+        <WantGlyph size={19} active={on} />
       </button>
     );
   }
@@ -150,6 +152,7 @@ export function WantButton({ item, variant = 'chip' }: { item: WantItem; variant
 /* ---------- Check-in card ---------- */
 export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { c: CheckIn; showPlace?: boolean; footer?: ReactNode; layout?: 'card' | 'hero' }) {
   const navigate = useNavigate();
+  const { settings } = useSettings();
   const { data, has, toggle } = useAppData();
   const author = person(c.authorId);
   const place = c.placeId ? placeById(c.placeId) : undefined;
@@ -167,6 +170,7 @@ export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { 
   const profile = c.authorId === 'me' ? '/me' : `/people/${c.authorId}`;
   const spend = c.spend === undefined ? undefined : c.spend === 0 ? 'Free' : `~${rupees(c.spend)} pp`;
   const facts = [
+    place?.origin.outsideCity ? `Outside ${settings.location.city}` : undefined,
     c.invited ? 'Invited · not counted' : undefined,
     spend,
     c.withIds?.length ? `With ${c.withIds.map((w) => person(w).name.split(' ')[0]).join(', ')}` : undefined,
@@ -304,13 +308,7 @@ export function CheckInGrid({ items }: { items: CheckIn[] }) {
               </span>
             )}
             <span className={`checkin-tile__verdict tone-${meta.tone}`} aria-hidden="true">
-              <NamedGlyph name={meta.glyph} size={15} duo />
-            </span>
-            <span className="checkin-tile__text" aria-hidden="true">
-              <b>{c.items[0] ?? c.placeName}</b>
-              <small>
-                {c.placeName} · {c.ago}
-              </small>
+              <NamedGlyph name={meta.glyph} size={12} duo />
             </span>
           </Link>
         );
@@ -370,7 +368,7 @@ export function PersonRow({ personId, meta }: { personId: string; meta?: ReactNo
   return (
     <div className="list-row">
       <Link to={`/people/${personId}`} className="row grow" style={{ textDecoration: 'none', color: 'inherit', minWidth: 0 }}>
-        <Avatar who={p} size={44} />
+        <Avatar who={p} size={40} />
         <span className="list-row__body">
           <span className="list-row__title">{p.name}</span>
           <span className="list-row__meta">{meta ?? `@${info.handle} · ${info.checkIns} check-ins`}</span>
@@ -386,11 +384,11 @@ export function PersonCard({ personId, reason, cover }: { personId: string; reas
   const p = person(personId);
   const info = profileInfo(personId);
   return (
-    <article className="card person-card">
+    <article className="person-card">
       <Link to={`/people/${personId}`} className="person-card__link" aria-label={`${p.name}, ${reason}`}>
         <span className="person-card__cover">{cover ? <img src={cover} alt="" loading="lazy" decoding="async" /> : null}</span>
         <span className="person-card__avatar">
-          <Avatar who={p} size={60} />
+          <Avatar who={p} size={52} />
         </span>
         <span className="person-card__name">{p.name}</span>
         <span className="meta person-card__handle">@{info.handle}</span>
@@ -406,7 +404,7 @@ export function CollectionCard({ col }: { col: Collection }) {
   const owner = person(col.ownerId);
   const places = col.placeIds.map((id) => placeById(id)).filter(Boolean);
   return (
-    <Link to={`/lists/${col.id}`} className="card collection-card glyph-host">
+    <Link to={`/lists/${col.id}`} className="collection-card glyph-host">
       <span className={`collection-card__mosaic collection-card__mosaic--${Math.min(places.length, 3)}`} aria-hidden="true">
         {places.slice(0, 3).map((p) => (
           <span key={p!.id} className={`tone-${p!.tone}`}>
@@ -416,9 +414,9 @@ export function CollectionCard({ col }: { col: Collection }) {
       </span>
       <span className="collection-card__body">
         <span className="photo-card__title">{col.title}</span>
-        <span className="row" style={{ gap: 8 }}>
-          <Avatar who={{ ...owner, verified: false }} size={22} />
-          <span className="meta">
+        <span className="row" style={{ gap: 6 }}>
+          <Avatar who={{ ...owner, verified: false }} size={18} />
+          <span className="meta truncate">
             {col.ownerId === 'me' ? 'You' : owner.name.split(' ')[0]} · {places.length} places · {compact(col.followers)} followers
           </span>
         </span>

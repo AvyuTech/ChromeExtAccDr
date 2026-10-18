@@ -59,7 +59,10 @@ const COVER: Record<string, string> = {
 
 export const coverPhoto = (personId: string) => photo(COVER[personId] ?? '') ?? scenePhoto('sunset-friends');
 
-/** Cover photo, overlapping avatar, name, badges, bio, actions and a stat row. */
+/**
+ * Profile top, Instagram style: a full-bleed cover, the avatar overlapping it with
+ * the stats beside it, then name, badges, bio and full-width actions. No card.
+ */
 export function ProfileHero({
   who,
   label,
@@ -86,39 +89,75 @@ export function ProfileHero({
   footer?: ReactNode;
 }) {
   return (
-    <section className="card profile-hero" aria-label={label}>
+    <section className="profile-hero" aria-label={label}>
       <div className="profile-hero__cover">
         <img src={coverPhoto(who.id)} alt="" />
         {place ? (
           <span className="photo-pill profile-hero__place">
-            <PinGlyph size={13} />
+            <PinGlyph size={12} />
             {place}
           </span>
         ) : null}
       </div>
       <div className="profile-hero__top">
         <span className="profile-hero__avatar">
-          <Avatar who={{ ...who, verified: false }} size={84} />
+          <Avatar who={{ ...who, verified: false }} size={76} />
           {online ? <span className="profile-hero__online" aria-hidden="true" /> : null}
         </span>
-        <div className="profile-hero__actions">{actions}</div>
+        <dl className="profile-hero__stats">
+          {stats.map((st) => (
+            <div key={st.label} className="profile-hero__stat">
+              <dt>{st.label}</dt>
+              <dd className="num">{st.value}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
       <div className="profile-hero__body">
         <h2 className="profile-hero__name">{name}</h2>
-        <span className="meta">{sub}</span>
-        {badges ? <div className="row row--wrap profile-hero__badges">{badges}</div> : null}
+        <span className="profile-hero__sub">{sub}</span>
         {bio ? <p className="profile-hero__bio">{bio}</p> : null}
+        {badges ? <div className="profile-hero__badges">{badges}</div> : null}
       </div>
-      <dl className="profile-hero__stats">
-        {stats.map((st) => (
-          <div key={st.label} className="profile-hero__stat">
-            <dt>{st.label}</dt>
-            <dd className="num">{st.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="profile-hero__actions">{actions}</div>
       {footer}
     </section>
+  );
+}
+
+/** One round outline icon with a small label under it, for the profile action row. */
+export function ProfileAction({
+  label,
+  children,
+  to,
+  onClick,
+  pressed,
+  primary,
+  ariaLabel,
+}: {
+  label: string;
+  children: ReactNode;
+  to?: string;
+  onClick?: () => void;
+  pressed?: boolean;
+  primary?: boolean;
+  ariaLabel?: string;
+}) {
+  const cls = `profile-action${primary ? ' profile-action--primary' : ''}`;
+  const inner = (
+    <>
+      <span className="profile-action__icon">{children}</span>
+      <span className="profile-action__label">{label}</span>
+    </>
+  );
+  return to ? (
+    <Link to={to} className={cls} aria-label={ariaLabel}>
+      {inner}
+    </Link>
+  ) : (
+    <button type="button" className={cls} onClick={onClick} aria-pressed={pressed} aria-label={ariaLabel}>
+      {inner}
+    </button>
   );
 }
 
@@ -127,17 +166,23 @@ export function ViewToggle({ value, onChange }: { value: 'grid' | 'list'; onChan
   return (
     <div className="view-toggle" role="radiogroup" aria-label="Layout">
       <button type="button" role="radio" aria-checked={value === 'grid'} aria-label="Photo grid" onClick={() => onChange('grid')}>
-        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-          <rect x="2" y="2" width="6" height="6" rx="1.8" fill="currentColor" />
-          <rect x="10" y="2" width="6" height="6" rx="1.8" fill="currentColor" />
-          <rect x="2" y="10" width="6" height="6" rx="1.8" fill="currentColor" />
-          <rect x="10" y="10" width="6" height="6" rx="1.8" fill="currentColor" />
+        <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="4.4" height="4.4" rx="1" fill="currentColor" />
+          <rect x="6.8" y="1.5" width="4.4" height="4.4" rx="1" fill="currentColor" />
+          <rect x="12.1" y="1.5" width="4.4" height="4.4" rx="1" fill="currentColor" />
+          <rect x="1.5" y="6.8" width="4.4" height="4.4" rx="1" fill="currentColor" />
+          <rect x="6.8" y="6.8" width="4.4" height="4.4" rx="1" fill="currentColor" />
+          <rect x="12.1" y="6.8" width="4.4" height="4.4" rx="1" fill="currentColor" />
+          <rect x="1.5" y="12.1" width="4.4" height="4.4" rx="1" fill="currentColor" />
+          <rect x="6.8" y="12.1" width="4.4" height="4.4" rx="1" fill="currentColor" />
+          <rect x="12.1" y="12.1" width="4.4" height="4.4" rx="1" fill="currentColor" />
         </svg>
       </button>
-      <button type="button" role="radio" aria-checked={value === 'list'} aria-label="Full cards" onClick={() => onChange('list')}>
-        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-          <rect x="2" y="2" width="14" height="8" rx="2" fill="currentColor" />
-          <rect x="2" y="12" width="14" height="4" rx="1.6" fill="currentColor" opacity=".55" />
+      <button type="button" role="radio" aria-checked={value === 'list'} aria-label="Full posts" onClick={() => onChange('list')}>
+        <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="15" height="9.5" rx="1.6" fill="currentColor" />
+          <rect x="1.5" y="13" width="15" height="1.8" rx=".9" fill="currentColor" opacity=".6" />
+          <rect x="1.5" y="16" width="9" height="1.5" rx=".75" fill="currentColor" opacity=".4" />
         </svg>
       </button>
     </div>
@@ -226,8 +271,8 @@ export function WantRow({
         ) : null}
       </span>
       {mode === 'mine' ? (
-        <button type="button" className="icon-btn icon-btn--ghost" aria-label={`${t('people.remove')}: ${item.title}`} onClick={onRemove} style={{ width: 40, height: 40, color: 'var(--muted)' }}>
-          <TrashGlyph size={18} />
+        <button type="button" className="icon-btn icon-btn--ghost" aria-label={`${t('people.remove')}: ${item.title}`} onClick={onRemove} style={{ width: 32, height: 32, color: 'var(--muted)' }}>
+          <TrashGlyph size={17} />
         </button>
       ) : item.done ? null : (
         <WantButton item={{ ...item, id: `copy-${item.id}`, done: false, doneAgo: undefined }} variant="icon" />
@@ -251,9 +296,9 @@ export function PlanCard({ personId, items }: { personId: string; items: WantIte
     <div className="plan-together">
       <span className="plan-together__media">
         <Cover src={wantPhoto(items[0])} glyph={target.glyph} tone={target.tone} className="plan-together__photo" />
-        <AvatarStack ids={['me', personId]} size={26} />
+        <AvatarStack ids={['me', personId]} size={22} />
       </span>
-      <p className="body-sm grow">
+      <p className="plan-together__text">
         You and <b>{first}</b> both want to try <b>{text}</b>.
       </p>
       <Link to={chatLink(personId, `Want to do ${text} together this weekend?`)} className="btn btn--sm btn--primary">
@@ -278,7 +323,7 @@ export function TabStrip<T extends string>({
   idPrefix: string;
 }) {
   return (
-    <div className="tabs" role="tablist" aria-label={label}>
+    <div className="tabs people-tabs" role="tablist" aria-label={label}>
       {tabs.map((x) => (
         <button
           key={x.id}

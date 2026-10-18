@@ -23,7 +23,7 @@ function SavedPlace({ place }: { place: Place }) {
   const toast = useToast();
   const c = placeCommunity(place.id, data, settings);
   return (
-    <article className="card saved-place">
+    <article className="saved-place">
       <Link to={`/place/${place.id}`} className="saved-place__link">
         <Cover src={placePhoto(place.id)} glyph={place.glyph} tone={place.tone} className="saved-place__photo" />
         <span className="saved-place__body">
@@ -32,8 +32,8 @@ function SavedPlace({ place }: { place: Place }) {
             {place.kind} · {km(place.distanceKm)}
           </span>
           {c.friendIds.length ? (
-            <span className="row" style={{ gap: 6 }}>
-              <FaceStack ids={c.friendIds} size={20} />
+            <span className="row" style={{ gap: 5 }}>
+              <FaceStack ids={c.friendIds} size={16} />
               <span className="meta" style={{ color: 'var(--accent)', fontWeight: 700 }}>
                 {c.friendIds.length === 1 ? '1 friend' : `${c.friendIds.length} friends`}
               </span>
@@ -49,7 +49,7 @@ function SavedPlace({ place }: { place: Place }) {
       <button
         type="button"
         className="photo-action"
-        style={{ top: 8, right: 8, width: 36, height: 36 }}
+        style={{ top: 6, right: 6, width: 30, height: 30 }}
         aria-pressed="true"
         aria-label={`Remove ${place.name} from saved`}
         onClick={() => {
@@ -57,7 +57,7 @@ function SavedPlace({ place }: { place: Place }) {
           toast('Removed from saved', { label: 'Undo', onClick: () => toggle('savedPlaces', place.id) });
         }}
       >
-        <SaveGlyph size={18} active />
+        <SaveGlyph size={16} active />
       </button>
     </article>
   );
@@ -101,7 +101,7 @@ export default function Saved() {
           </span>
         </section>
 
-        <div className="tabs" role="tablist" aria-label={t('me.saved')}>
+        <div className="tabs people-tabs" role="tablist" aria-label={t('me.saved')}>
           {tabs.map((x) => (
             <button key={x.id} id={`saved-tab-${x.id}`} type="button" role="tab" className="tab" aria-selected={tab === x.id} aria-controls="saved-panel" onClick={() => setTab(x.id)}>
               {t(x.key)} <span className="muted">{x.n}</span>
@@ -131,7 +131,11 @@ export default function Saved() {
             ))}
           {tab === 'events' &&
             (events.length ? (
-              events.map((e) => <EventRow key={e.id} event={e} />)
+              <div>
+                {events.map((e) => (
+                  <EventRow key={e.id} event={e} />
+                ))}
+              </div>
             ) : (
               <EmptyState
                 glyph="events"
@@ -165,7 +169,11 @@ export default function Saved() {
             ))}
           {tab === 'posts' &&
             (posts.length ? (
-              posts.map((p) => <PostCard key={p.id} post={p} />)
+              <div className="feed">
+                {posts.map((p) => (
+                  <PostCard key={p.id} post={p} />
+                ))}
+              </div>
             ) : (
               <EmptyState
                 glyph="question"

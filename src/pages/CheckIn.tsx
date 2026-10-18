@@ -1,23 +1,40 @@
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { eventPhoto, placePhoto } from '../assets/photos';
 import { Avatar, Cover } from '../components/cards';
 import { VerdictPicker } from '../components/checkin';
 import { Segmented, Sheet, Switch } from '../components/ui';
-import { neighbourhoodName, person } from '../data/core';
+import { NEIGHBOURHOODS, neighbourhoodName, person } from '../data/core';
 import { EVENTS, eventById } from '../data/events';
 import { CHECKIN_TAGS, SPEND_BANDS } from '../data/friends';
 import { PLACES, placeById } from '../data/places';
-import type { CheckInKind, CityEvent, EventCategory, Place, Verdict } from '../data/types';
+import type { CheckInKind, CityEvent, EventCategory, Place, PlaceCategory, SpottedPlace, Tone, Verdict } from '../data/types';
 import { useT } from '../i18n';
-import { CameraGlyph, CheckGlyph, ChevronDownGlyph, CloseGlyph, ImageGlyph, NamedGlyph, PinGlyph, PlusGlyph, SearchGlyph, ShieldGlyph } from '../icons';
+import { CameraGlyph, CheckGlyph, ChevronDownGlyph, CloseGlyph, ImageGlyph, NamedGlyph, PinGlyph, PlusGlyph, SearchGlyph, ShieldGlyph, type GlyphName } from '../icons';
 import { km, rupees } from '../lib/format';
 import { itemsFor } from '../lib/friends';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 
-type Target = { type: 'place'; place: Place } | { type: 'event'; event: CityEvent } | { type: 'custom'; name: string };
+type Target =
+  | { type: 'place'; place: Place }
+  | { type: 'event'; event: CityEvent }
+  /** A place that isn't listed; `area` and `kindLabel` are set when someone just added it. */
+  | { type: 'custom'; name: string; area?: string; kindLabel?: string };
+
+/** What a newly added place can be. Food kinds switch the check-in to "Ate or drank". */
+const SPOT_KINDS: Array<{ id: string; label: string; category: PlaceCategory; glyph: GlyphName; tone: Tone; food: boolean }> = [
+  { id: 'cafe', label: 'Café', category: 'cafe', glyph: 'cafe', tone: 'peach', food: true },
+  { id: 'restaurant', label: 'Restaurant', category: 'food', glyph: 'food', tone: 'amber', food: true },
+  { id: 'street', label: 'Street food', category: 'food', glyph: 'food', tone: 'yellow', food: true },
+  { id: 'bakery', label: 'Bakery', category: 'cafe', glyph: 'cafe', tone: 'clay', food: true },
+  { id: 'park', label: 'Park or lake', category: 'nature', glyph: 'nature', tone: 'mint', food: false },
+  { id: 'class', label: 'Class or studio', category: 'culture', glyph: 'pottery', tone: 'violet', food: false },
+  { id: 'sport', label: 'Sports', category: 'sports', glyph: 'sports', tone: 'teal', food: false },
+  { id: 'shop', label: 'Shop or market', category: 'shopping', glyph: 'shopping', tone: 'blue', food: false },
+];
+const NEEDED_TO_LIST = 3;
 
 const isFood = (p: Place) => p.category === 'food' || p.category === 'cafe';
 
@@ -61,7 +78,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
   const navigate = useNavigate();
   const toast = useToast();
   const { settings } = useSettings();
-  const { data, addCheckIn, setWantDone } = useAppData();
+  const { data, addCheckIn, setWantDone, addSpot } = useAppData();
 
   const preset = initialTarget(params);
   const [kind, setKind] = useState<CheckInKind>(() => {
@@ -85,6 +102,13 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
   const [audience, setAudience] = useState<'friends' | 'everyone'>(settings.privacy.checkInAudience);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const verifyAttempt = useRef(0);
+
+  // Add a new place (people add places; businesses can't list themselves)
+  const [addOpen, setAddOpen] = useState(false);
+  const [spotName, setSpotName] = useState('');
+  const [spotKind, setSpotKind] = useState('cafe');
+  const [spotArea, setSpotArea] = useState(settings.location.home);
+  const [spotNote, setSpotNote] = useState('');
 
   useEffect(() => () => (photo ? URL.revokeObjectURL(photo) : undefined), [photo]);
 
@@ -177,6 +201,44 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
     setPhoto(URL.createObjectURL(f));
   };
 
+  const openAdd = (name = '') => {
+    setSpotName(name);
+    setSpotKind(kind === 'ate' ? 'cafe' : 'park');
+    setSpotArea(settings.location.home);
+    setSpotNote('');
+    setAddOpen(true);
+  };
+
+  const saveSpot = (e: FormEvent) => {
+    e.preventDefault();
+    const name = spotName.trim();
+    if (!name) return;
+    const k = SPOT_KINDS.find((x) => x.id === spotKind) ?? SPOT_KINDS[0];
+    const spot: SpottedPlace = {
+      id: `spot-${Date.now()}`,
+      name,
+      kind: k.label,
+      category: k.category,
+      area: neighbourhoodName(spotArea),
+      spottedBy: 'me',
+      ago: 'Just now',
+      note: spotNote.trim(),
+      confirmedBy: ['me'],
+      needed: NEEDED_TO_LIST,
+      glyph: k.glyph,
+      tone: k.tone,
+    };
+    addSpot(spot);
+    const nextKind: CheckInKind = k.food ? 'ate' : 'did';
+    if (nextKind !== kind) {
+      setKind(nextKind);
+      if (nextKind === 'ate' && spend === 0) setSpend(undefined);
+    }
+    pick({ type: 'custom', name, area: spot.area, kindLabel: k.label });
+    setAddOpen(false);
+    toast(t('checkin.spot.added', { name, n: spot.needed - spot.confirmedBy.length }));
+  };
+
   const leave = () => (window.history.length > 1 ? navigate(-1) : navigate('/'));
 
   const share = () => {
@@ -185,7 +247,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
     const placeId = target.type === 'place' ? target.place.id : undefined;
     const eventId = target.type === 'event' ? target.event.id : undefined;
     const placeName = target.type === 'place' ? target.place.name : target.type === 'event' ? target.event.title : target.name;
-    const area = target.type === 'place' ? target.place.area : target.type === 'event' ? target.event.area : neighbourhoodName(settings.location.home);
+    const area = target.type === 'place' ? target.place.area : target.type === 'event' ? target.event.area : (target.area ?? neighbourhoodName(settings.location.home));
     addCheckIn({
       id,
       authorId: 'me',
@@ -256,7 +318,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
         <section className="section" aria-labelledby="ci-where">
           {stepHead(1, 'ci-where', t('checkin.where'), !!target)}
           {target ? (
-            <div className="checkin-target card card--tight">
+            <div className="checkin-target">
               {target.type === 'place' ? (
                 <Cover src={placePhoto(target.place.id)} glyph={target.place.glyph} tone={target.place.tone} className="checkin-target__photo" />
               ) : target.type === 'event' ? (
@@ -267,7 +329,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
                 </span>
               )}
               <span className="stack grow" style={{ gap: 2, minWidth: 0 }}>
-                <span className="strong" style={{ fontSize: '0.96875rem' }}>
+                <span className="strong" style={{ fontSize: '0.90625rem' }}>
                   {target.type === 'place' ? target.place.name : target.type === 'event' ? target.event.title : target.name}
                 </span>
                 <span className="meta">
@@ -275,7 +337,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
                     ? `${target.place.kind} · ${target.place.area} · ${km(target.place.distanceKm)}`
                     : target.type === 'event'
                       ? `${target.event.day}, ${target.event.time} · ${target.event.area}`
-                      : `${t('checkin.newPlace')} · ${neighbourhoodName(settings.location.home)}`}
+                      : `${target.kindLabel ?? t('checkin.newPlace')} · ${target.area ?? neighbourhoodName(settings.location.home)}${target.kindLabel ? ` · ${t('checkin.spot.pending')}` : ''}`}
                 </span>
               </span>
               <button
@@ -325,6 +387,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
 
               {q ? (
                 <div className="list">
+                  {results.length === 0 ? <p className="meta checkin-noresults">{t('checkin.noResults', { q: query.trim() })}</p> : null}
                   {results.map((p) => (
                     <button key={p.id} type="button" className="list-row" onClick={() => pick({ type: 'place', place: p })}>
                       <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="checkin-result__photo" />
@@ -336,12 +399,13 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
                       </span>
                     </button>
                   ))}
-                  <button type="button" className="list-row" onClick={() => pick({ type: 'custom', name: query.trim() })}>
+                  <button type="button" className="list-row" onClick={() => openAdd(query.trim())}>
                     <span className="tile tone-violet">
                       <PlusGlyph size={18} />
                     </span>
                     <span className="list-row__body">
                       <span className="list-row__title">{t('checkin.notListed', { q: query.trim() })}</span>
+                      <span className="list-row__meta">{t('checkin.spot.hint')}</span>
                     </span>
                   </button>
                 </div>
@@ -359,6 +423,9 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
                       </button>
                     ))}
                   </div>
+                  <button type="button" className="checkin-addlink" onClick={() => openAdd()}>
+                    {t('checkin.cantFind')}
+                  </button>
                   {kind === 'did' && weekendEvents.length ? (
                     <>
                       <span className="eyebrow muted">{t('checkin.thisWeekend')}</span>
@@ -440,9 +507,9 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
             <div className="photo-preview">
               <img src={photo} alt="Your photo" />
               {items.length ? (
-                <span className="checkin-card__items" aria-hidden="true">
+                <span className="feed-post__tags photo-preview__tags" aria-hidden="true">
                   {items.map((i) => (
-                    <span key={i} className="checkin-card__item">
+                    <span key={i} className="feed-post__tag">
                       {i}
                     </span>
                   ))}
@@ -465,7 +532,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
             <div className="photo-drop">
               <label className="photo-drop__option photo-drop__option--main">
                 <span className="photo-drop__icon">
-                  <CameraGlyph size={24} />
+                  <CameraGlyph size={20} />
                 </span>
                 <span className="strong">{t('checkin.takePhoto')}</span>
                 <span className="meta">{t('checkin.photoWhy')}</span>
@@ -473,7 +540,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
               </label>
               <label className="photo-drop__option">
                 <span className="photo-drop__icon">
-                  <ImageGlyph size={22} />
+                  <ImageGlyph size={19} />
                 </span>
                 <span className="strong">{t('checkin.choosePhoto')}</span>
                 <input type="file" accept="image/*" className="sr-only" onChange={onPhoto} />
@@ -484,7 +551,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
         </section>
 
         {/* Optional details */}
-        <section className="card checkin-details">
+        <section className="checkin-details">
           <button type="button" className="details-toggle" aria-expanded={detailsOpen} aria-controls="ci-details" onClick={() => setDetailsOpen((v) => !v)}>
             <span className="strong">{t('checkin.details')}</span>
             <span className="meta">{t('checkin.optional')}</span>
@@ -614,10 +681,71 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
           </span>
           <span className="meta strong">{ready ? t('checkin.ready') : t('checkin.progress', { n: done })}</span>
         </div>
-        <button type="button" className="btn btn--primary btn--lg" disabled={!ready} onClick={share}>
+        <button type="button" className="btn btn--primary" disabled={!ready} onClick={share}>
           {t('checkin.share')}
         </button>
       </div>
+
+      <Sheet open={addOpen} onClose={() => setAddOpen(false)} title={t('checkin.spot.title')}>
+        <form className="stack spot-form" onSubmit={saveSpot}>
+          <label className="field">
+            <span className="field__label">{t('checkin.spot.name')}</span>
+            <input
+              className="input"
+              value={spotName}
+              onChange={(e) => setSpotName(e.target.value)}
+              placeholder={t('checkin.spot.namePh')}
+              maxLength={60}
+              autoComplete="off"
+              required
+            />
+          </label>
+          <div className="field">
+            <span className="field__label" id="spot-kind">
+              {t('checkin.spot.kind')}
+            </span>
+            <div className="chip-wrap" role="group" aria-labelledby="spot-kind">
+              {SPOT_KINDS.map((k) => (
+                <button key={k.id} type="button" className="chip chip--accent" aria-pressed={spotKind === k.id} onClick={() => setSpotKind(k.id)}>
+                  <NamedGlyph name={k.glyph} size={15} />
+                  {k.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <label className="field">
+            <span className="field__label">{t('checkin.spot.area')}</span>
+            <select className="select" value={spotArea} onChange={(e) => setSpotArea(e.target.value)}>
+              {NEIGHBOURHOODS.map((n) => (
+                <option key={n.id} value={n.id}>
+                  {n.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span className="field__label">
+              {t('checkin.spot.note')} <span className="muted">· {t('checkin.optional')}</span>
+            </span>
+            <input className="input" value={spotNote} onChange={(e) => setSpotNote(e.target.value)} placeholder={t('checkin.spot.notePh')} maxLength={140} />
+          </label>
+          <label className="spot-photo">
+            {photo ? <img src={photo} alt="" /> : <CameraGlyph size={20} />}
+            <span className="stack" style={{ gap: 1 }}>
+              <span className="strong">{photo ? t('checkin.retake') : t('checkin.spot.photo')}</span>
+              <span className="meta">{t('checkin.spot.photoWhy')}</span>
+            </span>
+            <input type="file" accept="image/*" className="sr-only" onChange={onPhoto} />
+          </label>
+          <p className="spot-rule">
+            <ShieldGlyph size={14} />
+            {t('checkin.spot.rule')}
+          </p>
+          <button type="submit" className="btn btn--primary btn--block" disabled={!spotName.trim()}>
+            {t('checkin.spot.save')}
+          </button>
+        </form>
+      </Sheet>
 
       <Sheet open={confirmDiscard} onClose={() => setConfirmDiscard(false)} title={t('checkin.discardTitle')}>
         <p className="body-sm muted">{t('checkin.discardBody')}</p>

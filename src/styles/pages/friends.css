@@ -52,7 +52,7 @@
   align-items: center;
 }
 .avatar-stack > .avatar {
-  border: 2px solid var(--surface);
+  border: 2px solid var(--ground);
   margin-left: -8px;
 }
 .avatar-stack > .avatar:first-child {
@@ -63,57 +63,6 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--muted);
-}
-
-/* Check-in card */
-.checkin-card {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.checkin-card__plate {
-  position: relative;
-  display: block;
-  width: 100%;
-  min-height: 92px;
-  padding: 0;
-  border: none;
-  border-radius: 20px;
-  overflow: hidden;
-  background: var(--tone-bg);
-  color: var(--tone-ink);
-  text-align: left;
-}
-.checkin-card__photo {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-}
-.checkin-card__glyph {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 112px;
-}
-.checkin-card__items {
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  min-width: 0;
-}
-.checkin-card__item {
-  padding: 6px 11px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
-  color: #1d2330;
-  font-size: 0.8125rem;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(29, 35, 48, 0.14);
 }
 
 /* Friends strip */
@@ -200,22 +149,24 @@
   font-weight: 600;
 }
 
-/* Curated list card */
+/* Curated list tile: photo mosaic is the tile, title and owner under it */
 .collection-card {
   display: flex;
   flex-direction: column;
-  width: 236px;
+  gap: 8px;
+  width: 210px;
   flex-shrink: 0;
-  padding: 0;
-  overflow: hidden;
+  min-width: 0;
   text-decoration: none;
   color: inherit;
 }
 .collection-card__mosaic {
   display: grid;
-  gap: 3px;
-  height: 128px;
-  background: var(--surface);
+  gap: 2px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ground);
 }
 .collection-card__mosaic--1 {
   grid-template-columns: 1fr;
@@ -249,8 +200,9 @@
 .collection-card__body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 14px 16px 16px;
+  gap: 3px;
+  padding: 0 2px;
+  min-width: 0;
 }
 
 /* Create sheet: Quick check-in hero */
@@ -277,78 +229,25 @@
   color: #ffffff;
 }
 
-.checkin-card__link {
-  color: var(--ink);
-  text-decoration: none;
-}
-.checkin-card__link:hover,
-.checkin-card__link:focus-visible {
-  text-decoration: underline;
-}
-
-/* Check-in detail: big photo first */
-.checkin-card--hero {
-  padding: 0;
-  overflow: hidden;
-  gap: 14px;
-}
-.checkin-card--hero > :not(.checkin-card__plate) {
-  margin: 0 16px;
-}
-.checkin-card--hero > :last-child {
-  margin-bottom: 10px;
-}
-.checkin-card--hero .checkin-card__plate {
-  border-radius: 0;
-}
-.checkin-card--hero .checkin-card__photo {
-  aspect-ratio: 4 / 3.4;
-}
-.checkin-card--hero .checkin-card__glyph {
-  height: 220px;
-}
-.checkin-card--hero .checkin-card__items {
-  left: 14px;
-  right: 14px;
-  bottom: 14px;
-}
-.checkin-card__verdict {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-}
-.checkin-card__verdict .badge {
-  padding: 7px 12px;
-  box-shadow: 0 2px 10px rgba(29, 35, 48, 0.16);
-}
-.checkin-card__note {
-  font-family: var(--font-display);
-  font-size: 1.0625rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.45;
-}
-
-/* Photo grid of check-ins */
+/* Photo grid of check-ins: three columns, edge to edge, 2px gaps */
 .checkin-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+  margin: 0 calc(var(--gutter) * -1);
 }
 .checkin-tile {
   position: relative;
   display: block;
-  aspect-ratio: 1 / 1.08;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: 20px;
   background: var(--tone-bg);
-  color: #ffffff;
+  color: var(--tone-ink);
   text-decoration: none;
   isolation: isolate;
-  transition: transform 0.15s ease;
 }
 .checkin-tile:active {
-  transform: scale(0.97);
+  opacity: 0.85;
 }
 .checkin-tile > img {
   position: absolute;
@@ -358,88 +257,55 @@
   object-fit: cover;
   z-index: -2;
 }
-.checkin-tile::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(180deg, rgba(10, 12, 18, 0) 45%, rgba(10, 12, 18, 0.72) 100%);
-}
 .checkin-tile__glyph {
   position: absolute;
-  inset: 0 0 30% 0;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--tone-ink);
   z-index: -1;
 }
 .checkin-tile__verdict {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 11px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: var(--tone-bg);
   color: var(--tone-ink);
-  box-shadow: 0 2px 8px rgba(10, 12, 18, 0.2);
-}
-.checkin-tile__text {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 11px;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-}
-.checkin-tile__text b {
-  font-family: var(--font-display);
-  font-size: 0.9375rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.checkin-tile__text small {
-  font-size: 0.71875rem;
-  font-weight: 600;
-  opacity: 0.88;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(10, 12, 18, 0.25);
 }
 
 /* Small photo thumbs in check-in rows */
 .checkin-row__thumb {
   width: 44px;
   height: 44px;
-  border-radius: 13px;
+  border-radius: 10px;
 }
 
-/* Suggested people */
+/* Suggested people: cover, face and follow, no box */
 .person-card {
   flex-shrink: 0;
-  width: 172px;
+  width: 140px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 0 0 14px;
-  overflow: hidden;
+  gap: 8px;
   text-align: center;
+}
+.person-card .btn {
+  width: 100%;
+  border-radius: 10px;
 }
 .person-card__link {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   width: 100%;
   color: inherit;
   text-decoration: none;
@@ -447,7 +313,9 @@
 .person-card__cover {
   display: block;
   width: 100%;
-  height: 72px;
+  height: 76px;
+  border-radius: 12px;
+  overflow: hidden;
   background: var(--accent-tint);
 }
 .person-card__cover img {
@@ -457,25 +325,24 @@
   object-fit: cover;
 }
 .person-card__avatar {
-  margin-top: -32px;
-  margin-bottom: 6px;
+  margin-top: -28px;
+  margin-bottom: 4px;
   border-radius: 50%;
-  box-shadow: 0 0 0 3px var(--surface);
+  box-shadow: 0 0 0 3px var(--ground);
 }
 .person-card__name {
   font-family: var(--font-display);
-  font-size: 0.96875rem;
+  font-size: 0.875rem;
   font-weight: 800;
   letter-spacing: -0.015em;
 }
 .person-card__handle {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
 }
 .person-card__reason {
-  margin-top: 6px;
-  padding: 0 12px;
+  margin-top: 4px;
   min-height: 2.6em;
-  font-size: 0.78125rem;
+  font-size: 0.71875rem;
   font-weight: 600;
   line-height: 1.3;
   color: var(--accent-strong);
@@ -488,19 +355,19 @@
 .plan-card__media {
   position: relative;
   flex-shrink: 0;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
 }
 .plan-card__photo {
-  width: 52px;
-  height: 52px;
-  border-radius: 15px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
 }
 .plan-card__media > .avatar {
   position: absolute;
   right: -6px;
   bottom: -6px;
-  box-shadow: 0 0 0 2px var(--surface);
+  box-shadow: 0 0 0 2px var(--ground);
 }
 .plan-card .list {
   box-shadow: none;

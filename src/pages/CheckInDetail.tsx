@@ -52,7 +52,7 @@ export default function CheckInDetail() {
       <>
         <PageHeader title={t('checkin.detail')} />
         <main className="page page--with-header">
-          <div className="card stack checkin-locked">
+          <div className="stack checkin-locked">
             <Avatar who={author} size={64} />
             <h2 className="section__title">{t('checkin.lockedTitle', { name: first })}</h2>
             <p className="body-sm muted">{t('checkin.lockedBody')}</p>
@@ -88,7 +88,7 @@ export default function CheckInDetail() {
         <CheckInCard c={c} layout="hero" />
 
         {place && community ? (
-          <Link to={`/place/${place.id}`} className="card card--tight place-mini glyph-host">
+          <Link to={`/place/${place.id}`} className="place-mini glyph-host">
             <Cover src={placePhoto(place.id)} glyph={place.glyph} tone={place.tone} className="place-mini__photo" />
             <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
               <span className="place-mini__name">{place.name}</span>
@@ -103,15 +103,15 @@ export default function CheckInDetail() {
               ) : null}
               {community.friendIds.length ? (
                 <span className="row" style={{ gap: 6 }}>
-                  <AvatarStack ids={community.friendIds} size={22} />
+                  <AvatarStack ids={community.friendIds} size={18} />
                   <span className="meta">{t('checkin.friendsBeen', { n: community.friendIds.length })}</span>
                 </span>
               ) : null}
             </span>
-            <ChevronRightGlyph size={18} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+            <ChevronRightGlyph size={18} style={{ color: 'var(--muted)', flexShrink: 0 }} />
           </Link>
         ) : event ? (
-          <Link to={`/event/${event.id}`} className="card card--tight place-mini glyph-host">
+          <Link to={`/event/${event.id}`} className="place-mini glyph-host">
             <Cover src={eventPhoto(event.id)} glyph={event.glyph} tone={event.tone} className="place-mini__photo" />
             <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
               <span className="place-mini__name">{event.title}</span>
@@ -119,11 +119,11 @@ export default function CheckInDetail() {
                 {event.day}, {event.time} · {event.area}
               </span>
             </span>
-            <ChevronRightGlyph size={18} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+            <ChevronRightGlyph size={18} style={{ color: 'var(--muted)', flexShrink: 0 }} />
           </Link>
         ) : null}
 
-        <div className="row row--wrap" style={{ gap: 8 }}>
+        <div className="row row--wrap checkin-detail__actions" style={{ gap: 6 }}>
           {mine ? (
             <Link to={place ? `/checkin?place=${place.id}` : '/checkin'} className="btn btn--soft btn--sm">
               <NamedGlyph name="checkin" size={16} />
@@ -148,16 +148,11 @@ export default function CheckInDetail() {
                 const who = person(cm.authorId);
                 return (
                   <div key={cm.id} className="row comment-row">
-                    <Avatar who={who} size={32} />
-                    <div className="comment-row__bubble">
-                      <span className="strong" style={{ fontSize: '0.84375rem' }}>
-                        {cm.authorId === 'me' ? 'You' : who.name}
-                      </span>{' '}
-                      <span className="meta">{cm.ago}</span>
-                      <p className="body-sm" style={{ color: 'var(--ink)' }}>
-                        {cm.text}
-                      </p>
-                    </div>
+                    <Avatar who={who} size={30} />
+                    <p className="comment-row__text">
+                      <b>{cm.authorId === 'me' ? 'You' : who.name}</b> {cm.text}
+                      <span className="meta comment-row__ago">{cm.ago}</span>
+                    </p>
                   </div>
                 );
               })}

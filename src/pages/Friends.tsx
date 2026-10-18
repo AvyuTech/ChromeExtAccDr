@@ -97,20 +97,24 @@ export default function Friends() {
           ]}
         />
 
-        <div id="friends-panel" role="tabpanel" aria-labelledby={`friends-tab-${tab}`} className="stack stack--lg">
+        <div id="friends-panel" role="tabpanel" aria-labelledby={`friends-tab-${tab}`} className="stack" style={{ gap: 18 }}>
           {tab === 'activity' ? (
             <>
               {plans.length ? (
-                <section className="section" aria-labelledby="plan-title">
-                  <SectionHead id="plan-title" title={t('people.planTogether')} />
+                <section className="section" aria-labelledby="plan-title" style={{ gap: 2 }}>
+                  <div className="section__head">
+                    <h2 className="section__title" id="plan-title">
+                      {t('people.planTogether')}
+                    </h2>
+                    {plans.length > 2 ? (
+                      <button type="button" className="section__link friends-more" aria-expanded={showAllPlans} onClick={() => setShowAllPlans((v) => !v)}>
+                        {showAllPlans ? 'Show fewer' : `Show ${plans.length - 2} more`}
+                      </button>
+                    ) : null}
+                  </div>
                   {(showAllPlans ? plans : plans.slice(0, 2)).map(([id, items]) => (
                     <PlanCard key={id} personId={id} items={items} />
                   ))}
-                  {plans.length > 2 ? (
-                    <button type="button" className="btn btn--ghost btn--sm" style={{ alignSelf: 'center' }} aria-expanded={showAllPlans} onClick={() => setShowAllPlans((v) => !v)}>
-                      {showAllPlans ? 'Show fewer' : `Show ${plans.length - 2} more`}
-                    </button>
-                  ) : null}
                 </section>
               ) : null}
 
@@ -133,9 +137,11 @@ export default function Friends() {
                       <h2 className="people-group-title" id={`grp-${g.key}`}>
                         {t(g.key)}
                       </h2>
-                      {g.items.map((c) => (
-                        <CheckInCard key={c.id} c={c} />
-                      ))}
+                      <div className="feed">
+                        {g.items.map((c) => (
+                          <CheckInCard key={c.id} c={c} />
+                        ))}
+                      </div>
                     </section>
                   ))
               )}
@@ -208,8 +214,8 @@ export default function Friends() {
                         {t('people.invite')}
                       </h2>
                       <p className="body-sm">{t('people.inviteBody')}</p>
-                      <button type="button" className="btn btn--lime" onClick={invite}>
-                        <LinkGlyph size={18} />
+                      <button type="button" className="btn btn--lime btn--sm" onClick={invite}>
+                        <LinkGlyph size={16} />
                         {t('people.shareInvite')}
                       </button>
                     </div>

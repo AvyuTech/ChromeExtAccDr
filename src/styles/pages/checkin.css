@@ -7,26 +7,30 @@
 .checkin-header .page-header__title {
   flex-grow: 0;
   text-align: center;
-  font-size: clamp(1rem, 4.8vw, 1.1875rem);
+  font-size: clamp(0.9375rem, 4.4vw, 1.0625rem);
 }
 .checkin-header__spacer {
   width: 72px;
 }
+.checkin-page > .segmented button {
+  min-height: 34px;
+}
 .checkin-page {
-  padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px));
+  gap: 18px;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
 .checkin-step {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.0625rem;
+  gap: 8px;
+  font-size: 0.9688rem;
 }
 .checkin-step__num {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: 11px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -47,17 +51,18 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 6px 0;
 }
 
 .checkin-target__photo {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
 }
 .checkin-result__photo {
-  width: 46px;
-  height: 46px;
-  border-radius: 13px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
 }
 
 .guess-card {
@@ -65,16 +70,17 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 10px 14px 10px 10px;
-  border-radius: 22px;
+  padding: 8px 10px 8px 8px;
+  border-radius: 14px;
   border: 1.5px dashed var(--accent-line);
   background: var(--accent-tint-2);
   color: var(--ink);
+  font-size: 0.875rem;
 }
 .guess-card__photo {
-  width: 58px;
-  height: 58px;
-  border-radius: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
 }
 .guess-card__pin {
   position: absolute;
@@ -101,10 +107,10 @@
   }
 }
 .guess-card__add {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
-  border-radius: 18px;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -112,43 +118,37 @@
   color: var(--on-accent);
 }
 
-/* Nearby places as photo cards */
+/* Nearby places as photo tiles: photo, then name, no box */
 .checkin-picks {
   gap: 10px;
 }
 .checkin-pick {
   flex-shrink: 0;
-  width: 132px;
+  width: 112px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
-  padding: 0 0 10px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--surface);
+  gap: 1px;
+  padding: 0;
+  border: none;
+  background: none;
   color: var(--ink);
   text-align: left;
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s ease;
 }
 .checkin-pick:active {
   transform: scale(0.97);
 }
-.checkin-pick:hover {
-  border-color: var(--accent-line);
-}
 .checkin-pick__photo {
   width: 100%;
   height: 84px;
-  border-radius: 0;
-  margin-bottom: 8px;
+  border-radius: 10px;
+  margin-bottom: 6px;
 }
 .checkin-pick__name {
-  padding: 0 10px;
   max-width: 100%;
   font-family: var(--font-display);
-  font-size: 0.84375rem;
+  font-size: 0.8125rem;
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.25;
@@ -157,13 +157,71 @@
   white-space: nowrap;
 }
 .checkin-pick__meta {
-  padding: 0 10px;
   max-width: 100%;
-  font-size: 0.71875rem;
+  font-size: 0.6875rem;
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.checkin-noresults {
+  padding: 4px 0 2px;
+}
+.checkin-addlink {
+  align-self: flex-start;
+  margin-top: -2px;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Add a new place */
+.spot-form {
+  gap: 14px;
+}
+.spot-form .chip-wrap {
+  gap: 6px;
+}
+.spot-photo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1.5px dashed var(--accent-line);
+  color: var(--accent);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.spot-photo > img {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.spot-photo .strong {
+  color: var(--ink);
+}
+.spot-rule {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: -2px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.spot-rule > .glyph {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--mint-ink);
 }
 
 .chip--person {
@@ -174,30 +232,29 @@
 .verdict-picker {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 .verdict-option {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  min-height: 124px;
-  padding: 16px 6px 14px 6px;
-  border-radius: 22px;
+  gap: 4px;
+  min-height: 96px;
+  padding: 12px 4px 10px;
+  border-radius: 14px;
   border: 1.5px solid var(--border);
   background: var(--surface);
   color: var(--ink);
-  box-shadow: var(--shadow-card);
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 .verdict-option:active {
   transform: scale(0.97);
 }
 .verdict-option__glyph {
-  width: 52px;
-  height: 52px;
-  border-radius: 26px;
+  width: 42px;
+  height: 42px;
+  border-radius: 21px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -206,20 +263,19 @@
 }
 .verdict-option__label {
   font-family: var(--font-display);
-  font-size: 0.96875rem;
+  font-size: 0.875rem;
   font-weight: 800;
   letter-spacing: -0.01em;
   text-align: center;
 }
 .verdict-option__sub {
-  font-size: 0.71875rem;
+  font-size: 0.6875rem;
   color: var(--muted);
   text-align: center;
 }
 .verdict-option[aria-checked='true'] {
   border-color: var(--tone-ink);
   background: var(--tone-bg);
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--tone-ink) 22%, transparent);
 }
 .verdict-option[aria-checked='true'] .verdict-option__glyph {
   background: var(--surface);
@@ -228,11 +284,11 @@
 .verdict-option[aria-checked='true']::after {
   content: '';
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 10px;
-  height: 10px;
-  border-radius: 5px;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
   background: var(--tone-ink);
 }
 
@@ -240,8 +296,9 @@
 .checkin-details {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 4px 16px;
+  gap: 12px;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
 }
 .checkin-details > .stack {
   padding-bottom: 14px;
@@ -251,12 +308,12 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  min-height: 52px;
+  min-height: 46px;
   padding: 0;
   border: none;
   background: none;
   color: var(--ink);
-  font-size: 0.9375rem;
+  font-size: 0.9063rem;
   text-align: left;
 }
 .details-toggle__chev {
@@ -269,8 +326,8 @@
 
 .photo-preview {
   position: relative;
+  margin: 0 calc(var(--gutter) * -1);
   overflow: hidden;
-  border-radius: 22px;
   background: var(--surface-3);
 }
 .photo-preview img {
@@ -279,27 +336,26 @@
   aspect-ratio: 4 / 3;
   object-fit: cover;
 }
-.photo-preview .checkin-card__items {
-  left: 12px;
-  right: 60px;
-  bottom: 12px;
+.photo-preview__tags {
+  right: 56px;
 }
 
 /* Photo picker */
 .photo-drop {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 .photo-drop__option {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-end;
-  gap: 4px;
-  min-height: 132px;
-  padding: 14px;
-  border-radius: 22px;
+  gap: 3px;
+  min-height: 104px;
+  padding: 12px;
+  border-radius: 14px;
+  font-size: 0.875rem;
   border: 1.5px dashed var(--accent-line);
   background: var(--surface);
   color: var(--ink);
@@ -319,10 +375,10 @@
   line-height: 1.35;
 }
 .photo-drop__icon {
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
   margin-bottom: auto;
-  border-radius: 15px;
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -345,10 +401,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)) 16px;
+  padding: 10px var(--gutter) calc(10px + env(safe-area-inset-bottom, 0px)) var(--gutter);
   background: var(--surface);
   border-top: 1px solid var(--border);
-  box-shadow: 0 -8px 24px rgba(23, 20, 43, 0.06);
 }
 .checkin-footer__progress {
   display: flex;
@@ -358,7 +413,7 @@
   min-width: 0;
 }
 .checkin-footer .btn {
-  min-width: 132px;
+  min-width: 120px;
 }
 .checkin-dots {
   display: flex;
@@ -376,22 +431,33 @@
 }
 
 /* ---------- Detail ---------- */
+/* The hero post sits flush under the header */
+.feed-post--hero {
+  margin-top: -4px;
+  border-top: none;
+  padding-top: 6px;
+}
 .place-mini {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 10px 14px 10px 10px;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
   text-decoration: none;
   color: inherit;
 }
+.feed-post--hero + .place-mini {
+  margin-top: -14px;
+}
 .place-mini__photo {
-  width: 76px;
-  height: 76px;
-  border-radius: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
 }
 .place-mini__name {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -399,27 +465,46 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.78125rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--mint-ink);
 }
+.checkin-detail__actions .btn {
+  border-radius: 10px;
+}
 
+/* Comments: Instagram-style lines, no bubbles */
 .comment-row {
   align-items: flex-start;
+  gap: 10px;
 }
-.comment-row__bubble {
+.comment-row__text {
   flex-grow: 1;
   min-width: 0;
-  padding: 10px 12px;
-  border-radius: 4px 16px 16px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ink);
 }
-.comment-row__bubble p {
+.comment-row__text b {
+  font-weight: 700;
+}
+.comment-row__ago {
+  display: block;
   margin-top: 2px;
+  font-size: 0.71875rem;
 }
 .comment-form {
   gap: 8px;
+}
+.comment-form .input {
+  height: 40px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+}
+.comment-form .icon-btn {
+  width: 40px;
+  height: 40px;
 }
 .comment-form .icon-btn:disabled {
   opacity: 0.45;
@@ -429,6 +514,6 @@
 .checkin-locked {
   align-items: center;
   text-align: center;
-  gap: 12px;
-  padding: 28px 20px;
+  gap: 10px;
+  padding: 28px 8px;
 }
