@@ -147,7 +147,7 @@ export const DEFAULT_SETTINGS: Settings = {
   ai: { answers: true, length: 'balanced', showSources: true, followUps: true, summariseThreads: true },
   data: { dataSaver: false, liveUpdates: true, offlineEssentials: true, autoplayVideos: 'wifi' },
   safety: {
-    contacts: [{ name: '[Trusted contact]', phone: '' }],
+    contacts: [],
     shareLocationOnSos: true,
     safeWalkCheckIn: false,
   },

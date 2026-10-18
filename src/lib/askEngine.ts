@@ -123,6 +123,11 @@ function modifiers(q: string): Modifiers {
   };
 }
 
+/** Lower-case only the first letter, so names like "SG Highway" or "Blue Line" survive mid-sentence. */
+function lowerFirst(text: string) {
+  return /^[A-Z][a-z]/.test(text) ? text[0].toLowerCase() + text.slice(1) : text;
+}
+
 function short(title: string) {
   return title.replace(/ by the riverfront$/i, '').replace(/^Sunday /, 'Sunday ');
 }
@@ -194,8 +199,9 @@ export function ask(query: string, o: AskOptions): AskResult {
           : m.couples
             ? `Here are **${events.length} good plans for two** ${when}.`
             : `There are **${events.length} things happening** near you ${when}.`;
-      const second = `The biggest is the **${short(top.title)}** on ${top.day === 'Sat–Sun' ? 'Saturday and Sunday' : top.day === 'Sat' ? 'Saturday' : top.day === 'Sun' ? 'Sunday' : top.day.toLowerCase()}.`;
-      const third = freeOne && !m.free ? `For something free, the **${freeOne.title.toLowerCase().replace(/^sunday /, 'Sunday ')}** is the local favourite.` : '';
+      const dayName = top.day === 'Sat–Sun' ? 'Saturday and Sunday' : top.day === 'Sat' ? 'Saturday' : top.day === 'Sun' ? 'Sunday' : top.day.toLowerCase();
+      const second = `The biggest is the **${short(top.title)}**${top.title.includes(dayName) ? '' : ` on ${dayName}`}.`;
+      const third = freeOne && !m.free ? `For something free, the **${freeOne.title.replace(/^Sunday /, 'Sunday ').replace(/^(?!Sunday )./, (c) => c.toLowerCase())}** is the local favourite.` : '';
       const unconfirmed = events.some((e) => !e.confirmed) ? 'Listings seen in only one place are marked unconfirmed.' : '';
       return {
         ...base,
@@ -241,10 +247,10 @@ export function ask(query: string, o: AskOptions): AskResult {
           confidence: 'low',
         };
       }
-      const named = places.slice(0, 3).map((p) => `**${p.name}** (${(p.bestTime ? `best ${p.bestTime.toLowerCase()}` : p.highlights[0]?.toLowerCase()) ?? p.kind})`);
+      const named = places.slice(0, 3).map((p) => `**${p.name}** (${(p.bestTime ? `best ${p.bestTime.toLowerCase()}` : (p.highlights[0] ? lowerFirst(p.highlights[0]) : undefined)) ?? p.kind})`);
       const list = named.length > 1 ? `${named.slice(0, -1).join(', ')} and ${named[named.length - 1]}` : named[0];
       const lead = places.length === 1 ? `Locals recommend ${list}.` : `Locals mention ${list}.`;
-      const watch = places[0].watchOuts[0] ? `Heads-up for ${places[0].name}: ${places[0].watchOuts[0].toLowerCase()}.` : '';
+      const watch = places[0].watchOuts[0] ? `Heads-up for ${places[0].name}: ${lowerFirst(places[0].watchOuts[0])}.` : '';
       return {
         ...base,
         heading: intent === 'places' ? 'Places locals love' : 'What locals recommend',
@@ -277,12 +283,12 @@ export function ask(query: string, o: AskOptions): AskResult {
         worst.level === 0
           ? 'Roads are **moving freely** across the west of the city right now.'
           : `**${worst.name}** is the slowest right now: **${worst.minutes} min** from ${worst.stretch.replace(' → ', ' to ')} (usually ${worst.usual}).`;
-      const cause = worst.cause ? `Cause: ${worst.cause.toLowerCase()}.` : '';
+      const cause = worst.cause ? `Cause: ${lowerFirst(worst.cause)}.` : '';
       const ok = clear.length ? `${clear.join(' and ')} ${clear.length > 1 ? 'are' : 'is'} clear.` : '';
       return {
         ...base,
         heading: 'Roads right now',
-        answer: finish([[lead, cause].filter(Boolean).join(' '), ok, alerts.length ? `Planned: ${alerts[0].title.toLowerCase()}.` : ''].filter(Boolean), o.length),
+        answer: finish([[lead, cause].filter(Boolean).join(' '), ok, alerts.length ? `Planned: ${lowerFirst(alerts[0].title)}.` : ''].filter(Boolean), o.length),
         sources: ['police', 'maps', 'neighbours'].filter((s) => o.sourceAllowed(s as SourceId)) as SourceId[],
         results: [...roads.map((r) => ({ type: 'corridor' as const, id: r.id })), ...alerts.map((a) => ({ type: 'alert' as const, id: a.id }))],
         followUps: [
@@ -305,7 +311,7 @@ export function ask(query: string, o: AskOptions): AskResult {
       return {
         ...base,
         heading: 'Leaving soon near you',
-        answer: finish([lead, more, alert ? `Note: ${alert.title.toLowerCase()}.` : ''].filter(Boolean), o.length),
+        answer: finish([lead, more, alert ? `Note: ${lowerFirst(alert.title)}.` : ''].filter(Boolean), o.length),
         sources: ['metro', 'neighbours'].filter((s) => o.sourceAllowed(s as SourceId)) as SourceId[],
         results: [...arrivals.map((a) => ({ type: 'arrival' as const, id: a.id })), ...(alert ? [{ type: 'alert' as const, id: alert.id }] : [])],
         followUps: [
@@ -366,7 +372,7 @@ export function ask(query: string, o: AskOptions): AskResult {
       return {
         ...base,
         heading: 'Water supply today',
-        answer: finish([`Supply in **${home.ward}** (${home.slot}) is **${status}**${home.note ? `: ${home.note.toLowerCase()}` : ''}.`, 'The evening slot is expected to run as normal.', 'Report a leak or no supply from City › Report an issue.'], o.length),
+        answer: finish([`Supply in **${home.ward}** (${home.slot}) is **${status}**${home.note ? `: ${lowerFirst(home.note)}` : ''}.`, 'The evening slot is expected to run as normal.', 'Report a leak or no supply from City › Report an issue.'], o.length),
         sources: ['amc', 'neighbours'].filter((s) => o.sourceAllowed(s as SourceId)) as SourceId[],
         results: alerts.map((x) => ({ type: 'alert', id: x.id })),
         followUps: [{ label: 'Report no water', query: 'Report a water problem' }],
@@ -381,7 +387,7 @@ export function ask(query: string, o: AskOptions): AskResult {
         heading: 'Power in your area',
         answer: finish(
           [
-            cuts.length ? `One planned cut: **${cuts[0].area}, ${cuts[0].window}** for ${cuts[0].reason.toLowerCase()}.` : 'No planned power cuts near you.',
+            cuts.length ? `One planned cut: **${cuts[0].area}, ${cuts[0].window}** for ${lowerFirst(cuts[0].reason)}.` : 'No planned power cuts near you.',
             'No outages reported in Bodakdev right now.',
             'Beware of fake "power will be cut tonight" messages; the utility never sends payment links by SMS.',
           ],
@@ -446,7 +452,7 @@ export function ask(query: string, o: AskOptions): AskResult {
       return {
         ...base,
         heading: 'Live deals',
-        answer: finish([`**${deals.length} deals** near you right now.`, `Most claimed: **${deals[0].title.toLowerCase()}** at ${deals[0].merchant} (${deals[0].ends.toLowerCase()}).`], o.length),
+        answer: finish([`**${deals.length} deals** near you right now.`, `Most claimed: **${lowerFirst(deals[0].title)}** at ${deals[0].merchant} (${lowerFirst(deals[0].ends)}).`], o.length),
         sources: ['maps', 'neighbours'].filter((s) => o.sourceAllowed(s as SourceId)) as SourceId[],
         results: deals.map((d) => ({ type: 'deal', id: d.id })),
         followUps: [{ label: 'Food deals', query: 'Food deals near me' }],
@@ -455,11 +461,22 @@ export function ask(query: string, o: AskOptions): AskResult {
     }
 
     case 'groups': {
-      const groups = [...GROUPS].sort((a, b) => b.postsToday - a.postsToday);
+      const words = q.toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 3 && !['group', 'groups', 'community', 'club', 'clubs', 'near', 'join'].includes(w));
+      const busiest = [...GROUPS].sort((a, b) => b.postsToday - a.postsToday);
+      const matching = busiest.filter((g) => words.some((w) => `${g.name} ${g.description}`.toLowerCase().includes(w)));
+      const groups = matching.length ? [...matching, ...busiest.filter((g) => !matching.includes(g))] : busiest;
       return {
         ...base,
         heading: 'Groups near you',
-        answer: finish([`The busiest groups today are **${groups[0].name}** and **${groups[1].name}**.`, 'Joining a group adds its posts to your Home feed.'], o.length),
+        answer: finish(
+          [
+            matching.length
+              ? `**${matching[0].name}** is the closest match, with ${matching[0].members.toLocaleString('en-IN')} members.`
+              : `The busiest groups today are **${groups[0].name}** and **${groups[1].name}**.`,
+            'Joining a group adds its posts to your Home feed.',
+          ],
+          o.length,
+        ),
         sources: ['neighbours'],
         results: groups.map((g) => ({ type: 'group', id: g.id })),
         followUps: [{ label: 'Pickleball partners', query: 'Pickleball groups' }],

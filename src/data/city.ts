@@ -98,7 +98,7 @@ export const ALERTS: CityAlert[] = [
     areas: ['all'],
     ago: '6 h ago',
     window: 'Ongoing',
-    source: 'police',
+    source: 'cyber',
     verified: true,
     tips: ['Do not click links in such messages', 'Pay bills only in the official app or Nearhood Services', 'Report fraud on the national cybercrime helpline 1930'],
     updates: [{ time: 'Yesterday', text: 'Cyber cell issued a public advisory.' }],

@@ -7,6 +7,7 @@ export const SOURCES: Record<SourceId, Source> = {
   news: { id: 'news', label: 'Local news', kind: 'platform' },
   neighbours: { id: 'neighbours', label: 'Neighbours', kind: 'community' },
   police: { id: 'police', label: 'Traffic police', kind: 'official' },
+  cyber: { id: 'cyber', label: 'Police cyber cell', kind: 'official' },
   amc: { id: 'amc', label: 'Municipal corporation', kind: 'official' },
   utility: { id: 'utility', label: 'Power utility', kind: 'official' },
   metro: { id: 'metro', label: 'Metro & BRTS', kind: 'official' },

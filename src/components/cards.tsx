@@ -60,6 +60,7 @@ const SOURCE_GLYPH: Record<SourceId, GlyphName> = {
   news: 'news',
   neighbours: 'users',
   police: 'police',
+  cyber: 'shield',
   amc: 'services',
   utility: 'bolt',
   metro: 'transit',
@@ -401,16 +402,19 @@ export function PlaceRow({ place, last }: { place: Place; last?: boolean }) {
       <span className="list-row__body">
         <span className="list-row__title">{place.name}</span>
         <span className="list-row__meta">
-          {place.kind} · {place.area} · {priceLevel(place.price)} · {km(place.distanceKm)}
+          {place.kind} · {place.area} · {priceLevel(place.price)}
         </span>
       </span>
-      {place.isNew && place.reviews < 30 ? (
-        <span className="badge">New</span>
-      ) : (
-        <span className="badge tone-mint">
-          {place.rating.toFixed(1)} · {compact(place.reviews)}
-        </span>
-      )}
+      <span className="stack" style={{ gap: 4, alignItems: 'flex-end', flexShrink: 0 }}>
+        {place.isNew && place.reviews < 30 ? (
+          <span className="badge">New</span>
+        ) : (
+          <span className="badge tone-mint">
+            {place.rating.toFixed(1)} · {compact(place.reviews)}
+          </span>
+        )}
+        <span className="meta">{km(place.distanceKm)}</span>
+      </span>
     </Link>
   );
 }

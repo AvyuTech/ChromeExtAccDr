@@ -11,6 +11,7 @@ export type SourceId =
   | 'news'
   | 'neighbours'
   | 'police'
+  | 'cyber'
   | 'amc'
   | 'utility'
   | 'metro'

@@ -83,3 +83,13 @@ describe('ask', () => {
     expect(r.followUps.length).toBeGreaterThan(0);
   });
 });
+
+describe('answer wording', () => {
+  it('keeps proper nouns capitalised mid-sentence', () => {
+    expect(ask('traffic now', base).answer).toMatch(/Cause: signal fault at Iscon crossroads/);
+  });
+
+  it('matches groups by topic', () => {
+    expect(ask('pickleball groups', base).answer).toMatch(/Pickleball Ahmedabad/);
+  });
+});
