@@ -104,3 +104,7 @@ Most photos are from [Unsplash](https://unsplash.com) under the [Unsplash Licens
 Everything in `src/data` is **sample data** for demonstrating the app. Neighbourhood names and the national emergency numbers (112, 100, 101, 108, 181, 1098, 1930) are real; venues, people, clubs, prices and schedules are illustrative, and `[bracketed]` values are placeholders. The live city feed is simulated in `src/state/live.ts`.
 
 To connect real services, replace the modules in `src/data` and `ask()` in `src/lib/askEngine.ts` with API calls. The answer engine returns the same shape a hosted model would (`answer`, `sources`, `results`, `followUps`), so the screens do not need to change.
+
+## Production architecture
+
+How Nearhood would run for real, from one city to 10 million posts a day (databases, keys, feeds, search, caching and AWS services): see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
