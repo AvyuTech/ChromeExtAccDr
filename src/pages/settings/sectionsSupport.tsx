@@ -6,7 +6,22 @@ import { person } from '../../data/core';
 import { EVENTS } from '../../data/events';
 import { placeById } from '../../data/places';
 import { useT } from '../../i18n';
-import { FlagGlyph, ImageGlyph, Logo, PinGlyph, PlusGlyph, SparkGlyph, TrashGlyph, TrustRing, WalkGlyph, Wordmark } from '../../icons';
+import {
+  FlagGlyph,
+  ImageGlyph,
+  Logo,
+  NamedGlyph,
+  PinGlyph,
+  PlusGlyph,
+  SparkGlyph,
+  TrashGlyph,
+  TrustRing,
+  UsersGlyph,
+  WalkGlyph,
+  Wordmark,
+  type GlyphName,
+} from '../../icons';
+import type { Tone } from '../../data/types';
 import { useSettings } from '../../state/settings';
 import { useToast } from '../../state/toast';
 import { APP_VERSION } from './meta';
@@ -38,7 +53,7 @@ export function SafetySection() {
         <h2 className="set-group__title" id={`${baseId}-contacts`}>
           {t('settings.safety.contacts')}
         </h2>
-        <div className="list">
+        <div className="list list--grouped">
           {s.contacts.map((c, i) => (
             <div key={i} className="list-row set-contact">
               <span className="avatar tone-violet" style={{ ['--avatar-size' as string]: '36px' }} aria-hidden="true">
@@ -117,7 +132,7 @@ export function SafetySection() {
         />
       </Group>
 
-      <div className="list">
+      <div className="list list--grouped">
         <LinkRow to="/city/safety" glyph="sos" tone="red" title={t('settings.safety.open')} meta="112, 108, 181 and the nearest hospital" />
       </div>
     </>
@@ -181,11 +196,15 @@ export function HelpSection() {
 
   return (
     <>
+      <div className="list list--grouped">
+        <SettingLink to="/settings/human" G={UsersGlyph} tone="mint" title={t('settings.human')} meta={t('settings.human.meta')} />
+      </div>
+
       <section className="set-group" aria-labelledby="faq-title">
         <h2 className="set-group__title" id="faq-title">
           {t('settings.help.faq')}
         </h2>
-        <div className="list">
+        <div className="list list--grouped">
           {FAQ.map((f) => (
             <details key={f.q} className="set-faq">
               <summary>{f.q}</summary>
@@ -195,9 +214,9 @@ export function HelpSection() {
         </div>
       </section>
 
-      <form className="card stack" onSubmit={submit} noValidate aria-labelledby="report-title">
-        <h2 className="section__title row" id="report-title" style={{ gap: 8 }}>
-          <FlagGlyph size={20} style={{ color: 'var(--accent)' }} />
+      <form className="set-block" onSubmit={submit} noValidate aria-labelledby="report-title">
+        <h2 className="set-block__title row" id="report-title" style={{ gap: 6 }}>
+          <FlagGlyph size={17} style={{ color: 'var(--accent)' }} />
           {t('settings.help.report')}
         </h2>
         <div className="field">
@@ -234,8 +253,8 @@ export function HelpSection() {
         </button>
       </form>
 
-      <section className="card stack" aria-labelledby="guidelines-title">
-        <h2 className="section__title" id="guidelines-title">
+      <section className="set-block" aria-labelledby="guidelines-title">
+        <h2 className="set-block__title" id="guidelines-title">
           {t('settings.help.guidelines')}
         </h2>
         <ol className="set-list">
@@ -257,29 +276,30 @@ export function AboutSection() {
     <>
       <section className="set-about" aria-labelledby="about-brand">
         <span className="set-about__mark">
-          <Logo size={76} tile title="Nearhood" />
+          <Logo size={60} tile title="Nearhood" />
         </span>
         <h2 id="about-brand" className="sr-only">
           Nearhood
         </h2>
-        <Wordmark size={34} />
+        <Wordmark size={28} />
         <p className="set-about__tag">{t('onboarding.tagline')}</p>
         <span className="row" style={{ gap: 6 }}>
-          <span className="badge tone-violet">{t('settings.about.version', { v: APP_VERSION })}</span>
-          <span className="badge badge--lime">{t('settings.about.madeIn')}</span>
+          <span className="badge badge--sm tone-violet">{t('settings.about.version', { v: APP_VERSION })}</span>
+          <span className="badge badge--sm badge--lime">{t('settings.about.madeIn')}</span>
         </span>
         <p className="body-sm muted" style={{ maxWidth: 300 }}>
           {t('settings.about.blurb')}
         </p>
       </section>
 
-      <div className="list">
+      <div className="list list--grouped">
+        <SettingLink to="/settings/human" G={UsersGlyph} tone="mint" title={t('settings.human')} meta={t('settings.human.meta')} />
         <SettingLink to="/settings/credits" G={ImageGlyph} tone="peach" title={t('settings.credits')} meta={t('settings.credits.meta', { n: total })} />
         <SettingLink to="/about/glyphs" G={SparkGlyph} tone="violet" title={t('settings.about.glyphs')} meta={t('settings.about.glyphsMeta')} />
       </div>
 
-      <section className="card stack" aria-labelledby="about-data">
-        <h2 className="section__title" id="about-data">
+      <section className="set-block" aria-labelledby="about-data">
+        <h2 className="set-block__title" id="about-data">
           {t('settings.about.data')}
         </h2>
         <p className="body-sm">
@@ -288,9 +308,9 @@ export function AboutSection() {
         </p>
       </section>
 
-      <section className="card stack" aria-labelledby="about-how">
-        <h2 className="section__title row" id="about-how" style={{ gap: 8 }}>
-          <TrustRing agree={3} size={22} />
+      <section className="set-block" aria-labelledby="about-how">
+        <h2 className="set-block__title row" id="about-how" style={{ gap: 6 }}>
+          <TrustRing agree={3} size={18} />
           {t('settings.about.how')}
         </h2>
         <p className="body-sm">
@@ -299,8 +319,8 @@ export function AboutSection() {
         </p>
       </section>
 
-      <section className="card stack" aria-labelledby="about-credits">
-        <h2 className="section__title" id="about-credits">
+      <section className="set-block" aria-labelledby="about-credits">
+        <h2 className="set-block__title" id="about-credits">
           {t('settings.about.credits')}
         </h2>
         <ul className="set-list">
@@ -312,6 +332,52 @@ export function AboutSection() {
           </li>
         </ul>
       </section>
+    </>
+  );
+}
+
+/* ======================= How Nearhood stays human ======================= */
+
+const HUMAN_RULES: Array<{ key: string; glyph: GlyphName; tone: Tone }> = [
+  { key: 'settings.human.r1', glyph: 'checkin', tone: 'violet' },
+  { key: 'settings.human.r2', glyph: 'deals', tone: 'mint' },
+  { key: 'settings.human.r3', glyph: 'services', tone: 'blue' },
+  { key: 'settings.human.r4', glyph: 'pin', tone: 'peach' },
+  { key: 'settings.human.r5', glyph: 'spark', tone: 'violet' },
+  { key: 'settings.human.r6', glyph: 'shield', tone: 'mint' },
+  { key: 'settings.human.r7', glyph: 'getaways', tone: 'teal' },
+];
+
+export function HumanSection() {
+  const t = useT();
+  return (
+    <>
+      <header className="human-head">
+        <span className="eyebrow muted">{t('settings.human')}</span>
+        <h2 className="human-head__title">{t('settings.human.title')}</h2>
+        <p className="body-sm muted">{t('settings.human.intro')}</p>
+      </header>
+
+      <ol className="human-rules">
+        {HUMAN_RULES.map((r, i) => (
+          <li key={r.key} className="human-rule glyph-host">
+            <span className={`tile set-tile tone-${r.tone}`} style={{ width: 30, height: 30, borderRadius: 10 }}>
+              <NamedGlyph name={r.glyph} size={17} />
+            </span>
+            <span className="stack grow" style={{ gap: 2, minWidth: 0 }}>
+              <span className="human-rule__title">
+                <span className="human-rule__n">{i + 1}</span>
+                {t(r.key)}
+              </span>
+              <span className="human-rule__body">{t(`${r.key}b`)}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      <p className="set-group__note">
+        {t('settings.human.footer')} <Link to="/settings/help">{t('settings.help')}</Link>
+      </p>
     </>
   );
 }
@@ -362,7 +428,9 @@ export function PhotoCreditsSection() {
         const rows = entries.filter(([k]) => k.startsWith(g.prefix));
         if (!rows.length) return null;
         return (
-          <Group key={g.prefix} title={`${t(g.key)} · ${rows.length}`}>
+          <section key={g.prefix} className="set-group" aria-label={t(g.key)}>
+            <h2 className="set-group__title">{`${t(g.key)} · ${rows.length}`}</h2>
+            <div className="list">
             {rows.map(([k, src]) => (
               <div key={k} className="list-row credit-row">
                 <img className="credit-row__thumb" src={photo(k)} alt="" loading="lazy" />
@@ -381,7 +449,8 @@ export function PhotoCreditsSection() {
                 </span>
               </div>
             ))}
-          </Group>
+            </div>
+          </section>
         );
       })}
 

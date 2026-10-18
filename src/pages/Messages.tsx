@@ -62,7 +62,7 @@ export default function Messages() {
               return (
                 <Link key={id} to={`/messages/c-${id}`} className="dm-strip__item">
                   <span className="dm-strip__face">
-                    <Avatar who={{ ...who, verified: false }} size={58} />
+                    <Avatar who={{ ...who, verified: false }} size={50} />
                     {ONLINE.includes(id) ? <span className="dm-strip__online" aria-label={t('social.activeNow')} /> : null}
                   </span>
                   <span className="dm-strip__name">{who.name.split(' ')[0]}</span>
@@ -75,7 +75,7 @@ export default function Messages() {
         {shown.length === 0 ? (
           <EmptyState glyph="question" title={t('social.noChats')} body={t('social.noChatsBody')} />
         ) : (
-          <div className="list">
+          <div className="list social-list">
             {shown.map(({ c, who, last, unread }) => (
               <Link
                 key={c.id}
@@ -84,10 +84,10 @@ export default function Messages() {
                 aria-label={`${who.name}${unread ? `, ${t('social.unreadCount', { n: unread })}` : ''}. ${last?.text ?? ''}`}
               >
                 <span className="dm-strip__face">
-                  <Avatar who={who} size={52} />
+                  <Avatar who={who} size={46} />
                   {ONLINE.includes(who.id) ? <span className="dm-strip__online" /> : null}
                 </span>
-                <span className="list-row__body">
+                <span className="list-row__body" style={{ gap: 1 }}>
                   <span className="row row--between" style={{ gap: 8 }}>
                     <span className="list-row__title">{who.name}</span>
                     <span className="meta" style={{ flexShrink: 0 }}>

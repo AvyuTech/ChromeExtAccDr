@@ -111,7 +111,7 @@ export const DEFAULT_SETTINGS: Settings = {
     work: 'sg-highway',
     radiusKm: 5,
     autoDetect: true,
-    commuteMode: 'metro',
+    commuteMode: 'car',
     leaveAt: '09:00',
     returnAt: '18:30',
   },

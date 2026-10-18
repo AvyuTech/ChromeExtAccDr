@@ -13,6 +13,7 @@ import {
   PaletteGlyph,
   SosGlyph,
   UserGlyph,
+  UsersGlyph,
 } from '../../icons';
 import { CommuteGlyph } from '../../icons/extra-settings';
 import type { GlyphComp } from './parts';
@@ -31,6 +32,7 @@ export type SectionId =
   | 'safety'
   | 'help'
   | 'about'
+  | 'human'
   | 'credits';
 
 export interface SectionMeta {
@@ -47,7 +49,7 @@ export interface SectionMeta {
 
 export const SECTIONS: SectionMeta[] = [
   { id: 'account', key: 'settings.account', G: UserGlyph, tone: 'violet', group: 'you', keywords: 'profile name email phone username bio delete verified' },
-  { id: 'location', key: 'settings.location', G: CommuteGlyph, tone: 'teal', group: 'you', keywords: 'city home work neighbourhood radius commute metro car travel time' },
+  { id: 'location', key: 'settings.location', G: CommuteGlyph, tone: 'teal', group: 'you', keywords: 'city home work neighbourhood radius commute road car travel time' },
   { id: 'notifications', key: 'settings.notifications', G: BellGlyph, tone: 'amber', group: 'you', keywords: 'push email digest quiet hours replies mentions friends follows followers check-ins' },
   { id: 'alerts', key: 'settings.alerts', G: AlertGlyph, tone: 'peach', group: 'you', keywords: 'traffic water power weather severity commute radius safety' },
   { id: 'appearance', key: 'settings.appearance', G: PaletteGlyph, tone: 'blue', group: 'display', keywords: 'theme dark light text size font' },
@@ -59,6 +61,15 @@ export const SECTIONS: SectionMeta[] = [
   { id: 'safety', key: 'settings.safety', G: SosGlyph, tone: 'red', group: 'support', keywords: 'sos emergency contacts location safe walk' },
   { id: 'help', key: 'settings.help', G: HelpGlyph, tone: 'yellow', group: 'support', keywords: 'faq support problem bug feedback guidelines' },
   { id: 'about', key: 'settings.about', G: InfoGlyph, tone: 'blue', group: 'support', keywords: 'version credits licence glyphs icons' },
+  {
+    id: 'human',
+    key: 'settings.human',
+    G: UsersGlyph,
+    tone: 'mint',
+    group: 'support',
+    keywords: 'curation rules ads business listing owner claim spotted ai fake reviews verified residents guides trust',
+    nested: true,
+  },
   { id: 'credits', key: 'settings.credits', G: ImageGlyph, tone: 'peach', group: 'support', keywords: 'photo photos images credits licence license unsplash flickr creative commons attribution', nested: true },
 ];
 

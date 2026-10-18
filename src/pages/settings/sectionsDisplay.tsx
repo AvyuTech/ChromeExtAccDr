@@ -107,11 +107,12 @@ export function AppearanceSection() {
       </Group>
       <button
         type="button"
-        className="btn btn--outline btn--block"
+        className="btn btn--sm btn--outline"
+        style={{ alignSelf: 'center' }}
         disabled={theme === 'system' && textScale === 1}
         onClick={() => update('appearance', { theme: 'system', textScale: 1 })}
       >
-        <TextSizeGlyph size={18} /> Reset to defaults
+        <TextSizeGlyph size={16} /> Reset to defaults
       </button>
     </>
   );
@@ -130,7 +131,7 @@ export function LanguageSection() {
         <h2 className="set-group__title" id="lang-title">
           {t('settings.language.choose')}
         </h2>
-        <div className="list" role="radiogroup" aria-labelledby="lang-title">
+        <div className="list list--grouped" role="radiogroup" aria-labelledby="lang-title">
           {LANGUAGES.map((l) => (
             <button key={l.id} type="button" role="radio" aria-checked={lang === l.id} className="list-row" onClick={() => update('language', l.id)} lang={l.id}>
               <span className="lang-badge" aria-hidden="true">
@@ -142,13 +143,13 @@ export function LanguageSection() {
                   {l.name}
                 </span>
               </span>
-              {lang === l.id ? <CheckGlyph size={20} style={{ color: 'var(--accent)' }} /> : null}
+              {lang === l.id ? <CheckGlyph size={18} style={{ color: 'var(--accent)' }} /> : null}
             </button>
           ))}
         </div>
       </section>
 
-      <section className="card stack" aria-labelledby="lang-preview">
+      <section className="set-block" aria-labelledby="lang-preview">
         <h2 className="eyebrow muted" id="lang-preview">
           {t('settings.language.preview')}
         </h2>
@@ -214,7 +215,7 @@ export function AccessibilitySection() {
         />
       </Group>
       <div className="card row" style={{ gap: 12 }} aria-label="Contrast preview">
-        <span className="display strong" style={{ fontSize: '1.75rem' }} aria-hidden="true">
+        <span className="display strong" style={{ fontSize: '1.5rem' }} aria-hidden="true">
           Aa
         </span>
         <span className="stack" style={{ gap: 2 }}>

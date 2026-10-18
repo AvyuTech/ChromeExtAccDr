@@ -10,7 +10,7 @@ export default function NotFound() {
         <span className="lost-art__ring" />
         <span className="lost-art__ring lost-art__ring--2" />
         <span className="lost-art__logo">
-          <Logo size={84} tile animated={false} />
+          <Logo size={68} tile animated={false} />
         </span>
         <span className="lost-art__pin lost-art__pin--a">
           <PinGlyph size={18} />

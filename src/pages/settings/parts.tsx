@@ -9,10 +9,10 @@ import { ChevronRightGlyph, type GlyphProps } from '../../icons';
 export type GlyphComp = ComponentType<GlyphProps>;
 
 /** Outline glyph on a soft tinted square, as on Home and Explore. */
-export function GlyphTile({ G, tone = 'violet', live, size = 36 }: { G: GlyphComp; tone?: Tone; live?: boolean; size?: number }) {
+export function GlyphTile({ G, tone = 'violet', live, size = 30 }: { G: GlyphComp; tone?: Tone; live?: boolean; size?: number }) {
   return (
-    <span className={`tile set-tile tone-${tone}`} style={{ width: size, height: size, borderRadius: Math.round(size * 0.34) }}>
-      <G size={Math.round(size * 0.56)} live={live} />
+    <span className={`tile set-tile tone-${tone}`} style={{ width: size, height: size, borderRadius: Math.round(size * 0.32) }}>
+      <G size={Math.round(size * 0.58)} live={live} />
     </span>
   );
 }
@@ -28,7 +28,7 @@ export function Group({ title, note, children, id }: { title?: ReactNode; note?:
           {title}
         </h2>
       ) : null}
-      <div className="list">{children}</div>
+      <div className="list list--grouped">{children}</div>
       {note ? <p className="set-group__note">{note}</p> : null}
     </section>
   );
@@ -227,7 +227,7 @@ export function ChoiceTiles<T extends string>({
         const on = o.value === value;
         return (
           <button key={o.value} type="button" role="radio" aria-checked={on} className="choice-tile glyph-host" onClick={() => onChange(o.value)}>
-            <o.G size={22} active={on} duo />
+            <o.G size={20} active={on} duo />
             <span>{o.label}</span>
           </button>
         );
@@ -239,7 +239,7 @@ export function ChoiceTiles<T extends string>({
 export function SectionIntro({ G, tone = 'violet', title, body }: { G: GlyphComp; tone?: Tone; title: ReactNode; body: ReactNode }) {
   return (
     <div className="set-intro">
-      <GlyphTile G={G} tone={tone} size={44} live />
+      <GlyphTile G={G} tone={tone} size={38} live />
       <div className="stack" style={{ gap: 2 }}>
         <span className="strong">{title}</span>
         <span className="body-sm muted">{body}</span>

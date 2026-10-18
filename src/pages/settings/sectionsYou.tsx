@@ -11,7 +11,6 @@ import {
   AutoGlyph,
   BellGlyph,
   BikeGlyph,
-  BusGlyph,
   CarGlyph,
   EventsGlyph,
   FriendsGlyph,
@@ -22,7 +21,6 @@ import {
   ReplyGlyph,
   ReportGlyph,
   ShieldGlyph,
-  TransitGlyph,
   UserGlyph,
   WalkGlyph,
 } from '../../icons';
@@ -105,11 +103,11 @@ export function AccountSection() {
 
   return (
     <>
-      <form className="card stack stack--lg" onSubmit={onSave} noValidate aria-label={t('settings.account.profile')}>
-        <div className="row" style={{ gap: 14 }}>
-          <Avatar who={me} size={64} />
-          <div className="stack" style={{ gap: 2 }}>
-            <span className="display strong" style={{ fontSize: '1.125rem' }}>
+      <form className="set-form" onSubmit={onSave} noValidate aria-label={t('settings.account.profile')}>
+        <div className="row" style={{ gap: 12 }}>
+          <Avatar who={me} size={52} />
+          <div className="stack" style={{ gap: 0 }}>
+            <span className="display strong" style={{ fontSize: '1.0625rem' }}>
               {draft.name || '…'}
             </span>
             <span className="meta">
@@ -205,8 +203,6 @@ export function AccountSection() {
 /* ======================= Location & commute ======================= */
 
 export const COMMUTE_MODES: Array<{ value: CommuteMode; G: GlyphComp }> = [
-  { value: 'metro', G: TransitGlyph },
-  { value: 'brts', G: BusGlyph },
   { value: 'car', G: CarGlyph },
   { value: 'two-wheeler', G: BikeGlyph },
   { value: 'auto', G: AutoGlyph },
@@ -248,12 +244,13 @@ export function LocationSection() {
         <RangeRow label={t('settings.location.radius')} value={loc.radiusKm} min={1} max={20} onChange={(v) => update('location', { radiusKm: v })} format={(v) => `${v} km`} />
       </Group>
 
-      <Group title={t('settings.location.commute')} note="Used for commute-only alerts and to suggest the quickest way around the city.">
+      <Group title={t('settings.location.commute')} note="Used for commute-only alerts and live road times on your usual route.">
         <StackRow label={t('settings.location.mode')}>
           <ChoiceTiles
             label={t('settings.location.mode')}
             value={loc.commuteMode}
             onChange={(v) => update('location', { commuteMode: v })}
+            columns={4}
             options={COMMUTE_MODES.map((m) => ({ value: m.value, G: m.G, label: t(`settings.mode.${m.value}`) }))}
           />
         </StackRow>
@@ -372,7 +369,8 @@ export function NotificationsSection() {
 
 /* ======================= City alerts ======================= */
 
-const KINDS = Object.keys(ALERT_KIND_META) as AlertKind[];
+// Nearhood covers roads, not public transport, so transit notices are not offered.
+const KINDS = Object.keys(ALERT_KIND_META).filter((k) => k !== 'transit') as AlertKind[];
 const SEVERITIES: Severity[] = ['info', 'advisory', 'warning', 'critical'];
 
 export function AlertsSection() {

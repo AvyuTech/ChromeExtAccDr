@@ -4,7 +4,7 @@ import { EmptyState, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n';
 import { SECTIONS, type SectionId } from './meta';
 import { AccessibilitySection, AppearanceSection, LanguageSection } from './sectionsDisplay';
-import { AboutSection, HelpSection, PhotoCreditsSection, SafetySection } from './sectionsSupport';
+import { AboutSection, HelpSection, HumanSection, PhotoCreditsSection, SafetySection } from './sectionsSupport';
 import { DataSection, PrivacySection, SourcesSection } from './sectionsTrust';
 import { AccountSection, AlertsSection, LocationSection, NotificationsSection } from './sectionsYou';
 
@@ -22,6 +22,7 @@ const BODIES: Record<SectionId, ComponentType> = {
   safety: SafetySection,
   help: HelpSection,
   about: AboutSection,
+  human: HumanSection,
   credits: PhotoCreditsSection,
 };
 

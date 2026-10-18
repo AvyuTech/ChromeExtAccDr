@@ -115,21 +115,19 @@ function PostView({ post }: { post: Post }) {
         }
       />
       <main className="page page--with-header page--with-composer">
-        <article className="card stack" style={{ gap: 14 }}>
-          <div className="row" style={{ gap: 12 }}>
-            <Avatar who={author} size={48} />
-            <div className="grow" style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <article className="feed-post post-detail">
+          <div className="feed-post__head">
+            <Avatar who={author} size={38} />
+            <div className="feed-post__who">
               <span className="row row--wrap" style={{ gap: '2px 6px' }}>
-                <span className="strong">{author.name}</span>
+                <span className="feed-post__name">{author.name}</span>
                 {author.badge ? <span className="badge badge--sm tone-violet">{author.badge}</span> : null}
               </span>
               <span className="meta">
                 {post.area} · {post.ago}
               </span>
             </div>
-            <span className={`badge tone-${meta.tone}`} style={{ fontWeight: 700 }}>
-              {post.topic}
-            </span>
+            <span className={`badge badge--sm tone-${meta.tone}`}>{post.topic}</span>
           </div>
           <p className="post-detail__text">{post.text}</p>
           {group ? (
@@ -138,25 +136,20 @@ function PostView({ post }: { post: Post }) {
               {group.name}
             </Link>
           ) : null}
-          <div className="row" style={{ gap: 4, color: 'var(--muted)', fontSize: '0.84375rem', fontWeight: 500 }}>
+          <div className="feed-post__actions">
             <button
               type="button"
-              className="btn btn--ghost btn--sm"
+              className="feed-action"
               aria-pressed={up}
               aria-label={`Upvote, ${upCount}`}
-              style={{ color: up ? 'var(--accent)' : 'var(--muted)', fontWeight: up ? 700 : 500, padding: '0 10px', gap: 6 }}
+              style={up ? { color: 'var(--accent)' } : undefined}
               onClick={() => toggle('upvoted', post.id)}
             >
-              <UpvoteGlyph size={19} active={up} />
+              <UpvoteGlyph size={20} active={up} />
               {upCount}
             </button>
-            <button
-              type="button"
-              className="btn btn--ghost btn--sm"
-              style={{ color: 'var(--muted)', fontWeight: 500, padding: '0 10px', gap: 6 }}
-              onClick={() => inputRef.current?.focus()}
-            >
-              <ReplyGlyph size={19} />
+            <button type="button" className="feed-action" onClick={() => inputRef.current?.focus()}>
+              <ReplyGlyph size={20} />
               {replyTotal === 1 ? t('social.oneReply') : t('common.replies', { n: replyTotal })}
             </button>
             <span className="grow" />
@@ -171,7 +164,7 @@ function PostView({ post }: { post: Post }) {
                 toast(on ? 'Saved to your list' : 'Removed from saved');
               }}
             >
-              <SaveGlyph size={19} active={saved} />
+              <SaveGlyph size={20} active={saved} />
             </button>
             <ShareButton title={post.text} path={`/post/${post.id}`} />
           </div>
@@ -212,20 +205,18 @@ function PostView({ post }: { post: Post }) {
         <section className="section" aria-labelledby="replies-title">
           <SectionHead id="replies-title" title={`${t('social.replies')} · ${replyTotal}`} />
           {replies.length === 0 ? (
-            <div className="card">
-              <p className="body-sm muted">{t('social.noReplies')}</p>
-            </div>
+            <p className="body-sm muted">{t('social.noReplies')}</p>
           ) : (
-            <div className="list">
+            <div className="list social-list">
               {replies.map((r) => {
                 const who = person(r.authorId);
                 const liked = likedReplies.includes(r.id);
                 return (
                   <div key={r.id} className={`reply${r.helpful ? ' reply--helpful' : ''}${r.authorId === 'me' ? ' reply--mine' : ''}`}>
-                    <Avatar who={who} size={34} />
-                    <div className="stack grow" style={{ gap: 4 }}>
+                    <Avatar who={who} size={30} />
+                    <div className="stack grow" style={{ gap: 2 }}>
                       <div className="reply__head">
-                        <span className="strong" style={{ fontSize: '0.875rem' }}>
+                        <span className="strong" style={{ fontSize: '0.8125rem' }}>
                           {r.authorId === 'me' ? t('social.you') : who.name}
                         </span>
                         {who.badge && r.authorId !== 'me' ? <span className="badge badge--sm tone-violet">{who.badge}</span> : null}
@@ -236,13 +227,13 @@ function PostView({ post }: { post: Post }) {
                       <div className="reply__actions">
                         <button
                           type="button"
-                          className="btn btn--ghost btn--sm"
+                          className="feed-action"
                           aria-pressed={liked}
                           aria-label={`Upvote reply, ${r.upvotes + (liked ? 1 : 0)}`}
-                          style={{ color: liked ? 'var(--accent)' : 'var(--muted)', fontWeight: liked ? 700 : 500, padding: '0 10px', gap: 5 }}
+                          style={{ color: liked ? 'var(--accent)' : 'var(--muted)', fontSize: '0.75rem', height: 24 }}
                           onClick={() => setLikedReplies((xs) => (liked ? xs.filter((x) => x !== r.id) : [...xs, r.id]))}
                         >
-                          <UpvoteGlyph size={16} active={liked} />
+                          <UpvoteGlyph size={15} active={liked} />
                           {r.upvotes + (liked ? 1 : 0)}
                         </button>
                       </div>
@@ -262,7 +253,7 @@ function PostView({ post }: { post: Post }) {
               {related.map((p) => {
                 return (
                   <Link key={p.id} to={`/post/${p.id}`} className="list-row glyph-host">
-                    <Avatar who={{ ...person(p.authorId), verified: false }} size={40} />
+                    <Avatar who={{ ...person(p.authorId), verified: false }} size={32} />
                     <span className="list-row__body">
                       <span className="related-row__text">{p.text}</span>
                       <span className="list-row__meta">

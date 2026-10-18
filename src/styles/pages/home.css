@@ -99,11 +99,23 @@
   color: var(--ink);
 }
 
-/* Glyph gallery (/about/glyphs) */
+/* Glyph gallery (/about/glyphs): flat sections split by hairlines */
+.glyph-section {
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--divider);
+}
+.glyph-section:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+.glyph-section .section__title {
+  font-size: 1rem;
+}
 .glyph-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(66px, 1fr));
+  gap: 6px;
 }
 .glyph-grid--4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -112,13 +124,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
-  padding: 12px 4px 10px;
+  gap: 6px;
+  padding: 10px 4px 8px;
   border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--surface-2);
+  border-radius: 13px;
+  background: var(--surface);
   color: var(--ink);
-  font-size: 0.7188rem;
+  font-size: 0.6563rem;
   font-weight: 700;
   text-align: center;
   word-break: break-word;
@@ -130,11 +142,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 12px;
+  gap: 6px;
+  padding: 10px;
   border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--surface-2);
+  border-radius: 13px;
+  background: var(--surface);
   text-align: center;
 }
 .glyph-demo .segmented {
@@ -147,13 +159,13 @@
   flex-wrap: wrap;
 }
 .brand-sheet__cell {
-  width: 88px;
-  height: 88px;
+  width: 72px;
+  height: 72px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 22px;
-  background: var(--surface-2);
+  border-radius: 18px;
+  background: var(--surface);
   border: 1px solid var(--border);
 }
 .brand-sheet__cell--violet {
@@ -161,8 +173,7 @@
   border-color: var(--accent-line);
 }
 .brand-sheet__cell--violet svg {
-  border-radius: 20px;
-  box-shadow: 0 10px 22px rgba(76, 52, 200, 0.3);
+  border-radius: 16px;
 }
 .brand-sheet__word {
   display: flex;

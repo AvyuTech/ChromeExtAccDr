@@ -179,14 +179,14 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
 
       <form id="compose-form" className="compose-form page page--with-header page--no-nav" onSubmit={submit} noValidate>
         <div className="compose-as">
-          <Avatar who={{ ...PEOPLE.me, name: settings.profile.name, verified: settings.profile.verifiedResident }} size={44} />
-          <span className="stack grow" style={{ gap: 1, minWidth: 0 }}>
-            <span className="strong">{t('social.postingAs', { name: settings.profile.name })}</span>
+          <Avatar who={{ ...PEOPLE.me, name: settings.profile.name, verified: settings.profile.verifiedResident }} size={36} />
+          <span className="stack grow" style={{ gap: 0, minWidth: 0 }}>
+            <span className="strong" style={{ fontSize: '0.875rem' }}>{t('social.postingAs', { name: settings.profile.name })}</span>
             <span className="meta truncate">{t('social.visibleTo', { where: whereLabel })}</span>
           </span>
         </div>
-        <fieldset className="stack" style={{ border: 'none', margin: 0, padding: 0, gap: 10 }}>
-          <legend className="field__label" style={{ marginBottom: 10 }}>
+        <fieldset className="stack" style={{ border: 'none', margin: 0, padding: 0, gap: 8 }}>
+          <legend className="field__label" style={{ marginBottom: 6 }}>
             {t('social.whatType')}
           </legend>
           <div className="type-grid" role="radiogroup" aria-label={t('social.whatType')}>
@@ -195,8 +195,8 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
               const on = type === x.id;
               return (
                 <button key={x.id} type="button" role="radio" aria-checked={on} className="type-option glyph-host" onClick={() => chooseType(x.id)}>
-                  <span className={`tile tone-${meta.tone}`} style={{ width: 38, height: 38, borderRadius: 13 }}>
-                    <NamedGlyph name={meta.glyph} size={20} active={on} />
+                  <span className={`tile tone-${meta.tone}`} style={{ width: 28, height: 28, borderRadius: 9 }}>
+                    <NamedGlyph name={meta.glyph} size={16} active={on} />
                   </span>
                   {t(x.key)}
                 </button>

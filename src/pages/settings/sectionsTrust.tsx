@@ -22,7 +22,6 @@ import {
   ServicesGlyph,
   ShieldGlyph,
   SparkGlyph,
-  TransitGlyph,
   TrashGlyph,
   TrustRing,
   UsersGlyph,
@@ -191,7 +190,6 @@ const OFFICIAL: Array<{ id: SourceId; G: GlyphComp }> = [
   { id: 'cyber', G: ShieldGlyph },
   { id: 'amc', G: ServicesGlyph },
   { id: 'utility', G: BoltGlyph },
-  { id: 'metro', G: TransitGlyph },
   { id: 'imd', G: CloudGlyph },
   { id: 'cpcb', G: AirGlyph },
 ];
@@ -384,7 +382,7 @@ export function DataSection() {
           G={CityGlyph}
           tone="violet"
           title={t('settings.data.live')}
-          meta={d.dataSaver ? 'Paused while Data saver is on.' : 'Metro countdowns, traffic and air quality refresh on their own.'}
+          meta={d.dataSaver ? 'Paused while Data saver is on.' : 'Traffic, weather and air quality refresh on their own.'}
           checked={d.liveUpdates && !d.dataSaver}
           disabled={d.dataSaver}
           onChange={(v) => update('data', { liveUpdates: v })}

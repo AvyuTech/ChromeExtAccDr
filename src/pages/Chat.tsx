@@ -99,9 +99,9 @@ export default function Chat() {
           <BackGlyph size={20} />
         </button>
         <Link to={who.id === 'ward' ? '/city' : `/people/${who.id}`} className="chat-head__who">
-          <Avatar who={who} size={42} />
+          <Avatar who={who} size={34} />
           <span className="grow" style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <h1 className="page-header__title" style={{ fontSize: '1.0625rem' }}>
+            <h1 className="page-header__title" style={{ fontSize: '0.9688rem' }}>
               {who.name}
             </h1>
             <span className="meta truncate">
@@ -123,15 +123,15 @@ export default function Chat() {
                 {place.kind} · {place.area}
               </span>
             </span>
-            <ChevronRightGlyph size={18} />
+            <ChevronRightGlyph size={16} />
           </Link>
         ) : convo.context ? (
-          <span className="chip chip--soft" style={{ alignSelf: 'center', height: 32 }}>
+          <span className="chip chip--soft" style={{ alignSelf: 'center', height: 28 }}>
             {convo.context}
           </span>
         ) : null}
-        <p className="meta row" style={{ alignSelf: 'center', alignItems: 'flex-start', maxWidth: 320, gap: 8, lineHeight: 1.45 }}>
-          <ShieldGlyph size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+        <p className="meta row" style={{ alignSelf: 'center', alignItems: 'flex-start', maxWidth: 300, gap: 6, lineHeight: 1.4, fontSize: '0.7188rem' }}>
+          <ShieldGlyph size={14} style={{ flexShrink: 0, marginTop: 1 }} />
           {t('social.safetyNote')}
         </p>
 
@@ -143,7 +143,7 @@ export default function Chat() {
           </div>
         ) : null}
 
-        <div className="stack" role="log" aria-live="polite" style={{ gap: 8 }}>
+        <div className="stack" role="log" aria-live="polite" style={{ gap: 5 }}>
           {messages.map((m, i) => {
             const day = dayOf(m);
             const newDay = i === 0 || dayOf(messages[i - 1]) !== day;
@@ -164,7 +164,7 @@ export default function Chat() {
                   bubble
                 ) : (
                   <div className="bubble-row">
-                    <span className="bubble-row__face">{lastOfRun ? <Avatar who={{ ...who, verified: false }} size={28} /> : null}</span>
+                    <span className="bubble-row__face">{lastOfRun ? <Avatar who={{ ...who, verified: false }} size={24} /> : null}</span>
                     {bubble}
                   </div>
                 )}

@@ -92,17 +92,17 @@ export default function Updates() {
           groups
             .filter((g) => g.items.length)
             .map((g) => (
-              <section key={g.id} className="section" aria-labelledby={`updates-${g.id}`} style={{ gap: 8 }}>
+              <section key={g.id} className="section" aria-labelledby={`updates-${g.id}`} style={{ gap: 2 }}>
                 <h2 id={`updates-${g.id}`} className="notif-group-title">
                   {t(g.key)}
                 </h2>
-                <div className="list">
+                <div className="list social-list">
                   {g.items.map((n) => {
                     const isUnread = !data.readNotifications.includes(n.id);
                     const content = (
                       <>
                         <NotifVisual n={n} live={(n.kind === 'alert' || n.kind === 'friend') && isUnread} />
-                        <span className="list-row__body" style={{ gap: 3 }}>
+                        <span className="list-row__body" style={{ gap: 1 }}>
                           <span className="notif-row__title">{pendingRequest(n) ? `${person(n.actorId!).name} wants to follow you` : n.title}</span>
                           <span className="notif-row__body">{pendingRequest(n) ? 'Approve to let them see your friends-only check-ins.' : n.body}</span>
                           <span className="meta">{n.ago}</span>
@@ -171,13 +171,13 @@ function NotifVisual({ n, live }: { n: AppNotification; live: boolean }) {
   const src = n.actorId ? personPhoto(n.actorId) : eventId ? eventPhoto(eventId) : groupId ? groupPhoto(groupId) : deal?.placeId ? placePhoto(deal.placeId) : undefined;
   const badge = (
     <span className={`notif-visual__badge tone-${meta.tone}`}>
-      <NamedGlyph name={meta.glyph} size={12} />
+      <NamedGlyph name={meta.glyph} size={10} />
     </span>
   );
   if (n.actorId) {
     return (
       <span className="notif-visual">
-        <Avatar who={{ ...person(n.actorId), verified: false }} size={46} />
+        <Avatar who={{ ...person(n.actorId), verified: false }} size={40} />
         {badge}
       </span>
     );
@@ -192,7 +192,7 @@ function NotifVisual({ n, live }: { n: AppNotification; live: boolean }) {
   }
   return (
     <span className={`notif-visual notif-visual--tile tone-${meta.tone}`}>
-      <NamedGlyph name={meta.glyph} size={22} live={live} />
+      <NamedGlyph name={meta.glyph} size={19} live={live} />
     </span>
   );
 }

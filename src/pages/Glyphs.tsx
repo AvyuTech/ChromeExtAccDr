@@ -40,7 +40,6 @@ const CATEGORY: GlyphName[] = [
   'getaways',
   'groups',
   'services',
-  'transit',
   'safety',
   'report',
   'music',
@@ -81,14 +80,14 @@ export default function Glyphs() {
     <>
       <PageHeader title="Nearhood glyphs" fallback="/settings/about" sub="Hand-drawn, data-driven icon family" />
       <main className="page page--with-header">
-        <section className="card stack" aria-labelledby="g-brand">
+        <section className="glyph-section stack" aria-labelledby="g-brand">
           <SectionHead id="g-brand" title="Brand mark" />
           <div className="brand-sheet">
             <span className="brand-sheet__cell">
-              <Logo key={logoKey} size={64} title="Nearhood logo" />
+              <Logo key={logoKey} size={52} title="Nearhood logo" />
             </span>
             <span className="brand-sheet__cell brand-sheet__cell--violet">
-              <Logo key={`tile-${logoKey}`} size={64} tile title="Nearhood app icon" />
+              <Logo key={`tile-${logoKey}`} size={52} tile title="Nearhood app icon" />
             </span>
             <span className="brand-sheet__word">
               <Wordmark size={30} />
@@ -101,7 +100,7 @@ export default function Glyphs() {
           </button>
         </section>
 
-        <section className="card stack" aria-labelledby="g-nav">
+        <section className="glyph-section stack" aria-labelledby="g-nav">
           <SectionHead id="g-nav" title="Tab bar" />
           <p className="body-sm muted">Tap a tab: the roof hops, the compass needle swings, the city's windows light up and its tower broadcasts, the neighbourhood ring turns.</p>
           <div className="glyph-grid glyph-grid--4" role="radiogroup" aria-label="Active tab">
@@ -125,7 +124,7 @@ export default function Glyphs() {
           </div>
         </section>
 
-        <section className="card stack" aria-labelledby="g-cat">
+        <section className="glyph-section stack" aria-labelledby="g-cat">
           <div className="row row--between">
             <SectionHead id="g-cat" title="Categories" />
             <span className="row meta">
@@ -144,7 +143,7 @@ export default function Glyphs() {
           </div>
         </section>
 
-        <section className="card stack" aria-labelledby="g-weather">
+        <section className="glyph-section stack" aria-labelledby="g-weather">
           <SectionHead id="g-weather" title="Weather" />
           <div className="glyph-grid">
             {WEATHER.map((c) => (
@@ -156,7 +155,7 @@ export default function Glyphs() {
           </div>
         </section>
 
-        <section className="card stack" aria-labelledby="g-aqi">
+        <section className="glyph-section stack" aria-labelledby="g-aqi">
           <SectionHead id="g-aqi" title="Air quality dial" />
           <div className="row" style={{ justifyContent: 'center' }}>
             <AqiDial value={aqi} size={200} />
@@ -169,7 +168,7 @@ export default function Glyphs() {
           </label>
         </section>
 
-        <section className="card stack" aria-labelledby="g-live">
+        <section className="glyph-section stack" aria-labelledby="g-live">
           <SectionHead id="g-live" title="Live city signals" />
           <div className="grid-2">
             <div className="glyph-demo">
@@ -213,8 +212,8 @@ export default function Glyphs() {
               <span className="tile tile--xl tone-blue">
                 <CountdownRing value={mins} max={10} size={52} />
               </span>
-              <input className="range" type="range" min={0} max={10} value={mins} aria-label="Minutes to departure" onChange={(e) => setMins(Number(e.target.value))} />
-              <span className="meta">Next train countdown</span>
+              <input className="range" type="range" min={0} max={10} value={mins} aria-label="Minutes left" onChange={(e) => setMins(Number(e.target.value))} />
+              <span className="meta">Countdown to a plan or a deal ending</span>
             </div>
             <div className="glyph-demo">
               <StepRing step={step} size={64} key={step}>
@@ -226,7 +225,7 @@ export default function Glyphs() {
           </div>
         </section>
 
-        <section className="card stack" aria-labelledby="g-react">
+        <section className="glyph-section stack" aria-labelledby="g-react">
           <SectionHead id="g-react" title="Reactions" />
           <div className="row row--wrap" style={{ gap: 8 }}>
             <button type="button" className="btn btn--sm btn--outline" aria-pressed={up} onClick={() => setUp((v) => !v)} style={{ color: up ? 'var(--accent)' : undefined }}>
@@ -241,7 +240,7 @@ export default function Glyphs() {
           </div>
         </section>
 
-        <section className="card stack" aria-labelledby="g-all">
+        <section className="glyph-section stack" aria-labelledby="g-all">
           <SectionHead id="g-all" title={`Full set · ${Object.keys(GLYPHS).length}`} />
           <div className="glyph-grid">
             {(Object.keys(GLYPHS) as GlyphName[]).map((name) => (

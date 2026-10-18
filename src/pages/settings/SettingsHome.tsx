@@ -21,8 +21,8 @@ function trailFor(id: SectionId, s: Settings, t: (k: string, v?: Record<string, 
     case 'notifications':
       return s.notifications.push ? t('settings.on') : t('settings.off');
     case 'alerts': {
-      const on = (Object.keys(ALERT_KIND_META) as Array<keyof typeof ALERT_KIND_META>).filter((k) => s.alerts.kinds[k]).length;
-      return `${on}/8`;
+      const kinds = Object.keys(ALERT_KIND_META).filter((k) => k !== 'transit') as Array<keyof typeof ALERT_KIND_META>;
+      return `${kinds.filter((k) => s.alerts.kinds[k]).length}/${kinds.length}`;
     }
     case 'appearance':
       return t(`settings.theme.${s.appearance.theme}`);
@@ -69,14 +69,14 @@ export default function SettingsHome() {
     <>
       <PageHeader title={t('settings.title')} fallback="/me" />
       <main className="page page--with-header settings-page">
-        <Link to="/settings/account" className="card set-profile-card" aria-label={`${settings.profile.name}, ${t('settings.account')}`}>
-          <Avatar who={me} size={64} ring />
-          <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
-            <span className="set-profile-card__name">{settings.profile.name}</span>
+        <Link to="/settings/account" className="set-profile" aria-label={`${settings.profile.name}, ${t('settings.account')}`}>
+          <Avatar who={me} size={52} ring />
+          <span className="stack grow" style={{ gap: 1, minWidth: 0 }}>
+            <span className="set-profile__name">{settings.profile.name}</span>
             <span className="meta truncate">
               @{settings.profile.handle} · {neighbourhoodName(settings.location.home)}
             </span>
-            <span className="row row--wrap" style={{ gap: 6, marginTop: 4 }}>
+            <span className="row row--wrap" style={{ gap: 5, marginTop: 4 }}>
               {settings.profile.verifiedResident ? (
                 <span className="badge badge--sm tone-mint" style={{ gap: 4 }}>
                   <CheckGlyph size={12} />
@@ -86,29 +86,27 @@ export default function SettingsHome() {
               {PEOPLE.me.badge ? <span className="badge badge--sm tone-violet">{PEOPLE.me.badge}</span> : null}
             </span>
           </span>
-          <span className="set-profile-card__go" aria-hidden="true">
-            <ChevronRightGlyph size={18} />
-          </span>
+          <ChevronRightGlyph size={18} style={{ color: 'var(--muted)', flexShrink: 0 }} />
         </Link>
 
         <div className="quick-grid" role="group" aria-label={t('settings.home.quick')}>
           <button type="button" className="quick-tile" aria-pressed={dark} onClick={() => update('appearance', { theme: dark ? 'light' : 'dark' })}>
             <span className="quick-tile__icon">
-              <MoonGlyph size={20} active={dark} />
+              <MoonGlyph size={17} active={dark} />
             </span>
             <span className="quick-tile__label">{t('settings.home.darkMode')}</span>
             <span className="quick-tile__state">{dark ? t('settings.on') : t(`settings.theme.${settings.appearance.theme}`)}</span>
           </button>
           <button type="button" className="quick-tile" aria-pressed={settings.notifications.push} onClick={() => update('notifications', { push: !settings.notifications.push })}>
             <span className="quick-tile__icon">
-              <BellGlyph size={20} ringing={settings.notifications.push} active={settings.notifications.push} />
+              <BellGlyph size={17} ringing={settings.notifications.push} active={settings.notifications.push} />
             </span>
             <span className="quick-tile__label">{t('settings.home.push')}</span>
             <span className="quick-tile__state">{settings.notifications.push ? t('settings.on') : t('settings.off')}</span>
           </button>
           <button type="button" className="quick-tile" aria-pressed={settings.data.dataSaver} onClick={() => update('data', { dataSaver: !settings.data.dataSaver })}>
             <span className="quick-tile__icon">
-              <DataGlyph size={20} active={settings.data.dataSaver} />
+              <DataGlyph size={17} active={settings.data.dataSaver} />
             </span>
             <span className="quick-tile__label">{t('settings.data.saver')}</span>
             <span className="quick-tile__state">{settings.data.dataSaver ? t('settings.on') : t('settings.off')}</span>
@@ -116,7 +114,7 @@ export default function SettingsHome() {
         </div>
 
         <label className="search-field" htmlFor="settings-search">
-          <SearchGlyph size={20} />
+          <SearchGlyph size={18} />
           <span className="sr-only">{t('settings.search')}</span>
           <input id="settings-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('settings.search')} autoComplete="off" />
         </label>
@@ -131,7 +129,7 @@ export default function SettingsHome() {
               <h2 className="set-group__title" id={`grp-${g.id}`}>
                 {t(g.key)}
               </h2>
-              <div className="list">
+              <div className="list list--grouped">
                 {rows.map((s) => {
                   const trail = trailFor(s.id, settings, t);
                   return <SettingLink key={s.id} to={`/settings/${s.id}`} G={s.G} tone={s.tone} title={t(s.key)} trail={trail ? <span className="set-trail">{trail}</span> : undefined} />;
@@ -142,19 +140,29 @@ export default function SettingsHome() {
         })}
 
         {!query ? (
-          <div className="stack">
-            <button type="button" className="btn btn--outline btn--block" onClick={() => setSheet('reset')}>
-              <RefreshGlyph size={18} />
-              {t('settings.resetData')}
-            </button>
-            <button type="button" className="btn btn--danger btn--block" onClick={() => setSheet('signout')}>
-              <LogoutGlyph size={18} />
-              {t('settings.signOut')}
-            </button>
-            <p className="meta" style={{ textAlign: 'center', marginTop: 6 }}>
+          <section className="set-group" aria-label={t('settings.signOut')}>
+            <div className="list list--grouped">
+              <button type="button" className="list-row" onClick={() => setSheet('reset')}>
+                <span className="tile set-tile tone-violet" style={{ width: 30, height: 30, borderRadius: 10 }}>
+                  <RefreshGlyph size={17} />
+                </span>
+                <span className="list-row__body">
+                  <span className="list-row__title">{t('settings.resetData')}</span>
+                </span>
+              </button>
+              <button type="button" className="list-row set-row--danger" onClick={() => setSheet('signout')}>
+                <span className="tile set-tile tone-red" style={{ width: 30, height: 30, borderRadius: 10 }}>
+                  <LogoutGlyph size={17} />
+                </span>
+                <span className="list-row__body">
+                  <span className="list-row__title">{t('settings.signOut')}</span>
+                </span>
+              </button>
+            </div>
+            <p className="meta" style={{ textAlign: 'center', marginTop: 4 }}>
               {t('settings.footer', { v: APP_VERSION })}
             </p>
-          </div>
+          </section>
         ) : null}
       </main>
 
