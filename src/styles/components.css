@@ -2075,8 +2075,8 @@ a.feed-post__name:hover {
   padding: 0 16px;
   border: none;
   border-radius: 10px;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-fill);
+  color: var(--on-accent);
   font: inherit;
   font-size: 0.8125rem;
   font-weight: 700;
@@ -2119,10 +2119,16 @@ a.feed-post__name:hover {
   font-weight: 600;
   white-space: nowrap;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.12s ease;
+  /* Out of the layout until shown, so it never widens the page. */
+  display: none;
 }
 .action-icon:hover .action-icon__tip,
 .action-icon:focus-visible .action-icon__tip {
-  opacity: 1;
+  display: block;
+}
+/* The last icon sits at the screen edge: open its label leftwards. */
+.action-bar > .action-icon:last-child .action-icon__tip {
+  left: auto;
+  right: 0;
+  transform: none;
 }

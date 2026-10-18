@@ -496,52 +496,6 @@ export function ProfileHead({
   );
 }
 
-/** One round outline icon with a tiny label. `primary` fills it violet. */
-export function IconAction({
-  icon,
-  label,
-  onClick,
-  to,
-  href,
-  pressed,
-  primary,
-  ariaLabel,
-}: {
-  icon: ReactNode;
-  label: string;
-  onClick?: () => void;
-  to?: string;
-  href?: string;
-  pressed?: boolean;
-  primary?: boolean;
-  ariaLabel?: string;
-}) {
-  const cls = `icon-action${primary ? ' icon-action--primary' : ''}`;
-  const inner = (
-    <>
-      <span className="icon-action__icon">{icon}</span>
-      <span className="icon-action__label">{label}</span>
-    </>
-  );
-  if (to)
-    return (
-      <Link to={to} className={cls} aria-label={ariaLabel}>
-        {inner}
-      </Link>
-    );
-  if (href)
-    return (
-      <a href={href} className={cls} target="_blank" rel="noopener noreferrer" aria-label={ariaLabel}>
-        {inner}
-      </a>
-    );
-  return (
-    <button type="button" className={cls} aria-pressed={pressed} aria-label={ariaLabel} onClick={onClick}>
-      {inner}
-    </button>
-  );
-}
-
 /* ---------- Where a place came from, and claiming it ---------- */
 
 const ORIGIN_RULES = [

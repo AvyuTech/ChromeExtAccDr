@@ -17,8 +17,7 @@
   vertical-align: middle;
 }
 .level-tag .glyph,
-.level-badge .glyph,
-.helpful-line__level .glyph {
+.level-badge .glyph {
   color: var(--amber-ink);
 }
 .level-tag--hero {
@@ -42,61 +41,6 @@
 }
 .helpful-stat b {
   color: var(--ink);
-}
-
-/* One line on profiles: level · points · rank */
-.helpful-line {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-.helpful-line__row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-}
-.helpful-line__row .grow {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.helpful-line__level {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  flex-shrink: 0;
-  color: var(--ink);
-  font-weight: 800;
-}
-.helpful-line__next {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.helpful-line__next .meta {
-  font-size: 0.6875rem;
-  white-space: nowrap;
-}
-.helpful-line__bar {
-  flex: 1;
-  height: 3px;
-  max-width: 160px;
-  border-radius: 2px;
-  background: var(--surface-3);
-  overflow: hidden;
-}
-.helpful-line__bar > span {
-  display: block;
-  height: 100%;
-  border-radius: 2px;
-  background: var(--ink);
 }
 
 /* ---------- Progress to the next level ---------- */
