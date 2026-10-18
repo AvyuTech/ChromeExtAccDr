@@ -1,0 +1,31 @@
+{
+  "name": "nearhood",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Nearhood — a smart, city-level companion app for Ahmedabad: ask anything, verified city alerts, live city pulse, civic reports, events, deals and neighbourhood groups.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "build:single": "vite build --mode single",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "e2e": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "playwright": "^1.56.1",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.4",
+    "vite-plugin-singlefile": "^2.3.4",
+    "vitest": "^5.0.5"
+  }
+}

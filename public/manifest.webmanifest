@@ -1,0 +1,18 @@
+{
+  "name": "Nearhood",
+  "short_name": "Nearhood",
+  "description": "Ask anything about your city. Verified alerts, live city pulse, civic reports, events, deals and neighbourhood groups.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F5FA",
+  "theme_color": "#5B3FD9",
+  "categories": ["lifestyle", "social", "navigation"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

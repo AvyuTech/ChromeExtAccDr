@@ -1,0 +1,884 @@
+/* ===== Nearhood glyph system ===== */
+.glyph {
+  flex-shrink: 0;
+  overflow: visible;
+}
+.glyph .g-tint {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.glyph.is-active .g-tint,
+.glyph.is-duo .g-tint {
+  opacity: 0.16;
+}
+.glyph .g-fill {
+  fill: currentColor;
+}
+.glyph .g-dot {
+  fill: var(--g-dot, var(--mint));
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Nav glyphs keep the mint dot for the active tab only */
+.nav-item .glyph:not(.is-active) .g-dot {
+  transform: scale(0);
+}
+
+/* ----- Logo ----- */
+.logo--animated .logo__arch {
+  stroke-dasharray: 46;
+  animation: logo-arch 0.7s ease-out both;
+}
+.logo--animated .logo__dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: logo-drop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
+}
+@keyframes logo-arch {
+  from {
+    stroke-dashoffset: 46;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes logo-drop {
+  from {
+    transform: translateY(-14px) scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ----- Home ----- */
+.glyph--home .home__roof {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.glyph--home.is-active .home__roof {
+  animation: roof-hop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes roof-hop {
+  40% {
+    transform: translateY(-2px);
+  }
+}
+
+/* ----- Explore ----- */
+.glyph--explore .explore__needle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph--explore.is-active .explore__needle,
+.glyph-host:hover .glyph--explore .explore__needle {
+  animation: needle-swing 1s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+.glyph--explore .g-fill {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.glyph--explore.is-active .g-fill {
+  opacity: 1;
+}
+@keyframes needle-swing {
+  from {
+    transform: rotate(-200deg);
+  }
+  to {
+    transform: rotate(0);
+  }
+}
+
+/* ----- City ----- */
+.glyph--city .city__wave--1 {
+  opacity: 0.9;
+}
+.glyph--city .city__wave--2 {
+  opacity: 0.45;
+}
+.glyph--city .city__win {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0.55;
+}
+.glyph--city.is-active .city__win,
+.glyph--city.is-live .city__win {
+  fill: var(--mint);
+  opacity: 1;
+  animation: win-on 0.4s ease-out both;
+}
+.glyph--city.is-active .city__win--2,
+.glyph--city.is-live .city__win--2 {
+  animation-delay: 0.08s;
+}
+.glyph--city.is-active .city__win--3,
+.glyph--city.is-live .city__win--3 {
+  animation-delay: 0.16s;
+}
+.glyph--city.is-active .city__win--4,
+.glyph--city.is-live .city__win--4 {
+  animation-delay: 0.24s;
+}
+.glyph--city.is-active .city__wave--1 {
+  animation: city-wave 1.4s ease-out 2;
+}
+.glyph--city.is-active .city__wave--2 {
+  animation: city-wave 1.4s ease-out 0.2s 2;
+}
+.glyph--city.is-live .city__wave--1 {
+  animation: city-wave 1.8s ease-out infinite;
+}
+.glyph--city.is-live .city__wave--2 {
+  animation: city-wave 1.8s ease-out 0.3s infinite;
+}
+@keyframes win-on {
+  from {
+    opacity: 0.2;
+  }
+}
+@keyframes city-wave {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.15;
+  }
+}
+
+/* ----- Me ----- */
+.glyph--me .me__ring {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: opacity 0.3s ease;
+}
+.glyph--me.is-active .me__ring,
+.glyph--me.is-live .me__ring {
+  opacity: 0.9;
+  animation: ring-turn 1.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.glyph--me.is-live .me__ring {
+  animation: ring-turn 14s linear infinite;
+}
+@keyframes ring-turn {
+  from {
+    transform: rotate(-120deg);
+  }
+  to {
+    transform: rotate(0);
+  }
+}
+
+/* ----- Bell ----- */
+.glyph--bell .bell__body,
+.glyph--bell .bell__clapper {
+  transform-origin: 12px 3.5px;
+}
+.glyph--bell.is-live .bell__body {
+  animation: bell-ring 3.2s ease-in-out infinite;
+}
+.glyph--bell.is-live .bell__clapper {
+  animation: bell-ring 3.2s ease-in-out 0.06s infinite;
+}
+.glyph--bell .g-dot--on {
+  animation: badge-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes bell-ring {
+  0%,
+  36%,
+  100% {
+    transform: rotate(0);
+  }
+  4% {
+    transform: rotate(14deg);
+  }
+  9% {
+    transform: rotate(-12deg);
+  }
+  14% {
+    transform: rotate(9deg);
+  }
+  19% {
+    transform: rotate(-6deg);
+  }
+  24% {
+    transform: rotate(3deg);
+  }
+}
+
+/* ----- Chat ----- */
+.glyph--chat .chat__dot {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph--chat.is-live .chat__dot {
+  opacity: 1;
+  animation: typing 1.3s ease-in-out infinite;
+}
+.glyph--chat.is-live .chat__dot--2 {
+  animation-delay: 0.15s;
+}
+.glyph--chat.is-live .chat__dot--3 {
+  animation-delay: 0.3s;
+}
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-1.6px);
+    opacity: 1;
+  }
+}
+
+/* ----- Plus / FAB ----- */
+.glyph--plus {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.fab:hover .glyph--plus,
+.fab:focus-visible .glyph--plus {
+  transform: rotate(90deg);
+}
+
+/* ----- Spark (AI answer) ----- */
+.glyph--spark .spark__big,
+.glyph--spark .spark__small {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph--spark.is-live .spark__big {
+  animation: twinkle 1.6s ease-in-out infinite;
+}
+.glyph--spark.is-live .spark__small {
+  animation: twinkle 1.6s ease-in-out 0.5s infinite;
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  50% {
+    transform: scale(0.78) rotate(30deg);
+  }
+}
+
+/* ===== Category ambient motion (live, or hover on a .glyph-host) ===== */
+.food__steam {
+  transform-box: fill-box;
+  opacity: 0.9;
+}
+.is-live .food__steam,
+.glyph-host:hover .food__steam {
+  animation: steam 2.2s ease-in-out infinite;
+}
+.is-live .food__steam--2,
+.glyph-host:hover .food__steam--2 {
+  animation-delay: 0.35s;
+}
+.is-live .food__steam--3,
+.glyph-host:hover .food__steam--3 {
+  animation-delay: 0.7s;
+}
+@keyframes steam {
+  0% {
+    transform: translateY(1.5px);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-2.5px);
+    opacity: 0;
+  }
+}
+
+.events__ticket {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph-host:hover .events__ticket,
+.glyph--events.is-active .events__ticket {
+  animation: ticket-wiggle 0.7s ease-in-out;
+}
+.is-live .events__star {
+  animation: twinkle 2s ease-in-out infinite;
+}
+@keyframes ticket-wiggle {
+  25% {
+    transform: rotate(-9deg);
+  }
+  60% {
+    transform: rotate(6deg);
+  }
+}
+
+.deals__tag {
+  transform-origin: 7.6px 7.6px;
+}
+.is-live .deals__tag,
+.glyph-host:hover .deals__tag {
+  animation: tag-swing 2.6s ease-in-out infinite;
+}
+@keyframes tag-swing {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(9deg);
+  }
+  45% {
+    transform: rotate(-6deg);
+  }
+  65% {
+    transform: rotate(3deg);
+  }
+}
+
+.alert__pulse {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.is-live .alert__pulse {
+  animation: alert-pulse 1.9s ease-out infinite;
+}
+@keyframes alert-pulse {
+  0% {
+    transform: scale(0.45);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+.movies__clapper {
+  transform-origin: 3.4px 9.6px;
+}
+.is-live .movies__clapper,
+.glyph-host:hover .movies__clapper {
+  animation: clap 2.8s ease-in-out infinite;
+}
+@keyframes clap {
+  0%,
+  70%,
+  92%,
+  100% {
+    transform: rotate(0);
+  }
+  80% {
+    transform: rotate(-16deg);
+  }
+}
+
+.getaways__sun {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.is-live .getaways__sun,
+.glyph-host:hover .getaways__sun {
+  animation: sun-rise 3.2s ease-in-out infinite alternate;
+}
+@keyframes sun-rise {
+  from {
+    transform: translateY(3px);
+  }
+  to {
+    transform: translateY(-0.5px);
+  }
+}
+
+.groups__head {
+  transform-box: fill-box;
+}
+.is-live .groups__head,
+.glyph-host:hover .groups__head {
+  animation: bob 2.4s ease-in-out infinite;
+}
+.is-live .groups__head--2,
+.glyph-host:hover .groups__head--2 {
+  animation-delay: 0.2s;
+}
+.is-live .groups__head--3,
+.glyph-host:hover .groups__head--3 {
+  animation-delay: 0.4s;
+}
+@keyframes bob {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-1.3px);
+  }
+}
+
+.is-live .transit__train,
+.glyph-host:hover .transit__train {
+  animation: train-sway 1.4s ease-in-out infinite;
+}
+.is-live .transit__light {
+  animation: blink 1.4s steps(1) infinite;
+}
+.is-live .transit__light--2 {
+  animation-delay: 0.7s;
+}
+@keyframes train-sway {
+  0%,
+  100% {
+    transform: translateX(-0.5px);
+  }
+  50% {
+    transform: translateX(0.5px);
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.safety__beat {
+  stroke-dasharray: 1;
+}
+.is-live .safety__beat,
+.glyph-host:hover .safety__beat {
+  animation: beat-draw 2.2s ease-in-out infinite;
+}
+@keyframes beat-draw {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -1;
+  }
+}
+
+.report__cone {
+  transform-origin: 12px 19px;
+}
+.is-live .report__cone,
+.glyph-host:hover .report__cone {
+  animation: cone-wobble 2.4s ease-in-out infinite;
+}
+@keyframes cone-wobble {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+.music__note {
+  transform-box: fill-box;
+}
+.is-live .music__note,
+.glyph-host:hover .music__note {
+  animation: bob 1.2s ease-in-out infinite;
+}
+.is-live .music__note--2,
+.glyph-host:hover .music__note--2 {
+  animation-delay: 0.3s;
+}
+
+.is-live .mic__live {
+  animation: blink 1.2s steps(1) infinite;
+}
+
+.sports__ball {
+  transform-box: fill-box;
+}
+.is-live .sports__ball,
+.glyph-host:hover .sports__ball {
+  animation: ball-bounce 1.1s cubic-bezier(0.5, 0, 0.5, 1) infinite alternate;
+}
+@keyframes ball-bounce {
+  to {
+    transform: translate(1px, -2px);
+  }
+}
+
+.kids__kite {
+  transform-origin: 14px 9px;
+}
+.is-live .kids__kite,
+.glyph-host:hover .kids__kite {
+  animation: kite 3s ease-in-out infinite;
+}
+@keyframes kite {
+  0%,
+  100% {
+    transform: rotate(-4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(5deg) translateY(-1px);
+  }
+}
+
+/* ===== Data-driven glyphs ===== */
+
+/* Weather */
+.weather--sunny .weather__rays {
+  transform-origin: 12px 12px;
+}
+.weather--partly .weather__rays {
+  transform-origin: 9px 9px;
+}
+.glyph--weather.is-live .weather__rays {
+  animation: spin 22s linear infinite;
+}
+.glyph--weather.is-live .weather__cloud {
+  animation: cloud-drift 5s ease-in-out infinite alternate;
+}
+.glyph--weather.is-live .weather__cloud--back {
+  animation-direction: alternate-reverse;
+}
+.weather__drop {
+  transform-box: fill-box;
+}
+.glyph--weather.is-live .weather__drop {
+  animation: drop-fall 1s linear infinite;
+}
+.glyph--weather.is-live .weather__drop--2 {
+  animation-delay: 0.33s;
+}
+.glyph--weather.is-live .weather__drop--3 {
+  animation-delay: 0.66s;
+}
+.glyph--weather.is-live .weather__bolt {
+  animation: bolt-flash 2.6s steps(1) infinite;
+}
+.glyph--weather.is-live .weather__haze {
+  animation: haze-drift 4s ease-in-out infinite alternate;
+}
+.glyph--weather.is-live .weather__haze--2 {
+  animation-direction: alternate-reverse;
+}
+.glyph--weather.is-live .weather__star {
+  animation: blink 2.4s steps(1) infinite;
+}
+.glyph--weather.is-live .weather__star--2 {
+  animation-delay: 1.2s;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-0.7px);
+  }
+  to {
+    transform: translateX(0.7px);
+  }
+}
+@keyframes drop-fall {
+  0% {
+    transform: translateY(-2px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(3px);
+    opacity: 0;
+  }
+}
+@keyframes bolt-flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.2;
+  }
+  14% {
+    opacity: 1;
+  }
+  18% {
+    opacity: 0.3;
+  }
+}
+@keyframes haze-drift {
+  from {
+    transform: translateX(-1px);
+  }
+  to {
+    transform: translateX(1px);
+  }
+}
+
+/* AQI dial */
+.aqi-dial__marker {
+  transition: transform 1.1s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+.aqi-dial__value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.aqi-dial__label {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+/* Traffic */
+.traffic__lane {
+  animation: lane-flow 1s linear infinite;
+}
+@keyframes lane-flow {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+.traffic__car {
+  fill: var(--mint-strong);
+  transition: fill 0.4s ease;
+}
+.traffic--1 .traffic__car {
+  fill: #e8a628;
+}
+.traffic--2 .traffic__car {
+  fill: #f2994a;
+}
+.traffic--3 .traffic__car {
+  fill: var(--red);
+  transform-box: fill-box;
+  animation: idle-shake 0.9s ease-in-out infinite;
+}
+@keyframes idle-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(0.35px);
+  }
+}
+
+/* Water */
+.glyph--water.is-live .water__wave {
+  animation: wave-x 2.6s linear infinite;
+}
+@keyframes wave-x {
+  to {
+    transform: translateX(-12px);
+  }
+}
+
+/* Power */
+.power--outage .power__bolt {
+  animation: flicker 1.8s steps(1) infinite;
+}
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  8% {
+    opacity: 0.25;
+  }
+  12% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.4;
+  }
+  52% {
+    opacity: 1;
+  }
+}
+
+/* Trust ring + step ring */
+.trust-ring {
+  flex-shrink: 0;
+  overflow: visible;
+}
+.trust-ring__seg.is-on,
+.step-ring__seg.is-on {
+  animation: seg-in 0.45s ease-out both;
+}
+@keyframes seg-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.step-ring {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-ring > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.step-ring__inner {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Countdown */
+.countdown-ring {
+  flex-shrink: 0;
+}
+.countdown-ring__arc {
+  transition: stroke-dashoffset 0.8s ease;
+}
+.countdown-ring__value {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+}
+.countdown-ring__unit {
+  font-family: var(--font-body);
+  font-size: 7.5px;
+  font-weight: 600;
+}
+
+/* Reactions */
+.glyph--upvote .upvote__burst {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.glyph--upvote .upvote__arrow {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.glyph--upvote.is-active .g-tint {
+  opacity: 1;
+}
+.glyph--upvote.is-active .upvote__arrow {
+  animation: up-spring 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.glyph--upvote.is-active .upvote__burst {
+  animation: burst 0.6s ease-out;
+}
+@keyframes up-spring {
+  0% {
+    transform: translateY(3px) scaleY(0.85);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+.glyph--save .g-dot,
+.glyph--heart .g-dot {
+  transform: scale(0);
+}
+.glyph--save.is-active .g-tint,
+.glyph--heart.is-active .g-tint {
+  opacity: 1;
+}
+.glyph--save.is-active .g-dot {
+  transform: scale(1);
+}
+.glyph--save .save__mark,
+.glyph--heart .heart__shape {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.glyph--save.is-active .save__mark,
+.glyph--heart.is-active .heart__shape {
+  animation: pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes pop {
+  40% {
+    transform: scale(1.18);
+  }
+}
+
+/* Emergency + civic extras */
+.sos__ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+.is-live .sos__ring {
+  animation: alert-pulse 1.6s ease-out infinite;
+}
+.is-live .ambulance__siren {
+  animation: blink 0.8s steps(1) infinite;
+}
+.fire__flame {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.is-live .fire__flame {
+  animation: flame 1.2s ease-in-out infinite alternate;
+}
+@keyframes flame {
+  to {
+    transform: scaleY(1.06) scaleX(0.97);
+  }
+}
+.is-live .streetlight__beam {
+  animation: blink 1.6s steps(1) infinite;
+}
+.drain__drip {
+  transform-box: fill-box;
+}
+.is-live .drain__drip {
+  animation: drop-fall 1.3s linear infinite;
+}
+.is-live .noise__wave {
+  animation: blink 0.9s steps(1) infinite;
+}
+.water-tap__drop {
+  transform-box: fill-box;
+}
+.is-live .water-tap__drop {
+  animation: drop-fall 1.4s ease-in infinite;
+}

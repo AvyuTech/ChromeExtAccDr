@@ -1,0 +1,237 @@
+/*
+  Nearhood design tokens.
+  Light values come straight from the Nearhood canvas; dark values are tuned
+  for the same roles. Theme is chosen in Settings › Appearance:
+  - "system": no data-theme attribute, follows prefers-color-scheme
+  - "light" / "dark": data-theme on <html> forces it
+*/
+:root {
+  color-scheme: light;
+
+  --font-display: 'Sora', 'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --text-scale: 1;
+
+  --ground: #f6f5fa;
+  --backdrop: #e9e7f2;
+  --surface: #ffffff;
+  --surface-2: #f8f7fb;
+  --surface-3: #f3f1f8;
+  --border: #eceaf3;
+  --border-strong: #e7e5ef;
+  --divider: #f0eef5;
+
+  --ink: #17142b;
+  --ink-2: #2a2640;
+  --ink-3: #3b3750;
+  --muted: #5e5a72;
+  --faint: #b5b1c4;
+
+  --accent: #5b3fd9;
+  --accent-fill: #5b3fd9;
+  --accent-deep: #4a30c4;
+  --accent-strong: #3d2a9e;
+  --accent-tint: #eeeafd;
+  --accent-tint-2: #f3f0fe;
+  --accent-line: #d9d3fa;
+  --accent-soft-ink: #d9d3fa;
+  --on-accent: #ffffff;
+  --accent-shadow: rgba(91, 63, 217, 0.35);
+  --accent-glow: rgba(91, 63, 217, 0.1);
+
+  --mint: #2bd39e;
+  --mint-strong: #19b98a;
+  --mint-ink: #0b7a5a;
+  --mint-deep: #0a3d2d;
+  --mint-tint: #e3f7ef;
+  --mint-line: #bfead8;
+
+  --amber-ink: #7a4e00;
+  --amber-body: #6b5a35;
+  --amber-tint: #fff4de;
+  --amber-line: #f6dfae;
+  --amber-fill: #ffe2a6;
+
+  --peach-ink: #8a3b12;
+  --peach-tint: #ffe3d3;
+  --teal-ink: #11636b;
+  --teal-tint: #ddf1f3;
+  --blue-ink: #2f4aa8;
+  --blue-tint: #e4e9fb;
+  --green-ink: #0b6b4f;
+  --green-tint: #d7f3e8;
+  --yellow-ink: #7a4e00;
+  --yellow-tint: #fff0cf;
+  --clay-ink: #9a5530;
+  --clay-tint: #f3dccb;
+  --red: #d6383f;
+  --red-ink: #a3242e;
+  --red-tint: #fde4e4;
+  --red-line: #f6c2c4;
+  --night: #2d1f7a;
+  --night-ink: #b9aef5;
+
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgba(23, 20, 43, 0.04);
+  --shadow-float: 0 12px 32px rgba(23, 20, 43, 0.16);
+  --nav-height: 86px;
+  --column: 480px;
+}
+
+/* Dark theme: applied when the OS asks for it (unless Light is forced) or when Dark is forced. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --ground: #100e1b;
+    --backdrop: #08070e;
+    --surface: #1a1729;
+    --surface-2: #211d32;
+    --surface-3: #282340;
+    --border: #2c2741;
+    --border-strong: #37304f;
+    --divider: #251f38;
+    --ink: #f3f1fa;
+    --ink-2: #dedaeb;
+    --ink-3: #c9c4dc;
+    --muted: #aaa5c0;
+    --faint: #5c5675;
+    --accent: #ab9bff;
+    --accent-fill: #6b52ec;
+    --accent-deep: #5a41d6;
+    --accent-strong: #cbc1ff;
+    --accent-tint: #2a2352;
+    --accent-tint-2: #221c43;
+    --accent-line: #433a80;
+    --accent-soft-ink: #d9d3fa;
+    --on-accent: #ffffff;
+    --accent-shadow: rgba(0, 0, 0, 0.5);
+    --accent-glow: rgba(107, 82, 236, 0.18);
+    --mint: #2bd39e;
+    --mint-strong: #1fc493;
+    --mint-ink: #5fe3b6;
+    --mint-deep: #0a3d2d;
+    --mint-tint: #12342b;
+    --mint-line: #1f5245;
+    --amber-ink: #f5c86c;
+    --amber-body: #dcc596;
+    --amber-tint: #30260f;
+    --amber-line: #4d3c16;
+    --amber-fill: #4a3a14;
+    --peach-ink: #ffb68f;
+    --peach-tint: #3a2219;
+    --teal-ink: #84d8e0;
+    --teal-tint: #12313a;
+    --blue-ink: #aebcff;
+    --blue-tint: #1e2647;
+    --green-ink: #74e0ba;
+    --green-tint: #133328;
+    --yellow-ink: #f5c86c;
+    --yellow-tint: #33290f;
+    --clay-ink: #f0b691;
+    --clay-tint: #3a2519;
+    --red: #ff5d64;
+    --red-ink: #ff9ea2;
+    --red-tint: #3d1a1e;
+    --red-line: #5c262c;
+    --night: #2d1f7a;
+    --night-ink: #c9c0ff;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ground: #100e1b;
+  --backdrop: #08070e;
+  --surface: #1a1729;
+  --surface-2: #211d32;
+  --surface-3: #282340;
+  --border: #2c2741;
+  --border-strong: #37304f;
+  --divider: #251f38;
+  --ink: #f3f1fa;
+  --ink-2: #dedaeb;
+  --ink-3: #c9c4dc;
+  --muted: #aaa5c0;
+  --faint: #5c5675;
+  --accent: #ab9bff;
+  --accent-fill: #6b52ec;
+  --accent-deep: #5a41d6;
+  --accent-strong: #cbc1ff;
+  --accent-tint: #2a2352;
+  --accent-tint-2: #221c43;
+  --accent-line: #433a80;
+  --accent-soft-ink: #d9d3fa;
+  --on-accent: #ffffff;
+  --accent-shadow: rgba(0, 0, 0, 0.5);
+  --accent-glow: rgba(107, 82, 236, 0.18);
+  --mint: #2bd39e;
+  --mint-strong: #1fc493;
+  --mint-ink: #5fe3b6;
+  --mint-deep: #0a3d2d;
+  --mint-tint: #12342b;
+  --mint-line: #1f5245;
+  --amber-ink: #f5c86c;
+  --amber-body: #dcc596;
+  --amber-tint: #30260f;
+  --amber-line: #4d3c16;
+  --amber-fill: #4a3a14;
+  --peach-ink: #ffb68f;
+  --peach-tint: #3a2219;
+  --teal-ink: #84d8e0;
+  --teal-tint: #12313a;
+  --blue-ink: #aebcff;
+  --blue-tint: #1e2647;
+  --green-ink: #74e0ba;
+  --green-tint: #133328;
+  --yellow-ink: #f5c86c;
+  --yellow-tint: #33290f;
+  --clay-ink: #f0b691;
+  --clay-tint: #3a2519;
+  --red: #ff5d64;
+  --red-ink: #ff9ea2;
+  --red-tint: #3d1a1e;
+  --red-line: #5c262c;
+  --night: #2d1f7a;
+  --night-ink: #c9c0ff;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Settings › Accessibility › High contrast */
+:root[data-contrast='high'] {
+  --muted: #3b3750;
+  --faint: #6f6a86;
+  --border: #c9c5d9;
+  --border-strong: #b3aecb;
+  --divider: #d9d5e6;
+  --accent: #4a2fc4;
+  --accent-strong: #2c1d80;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-contrast='high']:not([data-theme='light']) {
+    --muted: #d6d2e6;
+    --faint: #8e88a8;
+    --border: #4a4366;
+    --border-strong: #5b5380;
+    --divider: #3a3354;
+    --accent: #c4b8ff;
+    --accent-strong: #e2dcff;
+  }
+}
+:root[data-theme='dark'][data-contrast='high'] {
+  --muted: #d6d2e6;
+  --faint: #8e88a8;
+  --border: #4a4366;
+  --border-strong: #5b5380;
+  --divider: #3a3354;
+  --accent: #c4b8ff;
+  --accent-strong: #e2dcff;
+}
