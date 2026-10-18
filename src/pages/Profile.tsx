@@ -1,7 +1,8 @@
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
-import { Avatar, ShareButton } from '../components/cards';
-import { CheckInCard, CollectionCard, FollowButton, TasteMatchPill } from '../components/friends';
-import { chatLink, DoneRing, PlanCard, TabStrip, WantRow } from '../components/people';
+import { useState } from 'react';
+import { ShareButton } from '../components/cards';
+import { CheckInCard, CheckInGrid, CollectionCard, FollowButton, TasteMatchPill } from '../components/friends';
+import { chatLink, DoneRing, PlanCard, ProfileHero, TabStrip, ViewToggle, WantRow } from '../components/people';
 import { EmptyState, PageHeader } from '../components/ui';
 import { PEOPLE } from '../data/core';
 import { useT } from '../i18n';
@@ -35,6 +36,7 @@ export default function Profile() {
   const t = useT();
   const [params, setParams] = useSearchParams();
   const { data } = useAppData();
+  const [view, setView] = useState<'grid' | 'list'>('grid');
 
   if (id === 'me') return <Navigate to="/me" replace />;
   const p = PEOPLE[id];
@@ -84,68 +86,50 @@ export default function Profile() {
     <>
       <PageHeader title={p.name} sub={`@${info.handle}`} fallback="/friends" actions={<ShareButton title={`${p.name} on Nearhood`} path={`/people/${id}`} />} />
       <main className="page page--with-header">
-        <section className="card me-profile" aria-label={p.name}>
-          <span className="me-avatar">
-            <svg className="me-avatar__ring" viewBox="0 0 100 100" aria-hidden="true">
-              <circle cx="50" cy="50" r="47" fill="none" stroke="var(--accent)" strokeWidth="2.2" strokeDasharray="6 8" strokeLinecap="round" />
-            </svg>
-            <Avatar who={{ ...p, verified: false }} size={76} />
-          </span>
-          <div className="stack" style={{ gap: 4, alignItems: 'center' }}>
-            <h2 className="display" style={{ fontSize: '1.375rem' }}>
-              {p.name}
-            </h2>
-            <span className="meta">
-              @{info.handle} · {p.area}
-            </span>
-          </div>
-          <div className="row row--wrap" style={{ justifyContent: 'center', gap: 6 }}>
-            {info.followsMe ? <span className="badge tone-mint">{t('people.followsYou')}</span> : null}
-            <TasteMatchPill personId={id} />
-            {p.badge ? (
-              <span className="badge tone-blue">
-                <UsersGlyph size={14} /> {p.badge}
-              </span>
-            ) : null}
-            {p.verified ? (
-              <span className="badge tone-mint">
-                <ShieldGlyph size={14} /> Verified
-              </span>
-            ) : null}
-          </div>
-          {info.bio ? (
-            <p className="body-sm" style={{ textAlign: 'center' }}>
-              {info.bio}
-            </p>
-          ) : null}
-          <div className="profile-actions">
-            <FollowButton personId={id} size="md" />
-            <Link to={chatLink(id)} className="btn btn--outline">
-              <ChatGlyph size={18} />
-              {t('people.message')}
-            </Link>
-          </div>
-          <dl className="me-stats">
-            {stats.map((s) => (
-              <div key={s.label} className="me-stat">
-                <dt>{s.label}</dt>
-                <dd className="num">{compact(s.value)}</dd>
-              </div>
-            ))}
-          </dl>
-          <span className="meta">{t('people.since', { year: info.since })}</span>
-        </section>
+        <ProfileHero
+          who={p}
+          label={p.name}
+          name={p.name}
+          sub={`@${info.handle} · ${t('people.since', { year: info.since })}`}
+          place={p.area}
+          badges={
+            <>
+              {info.followsMe ? <span className="badge tone-mint">{t('people.followsYou')}</span> : null}
+              <TasteMatchPill personId={id} />
+              {p.badge ? (
+                <span className="badge tone-blue">
+                  <UsersGlyph size={14} /> {p.badge}
+                </span>
+              ) : null}
+              {p.verified ? (
+                <span className="badge tone-mint">
+                  <ShieldGlyph size={14} /> Verified
+                </span>
+              ) : null}
+            </>
+          }
+          bio={info.bio}
+          actions={
+            <>
+              <Link to={chatLink(id)} className="icon-btn" aria-label={t('people.message')}>
+                <ChatGlyph size={20} />
+              </Link>
+              <FollowButton personId={id} size="md" />
+            </>
+          }
+          stats={stats.map((st) => ({ label: st.label, value: compact(st.value) }))}
+        />
 
         {info.tasteTags.length ? (
-          <section className="row row--wrap" style={{ gap: 6 }} aria-label={`${first} is into`}>
-            <span className="meta strong" style={{ marginRight: 2 }}>
-              {t('people.taste')}
-            </span>
-            {info.tasteTags.map((tag) => (
-              <span key={tag} className="badge">
-                {TASTE_LABEL[tag] ?? tag}
-              </span>
-            ))}
+          <section className="taste-row" aria-label={`${first} is into`}>
+            <span className="eyebrow muted">{t('people.taste')}</span>
+            <div className="chip-row">
+              {info.tasteTags.map((tag) => (
+                <span key={tag} className="chip chip--static">
+                  {TASTE_LABEL[tag] ?? tag}
+                </span>
+              ))}
+            </div>
           </section>
         ) : null}
 
@@ -177,9 +161,15 @@ export default function Profile() {
         <div id="profile-panel" role="tabpanel" aria-labelledby={`profile-tab-${tab}`} className="stack stack--lg">
           {tab === 'checkins' ? (
             <>
-              {visible.map((c) => (
-                <CheckInCard key={c.id} c={c} />
-              ))}
+              {visible.length ? (
+                <div className="row row--between">
+                  <span className="meta strong">
+                    {visible.length} {visible.length === 1 ? 'check-in' : 'check-ins'}
+                  </span>
+                  <ViewToggle value={view} onChange={setView} />
+                </div>
+              ) : null}
+              {view === 'grid' && visible.length ? <CheckInGrid items={visible} /> : visible.map((c) => <CheckInCard key={c.id} c={c} />)}
               {hidden > 0 ? (
                 <div className="notice locked-note">
                   <LockGlyph size={20} />

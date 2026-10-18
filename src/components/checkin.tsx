@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
+import { itemPhoto } from '../assets/photos';
 import { person } from '../data/core';
 import { placeById } from '../data/places';
 import type { CheckIn, CheckInKind, Verdict } from '../data/types';
 import { useT } from '../i18n';
 import { GoodGlyph, MustGlyph, NamedGlyph, SkipGlyph, type GlyphProps } from '../icons';
 import { VERDICT_META } from './friends';
-import { Avatar } from './cards';
+import { Avatar, Cover } from './cards';
 import type { ComponentType } from 'react';
 
 /* Pieces used by the quick check-in composer and the check-in detail page. */
@@ -55,9 +56,12 @@ export function CheckInRow({ c, showAuthor = true }: { c: CheckIn; showAuthor?: 
       {showAuthor ? (
         <Avatar who={{ ...who, verified: false }} size={40} />
       ) : (
-        <span className={`tile tone-${place?.tone ?? (c.kind === 'ate' ? 'peach' : 'teal')}`}>
-          <NamedGlyph name={place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events')} size={20} duo />
-        </span>
+        <Cover
+          src={itemPhoto(c.items[0], c.placeId, c.eventId)}
+          glyph={place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events')}
+          tone={place?.tone ?? (c.kind === 'ate' ? 'peach' : 'teal')}
+          className="checkin-row__thumb"
+        />
       )}
       <span className="list-row__body">
         <span className="list-row__title">{c.items.join(', ')}</span>

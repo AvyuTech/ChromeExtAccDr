@@ -38,6 +38,14 @@ export const friendsCreate: Dict = {
   'checkin.tags': { en: 'Quick tags', gu: 'ઝડપી ટૅગ્સ', hi: 'झटपट टैग' },
   'checkin.with': { en: 'With', gu: 'સાથે', hi: 'साथ में' },
   'checkin.photo': { en: 'Add a photo', gu: 'ફોટો ઉમેરો', hi: 'फ़ोटो जोड़ें' },
+  'checkin.takePhoto': { en: 'Take a photo', gu: 'ફોટો લો', hi: 'फ़ोटो लें' },
+  'checkin.choosePhoto': { en: 'From gallery', gu: 'ગેલેરીમાંથી', hi: 'गैलरी से' },
+  'checkin.photoWhy': {
+    en: 'Real photos make your verdict more useful to friends.',
+    gu: 'સાચા ફોટો તમારા અભિપ્રાયને મિત્રો માટે વધુ ઉપયોગી બનાવે છે.',
+    hi: 'असली फ़ोटो आपकी राय को दोस्तों के लिए ज़्यादा काम का बनाती हैं.',
+  },
+  'checkin.retake': { en: 'Change photo', gu: 'ફોટો બદલો', hi: 'फ़ोटो बदलें' },
   'checkin.removePhoto': { en: 'Remove photo', gu: 'ફોટો દૂર કરો', hi: 'फ़ोटो हटाएँ' },
   'checkin.photoNote': {
     en: 'In this preview, photos stay on your device.',

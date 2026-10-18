@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Avatar } from '../components/cards';
+import { eventPhoto, placePhoto } from '../assets/photos';
+import { Avatar, Cover } from '../components/cards';
 import { CheckInRow } from '../components/checkin';
 import { AvatarStack, CheckInCard, FollowButton, WantButton, wantFromCheckIn } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
@@ -8,7 +9,7 @@ import { person } from '../data/core';
 import { eventById } from '../data/events';
 import { placeById } from '../data/places';
 import { useT } from '../i18n';
-import { ChatGlyph, NamedGlyph, SendGlyph } from '../icons';
+import { ChatGlyph, ChevronRightGlyph, NamedGlyph, SendGlyph } from '../icons';
 import { compact } from '../lib/format';
 import { allCheckIns, canSee, checkInFor, placeCommunity } from '../lib/friends';
 import { useAppData } from '../state/appData';
@@ -84,15 +85,13 @@ export default function CheckInDetail() {
     <>
       <PageHeader title={t('checkin.detail')} sub={c.placeName} />
       <main className="page page--with-header">
-        <CheckInCard c={c} />
+        <CheckInCard c={c} layout="hero" />
 
         {place && community ? (
           <Link to={`/place/${place.id}`} className="card card--tight place-mini glyph-host">
-            <span className={`tile tile--lg tone-${place.tone}`}>
-              <NamedGlyph name={place.glyph} size={24} duo />
-            </span>
+            <Cover src={placePhoto(place.id)} glyph={place.glyph} tone={place.tone} className="place-mini__photo" />
             <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
-              <span className="strong">{place.name}</span>
+              <span className="place-mini__name">{place.name}</span>
               <span className="meta">
                 {place.kind} · {place.area}
               </span>
@@ -109,18 +108,18 @@ export default function CheckInDetail() {
                 </span>
               ) : null}
             </span>
+            <ChevronRightGlyph size={18} style={{ color: 'var(--accent)', flexShrink: 0 }} />
           </Link>
         ) : event ? (
           <Link to={`/event/${event.id}`} className="card card--tight place-mini glyph-host">
-            <span className={`tile tile--lg tone-${event.tone}`}>
-              <NamedGlyph name={event.glyph} size={24} duo />
-            </span>
+            <Cover src={eventPhoto(event.id)} glyph={event.glyph} tone={event.tone} className="place-mini__photo" />
             <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
-              <span className="strong">{event.title}</span>
+              <span className="place-mini__name">{event.title}</span>
               <span className="meta">
                 {event.day}, {event.time} · {event.area}
               </span>
             </span>
+            <ChevronRightGlyph size={18} style={{ color: 'var(--accent)', flexShrink: 0 }} />
           </Link>
         ) : null}
 

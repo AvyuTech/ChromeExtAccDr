@@ -285,3 +285,225 @@
 .checkin-card__link:focus-visible {
   text-decoration: underline;
 }
+
+/* Check-in detail: big photo first */
+.checkin-card--hero {
+  padding: 0;
+  overflow: hidden;
+  gap: 14px;
+}
+.checkin-card--hero > :not(.checkin-card__plate) {
+  margin: 0 16px;
+}
+.checkin-card--hero > :last-child {
+  margin-bottom: 10px;
+}
+.checkin-card--hero .checkin-card__plate {
+  border-radius: 0;
+}
+.checkin-card--hero .checkin-card__photo {
+  aspect-ratio: 4 / 3.4;
+}
+.checkin-card--hero .checkin-card__glyph {
+  height: 220px;
+}
+.checkin-card--hero .checkin-card__items {
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+}
+.checkin-card__verdict {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+}
+.checkin-card__verdict .badge {
+  padding: 7px 12px;
+  box-shadow: 0 2px 10px rgba(29, 35, 48, 0.16);
+}
+.checkin-card__note {
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.45;
+}
+
+/* Photo grid of check-ins */
+.checkin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.checkin-tile {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1.08;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--tone-bg);
+  color: #ffffff;
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 0.15s ease;
+}
+.checkin-tile:active {
+  transform: scale(0.97);
+}
+.checkin-tile > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+.checkin-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(10, 12, 18, 0) 45%, rgba(10, 12, 18, 0.72) 100%);
+}
+.checkin-tile__glyph {
+  position: absolute;
+  inset: 0 0 30% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tone-ink);
+  z-index: -1;
+}
+.checkin-tile__verdict {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tone-bg);
+  color: var(--tone-ink);
+  box-shadow: 0 2px 8px rgba(10, 12, 18, 0.2);
+}
+.checkin-tile__text {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.checkin-tile__text b {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.checkin-tile__text small {
+  font-size: 0.71875rem;
+  font-weight: 600;
+  opacity: 0.88;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Small photo thumbs in check-in rows */
+.checkin-row__thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+}
+
+/* Suggested people */
+.person-card {
+  flex-shrink: 0;
+  width: 172px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 14px;
+  overflow: hidden;
+  text-align: center;
+}
+.person-card__link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+.person-card__cover {
+  display: block;
+  width: 100%;
+  height: 72px;
+  background: var(--accent-tint);
+}
+.person-card__cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.person-card__avatar {
+  margin-top: -32px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--surface);
+}
+.person-card__name {
+  font-family: var(--font-display);
+  font-size: 0.96875rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+.person-card__handle {
+  font-size: 0.75rem;
+}
+.person-card__reason {
+  margin-top: 6px;
+  padding: 0 12px;
+  min-height: 2.6em;
+  font-size: 0.78125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--accent-strong);
+}
+
+/* Plan together card (Home and Friends) */
+.plan-card__row {
+  padding: 10px 0;
+}
+.plan-card__media {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+}
+.plan-card__photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+}
+.plan-card__media > .avatar {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.plan-card .list {
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}

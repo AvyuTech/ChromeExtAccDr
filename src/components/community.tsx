@@ -4,13 +4,13 @@ import { person } from '../data/core';
 import { placeById } from '../data/places';
 import type { CheckIn, WantItem } from '../data/types';
 import { useT } from '../i18n';
-import { itemPhoto } from '../assets/photos';
+import { eventPhoto, itemPhoto, placePhoto } from '../assets/photos';
 import { ChevronRightGlyph, FriendsGlyph, HeartGlyph, NamedGlyph, SendGlyph, type GlyphName } from '../icons';
 import { profileInfo, VERDICT_LABEL } from '../lib/friends';
 import { nowTime } from '../lib/format';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
-import { Avatar } from './cards';
+import { Avatar, Cover } from './cards';
 import { VERDICT_META, VerdictBadge } from './friends';
 import { Sheet } from './ui';
 
@@ -80,8 +80,15 @@ export function PlanTogetherCard({ plans }: { plans: Array<{ personId: string; i
           const target = (item.kind === 'dish' || item.kind === 'activity') && placeName ? placeName : item.title;
           const verb = (item.kind === 'dish' || item.kind === 'activity') && placeName ? 'go to' : 'try';
           return (
-            <div key={`${personId}-${item.id}`} className="list-row" style={{ padding: '10px 0' }}>
-              <Avatar who={{ ...who, verified: false }} size={36} />
+            <div key={`${personId}-${item.id}`} className="list-row plan-card__row">
+              <span className="plan-card__media">
+                <Cover
+                  src={item.kind === 'event' && item.refId ? eventPhoto(item.refId) : item.refId ? placePhoto(item.refId) : undefined}
+                  glyph={item.kind === 'event' ? 'events' : 'pin'}
+                  className="plan-card__photo"
+                />
+                <Avatar who={{ ...who, verified: false }} size={26} />
+              </span>
               <span className="list-row__body">
                 <span className="list-row__title">
                   You and {first} both want to {verb} {target}

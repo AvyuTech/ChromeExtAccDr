@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Avatar } from '../components/cards';
+import { eventPhoto, placePhoto } from '../assets/photos';
+import { Avatar, Cover } from '../components/cards';
 import { VerdictPicker } from '../components/checkin';
 import { Segmented, Sheet, Switch } from '../components/ui';
 import { neighbourhoodName, person } from '../data/core';
@@ -9,7 +10,7 @@ import { CHECKIN_TAGS, SPEND_BANDS } from '../data/friends';
 import { PLACES, placeById } from '../data/places';
 import type { CheckInKind, CityEvent, EventCategory, Place, Verdict } from '../data/types';
 import { useT } from '../i18n';
-import { CameraGlyph, CheckGlyph, ChevronDownGlyph, CloseGlyph, NamedGlyph, PinGlyph, PlusGlyph, SearchGlyph, ShieldGlyph } from '../icons';
+import { CameraGlyph, CheckGlyph, ChevronDownGlyph, CloseGlyph, ImageGlyph, NamedGlyph, PinGlyph, PlusGlyph, SearchGlyph, ShieldGlyph } from '../icons';
 import { km, rupees } from '../lib/format';
 import { itemsFor } from '../lib/friends';
 import { useAppData } from '../state/appData';
@@ -170,6 +171,12 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
     }
   };
 
+  const onPhoto = (e: ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setPhoto(URL.createObjectURL(f));
+  };
+
   const leave = () => (window.history.length > 1 ? navigate(-1) : navigate('/'));
 
   const share = () => {
@@ -251,13 +258,9 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
           {target ? (
             <div className="checkin-target card card--tight">
               {target.type === 'place' ? (
-                <span className={`tile tile--lg tone-${target.place.tone}`}>
-                  <NamedGlyph name={target.place.glyph} size={24} duo />
-                </span>
+                <Cover src={placePhoto(target.place.id)} glyph={target.place.glyph} tone={target.place.tone} className="checkin-target__photo" />
               ) : target.type === 'event' ? (
-                <span className={`tile tile--lg tone-${target.event.tone}`}>
-                  <NamedGlyph name={target.event.glyph} size={24} duo />
-                </span>
+                <Cover src={eventPhoto(target.event.id)} glyph={target.event.glyph} tone={target.event.tone} className="checkin-target__photo" />
               ) : (
                 <span className="tile tile--lg tone-violet">
                   <PinGlyph size={24} duo />
@@ -290,16 +293,20 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
             <>
               {guess && !q ? (
                 <button type="button" className="guess-card" onClick={() => pick({ type: 'place', place: guess })}>
-                  <span className="guess-card__pin">
-                    <PinGlyph size={20} duo live />
-                  </span>
+                  <Cover src={placePhoto(guess.id)} glyph={guess.glyph} tone={guess.tone} className="guess-card__photo">
+                    <span className="guess-card__pin">
+                      <PinGlyph size={14} />
+                    </span>
+                  </Cover>
                   <span className="stack grow" style={{ gap: 2, textAlign: 'left' }}>
                     <span className="strong">{t('checkin.nearGuess', { place: guess.name })}</span>
                     <span className="meta">
                       {t('checkin.guess')} · {guess.area} · {km(guess.distanceKm)}
                     </span>
                   </span>
-                  <PlusGlyph size={16} />
+                  <span className="guess-card__add" aria-hidden="true">
+                    <PlusGlyph size={16} />
+                  </span>
                 </button>
               ) : null}
 
@@ -320,9 +327,7 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
                 <div className="list">
                   {results.map((p) => (
                     <button key={p.id} type="button" className="list-row" onClick={() => pick({ type: 'place', place: p })}>
-                      <span className={`tile tone-${p.tone}`}>
-                        <NamedGlyph name={p.glyph} size={20} duo />
-                      </span>
+                      <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="checkin-result__photo" />
                       <span className="list-row__body">
                         <span className="list-row__title">{p.name}</span>
                         <span className="list-row__meta">
@@ -343,22 +348,28 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
               ) : (
                 <>
                   <span className="eyebrow muted">{t('checkin.nearby')}</span>
-                  <div className="chip-wrap">
+                  <div className="hscroll checkin-picks">
                     {nearby.map((p) => (
-                      <button key={p.id} type="button" className="chip" onClick={() => pick({ type: 'place', place: p })}>
-                        <NamedGlyph name={p.glyph} size={16} />
-                        {p.name}
+                      <button key={p.id} type="button" className="checkin-pick" onClick={() => pick({ type: 'place', place: p })}>
+                        <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="checkin-pick__photo" />
+                        <span className="checkin-pick__name">{p.name}</span>
+                        <span className="checkin-pick__meta">
+                          {p.area} · {km(p.distanceKm)}
+                        </span>
                       </button>
                     ))}
                   </div>
                   {kind === 'did' && weekendEvents.length ? (
                     <>
                       <span className="eyebrow muted">{t('checkin.thisWeekend')}</span>
-                      <div className="chip-wrap">
+                      <div className="hscroll checkin-picks">
                         {weekendEvents.map((e) => (
-                          <button key={e.id} type="button" className="chip" onClick={() => pick({ type: 'event', event: e })}>
-                            <NamedGlyph name={e.glyph} size={16} />
-                            {e.title}
+                          <button key={e.id} type="button" className="checkin-pick" onClick={() => pick({ type: 'event', event: e })}>
+                            <Cover src={eventPhoto(e.id)} glyph={e.glyph} tone={e.tone} className="checkin-pick__photo" />
+                            <span className="checkin-pick__name">{e.title}</span>
+                            <span className="checkin-pick__meta">
+                              {e.day} · {e.area}
+                            </span>
                           </button>
                         ))}
                       </div>
@@ -412,6 +423,64 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
         <section className="section" aria-labelledby="ci-verdict">
           {stepHead(3, 'ci-verdict', t('checkin.verdict'), !!verdict)}
           <VerdictPicker value={verdict} kind={kind} onChange={setVerdict} />
+        </section>
+
+        {/* Photo */}
+        <section className="section" aria-labelledby="ci-photo">
+          <h2 className="checkin-step" id="ci-photo">
+            <span className="checkin-step__num" aria-hidden="true">
+              <CameraGlyph size={13} />
+            </span>
+            {t('checkin.photo')}
+            <span className="meta" style={{ fontWeight: 600 }}>
+              · {t('checkin.optional')}
+            </span>
+          </h2>
+          {photo ? (
+            <div className="photo-preview">
+              <img src={photo} alt="Your photo" />
+              {items.length ? (
+                <span className="checkin-card__items" aria-hidden="true">
+                  {items.map((i) => (
+                    <span key={i} className="checkin-card__item">
+                      {i}
+                    </span>
+                  ))}
+                </span>
+              ) : null}
+              <button
+                type="button"
+                className="photo-action"
+                style={{ top: 10, right: 10 }}
+                aria-label={t('checkin.removePhoto')}
+                onClick={() => {
+                  URL.revokeObjectURL(photo);
+                  setPhoto(null);
+                }}
+              >
+                <CloseGlyph size={18} />
+              </button>
+            </div>
+          ) : (
+            <div className="photo-drop">
+              <label className="photo-drop__option photo-drop__option--main">
+                <span className="photo-drop__icon">
+                  <CameraGlyph size={24} />
+                </span>
+                <span className="strong">{t('checkin.takePhoto')}</span>
+                <span className="meta">{t('checkin.photoWhy')}</span>
+                <input type="file" accept="image/*" capture="environment" className="sr-only" onChange={onPhoto} />
+              </label>
+              <label className="photo-drop__option">
+                <span className="photo-drop__icon">
+                  <ImageGlyph size={22} />
+                </span>
+                <span className="strong">{t('checkin.choosePhoto')}</span>
+                <input type="file" accept="image/*" className="sr-only" onChange={onPhoto} />
+              </label>
+            </div>
+          )}
+          <span className="field__hint">{t('checkin.photoNote')}</span>
         </section>
 
         {/* Optional details */}
@@ -480,41 +549,6 @@ function CheckInForm({ params }: { params: URLSearchParams }) {
                   </div>
                 </div>
               ) : null}
-
-              <div className="field">
-                {photo ? (
-                  <div className="photo-preview">
-                    <img src={photo} alt="Your photo" />
-                    <button
-                      type="button"
-                      className="icon-btn"
-                      aria-label={t('checkin.removePhoto')}
-                      onClick={() => {
-                        URL.revokeObjectURL(photo);
-                        setPhoto(null);
-                      }}
-                    >
-                      <CloseGlyph size={18} />
-                    </button>
-                  </div>
-                ) : (
-                  <label className="btn btn--outline" style={{ alignSelf: 'flex-start' }}>
-                    <CameraGlyph size={18} />
-                    {t('checkin.photo')}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      capture="environment"
-                      className="sr-only"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        if (f) setPhoto(URL.createObjectURL(f));
-                      }}
-                    />
-                  </label>
-                )}
-                <span className="field__hint">{t('checkin.photoNote')}</span>
-              </div>
             </div>
           ) : null}
         </section>

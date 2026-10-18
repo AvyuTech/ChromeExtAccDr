@@ -148,7 +148,7 @@ export function WantButton({ item, variant = 'chip' }: { item: WantItem; variant
 }
 
 /* ---------- Check-in card ---------- */
-export function CheckInCard({ c, showPlace = true, footer }: { c: CheckIn; showPlace?: boolean; footer?: ReactNode }) {
+export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { c: CheckIn; showPlace?: boolean; footer?: ReactNode; layout?: 'card' | 'hero' }) {
   const navigate = useNavigate();
   const { data, has, toggle } = useAppData();
   const author = person(c.authorId);
@@ -163,63 +163,87 @@ export function CheckInCard({ c, showPlace = true, footer }: { c: CheckIn; showP
   const photoSrc = itemPhoto(c.items[0], c.placeId, c.eventId);
   if (!canSee(data, c)) return null;
 
-  return (
-    <article className="card checkin-card">
-      <div className="row" style={{ alignItems: 'flex-start' }}>
-        <Link to={c.authorId === 'me' ? '/me' : `/people/${c.authorId}`} aria-label={author.name} style={{ textDecoration: 'none' }}>
-          <Avatar who={author} />
-        </Link>
-        <div className="grow stack" style={{ gap: 1 }}>
-          <span style={{ fontSize: '0.90625rem' }}>
-            <Link to={c.authorId === 'me' ? '/me' : `/people/${c.authorId}`} className="strong checkin-card__link">
-              {c.authorId === 'me' ? 'You' : author.name}
-            </Link>{' '}
-            <span className="muted">{showPlace ? verb : c.kind === 'ate' ? 'had' : 'did'}</span>
-            {showPlace ? (
-              <>
-                {' '}
-                {c.placeId ? (
-                  <Link to={`/place/${c.placeId}`} className="strong checkin-card__link">
-                    {c.placeName}
-                  </Link>
-                ) : c.eventId ? (
-                  <Link to={`/event/${c.eventId}`} className="strong checkin-card__link">
-                    {c.placeName}
-                  </Link>
-                ) : (
-                  <b>{c.placeName}</b>
-                )}
-              </>
-            ) : null}
-          </span>
-          <span className="meta">
-            {friend && c.authorId !== 'me' ? 'Friend · ' : ''}
-            {c.ago}
-            {c.audience === 'friends' ? ' · Friends only' : ''}
-          </span>
-        </div>
-        <VerdictBadge verdict={c.verdict} kind={c.kind} />
-      </div>
-
-      <button type="button" className={`checkin-card__plate tone-${tone}`} onClick={() => navigate(`/checkin/${c.id}`)} aria-label={`Open check-in: ${c.items.join(', ')}`}>
-        {photoSrc ? (
-          <img className="checkin-card__photo" src={photoSrc} alt="" loading="lazy" decoding="async" />
-        ) : (
-          <span className="checkin-card__glyph">
-            <NamedGlyph name={glyph} size={30} duo />
-          </span>
-        )}
-        <span className="checkin-card__items">
-          {c.items.map((i) => (
-            <span key={i} className="checkin-card__item">
-              {i}
-            </span>
-          ))}
+  const hero = layout === 'hero';
+  const header = (
+    <div className="row" style={{ alignItems: 'flex-start' }}>
+      <Link to={c.authorId === 'me' ? '/me' : `/people/${c.authorId}`} aria-label={author.name} style={{ textDecoration: 'none' }}>
+        <Avatar who={author} size={hero ? 46 : 40} />
+      </Link>
+      <div className="grow stack" style={{ gap: 1 }}>
+        <span style={{ fontSize: hero ? '0.96875rem' : '0.90625rem' }}>
+          <Link to={c.authorId === 'me' ? '/me' : `/people/${c.authorId}`} className="strong checkin-card__link">
+            {c.authorId === 'me' ? 'You' : author.name}
+          </Link>{' '}
+          <span className="muted">{showPlace ? verb : c.kind === 'ate' ? 'had' : 'did'}</span>
+          {showPlace ? (
+            <>
+              {' '}
+              {c.placeId ? (
+                <Link to={`/place/${c.placeId}`} className="strong checkin-card__link">
+                  {c.placeName}
+                </Link>
+              ) : c.eventId ? (
+                <Link to={`/event/${c.eventId}`} className="strong checkin-card__link">
+                  {c.placeName}
+                </Link>
+              ) : (
+                <b>{c.placeName}</b>
+              )}
+            </>
+          ) : null}
         </span>
-      </button>
+        <span className="meta">
+          {friend && c.authorId !== 'me' ? 'Friend · ' : ''}
+          {c.ago}
+          {c.audience === 'friends' ? ' · Friends only' : ''}
+        </span>
+      </div>
+      {hero ? null : <VerdictBadge verdict={c.verdict} kind={c.kind} />}
+    </div>
+  );
+  const plateInner = (
+    <>
+      {photoSrc ? (
+        <img className="checkin-card__photo" src={photoSrc} alt="" loading={hero ? undefined : 'lazy'} decoding="async" />
+      ) : (
+        <span className="checkin-card__glyph">
+          <NamedGlyph name={glyph} size={hero ? 48 : 30} duo />
+        </span>
+      )}
+      {hero ? (
+        <span className="checkin-card__verdict">
+          <VerdictBadge verdict={c.verdict} kind={c.kind} />
+        </span>
+      ) : null}
+      <span className="checkin-card__items">
+        {c.items.map((i) => (
+          <span key={i} className="checkin-card__item">
+            {i}
+          </span>
+        ))}
+      </span>
+    </>
+  );
+
+  return (
+    <article className={`card checkin-card${hero ? ' checkin-card--hero' : ''}`}>
+      {hero ? (
+        <div className={`checkin-card__plate tone-${tone}`} role="img" aria-label={`${c.items.join(', ')} at ${c.placeName}`}>
+          {plateInner}
+        </div>
+      ) : (
+        header
+      )}
+      {hero ? (
+        header
+      ) : (
+        <button type="button" className={`checkin-card__plate tone-${tone}`} onClick={() => navigate(`/checkin/${c.id}`)} aria-label={`Open check-in: ${c.items.join(', ')}`}>
+          {plateInner}
+        </button>
+      )}
 
       {c.note ? (
-        <p className="body" style={{ fontSize: '0.9375rem' }}>
+        <p className={hero ? 'checkin-card__note' : 'body'} style={hero ? undefined : { fontSize: '0.9375rem' }}>
           {c.note}
         </p>
       ) : null}
@@ -265,6 +289,44 @@ export function CheckInCard({ c, showPlace = true, footer }: { c: CheckIn; showP
       </div>
       {footer}
     </article>
+  );
+}
+
+/* ---------- Photo grid of check-ins (profiles) ---------- */
+export function CheckInGrid({ items }: { items: CheckIn[] }) {
+  return (
+    <div className="checkin-grid">
+      {items.map((c) => {
+        const place = c.placeId ? placeById(c.placeId) : undefined;
+        const src = itemPhoto(c.items[0], c.placeId, c.eventId);
+        const meta = VERDICT_META[c.verdict];
+        return (
+          <Link
+            key={c.id}
+            to={`/checkin/${c.id}`}
+            className={`checkin-tile tone-${place?.tone ?? (c.kind === 'ate' ? 'peach' : 'teal')}`}
+            aria-label={`${c.items.join(', ')} at ${c.placeName}, ${VERDICT_LABEL[c.verdict][c.kind]}, ${c.ago}`}
+          >
+            {src ? (
+              <img src={src} alt="" loading="lazy" decoding="async" />
+            ) : (
+              <span className="checkin-tile__glyph">
+                <NamedGlyph name={place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events')} size={34} duo />
+              </span>
+            )}
+            <span className={`checkin-tile__verdict tone-${meta.tone}`} aria-hidden="true">
+              <NamedGlyph name={meta.glyph} size={15} duo />
+            </span>
+            <span className="checkin-tile__text" aria-hidden="true">
+              <b>{c.items[0] ?? c.placeName}</b>
+              <small>
+                {c.placeName} · {c.ago}
+              </small>
+            </span>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
 
@@ -327,6 +389,26 @@ export function PersonRow({ personId, meta }: { personId: string; meta?: ReactNo
       </Link>
       <FollowButton personId={personId} />
     </div>
+  );
+}
+
+/** Suggestion card with a cover photo, for "Suggested for you". */
+export function PersonCard({ personId, reason, cover }: { personId: string; reason: string; cover?: string }) {
+  const p = person(personId);
+  const info = profileInfo(personId);
+  return (
+    <article className="card person-card">
+      <Link to={`/people/${personId}`} className="person-card__link" aria-label={`${p.name}, ${reason}`}>
+        <span className="person-card__cover">{cover ? <img src={cover} alt="" loading="lazy" decoding="async" /> : null}</span>
+        <span className="person-card__avatar">
+          <Avatar who={p} size={60} />
+        </span>
+        <span className="person-card__name">{p.name}</span>
+        <span className="meta person-card__handle">@{info.handle}</span>
+        <span className="person-card__reason">{reason}</span>
+      </Link>
+      <FollowButton personId={personId} />
+    </article>
   );
 }
 

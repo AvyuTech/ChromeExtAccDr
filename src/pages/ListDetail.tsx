@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Avatar, ShareButton } from '../components/cards';
+import { placePhoto } from '../assets/photos';
+import { Avatar, Cover, ShareButton } from '../components/cards';
 import { WantButton } from '../components/friends';
 import { useListEdits } from '../components/people';
-import { EmptyState, PageHeader, Sheet, Tile } from '../components/ui';
+import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { person } from '../data/core';
 import { placeById } from '../data/places';
 import type { Place } from '../data/types';
@@ -90,10 +91,25 @@ export default function ListDetail() {
         }
       />
       <main className="page page--with-header">
-        <section className={`list-hero tone-${col.tone}`} aria-labelledby="list-title">
-          <span className="list-hero__glyph">
-            <NamedGlyph name={col.glyph} size={30} duo live />
-          </span>
+        <section className="card list-hero" aria-labelledby="list-title">
+          <div className={`list-hero__mosaic list-hero__mosaic--${Math.min(Math.max(places.length, 1), 4)} tone-${col.tone}`} aria-hidden="true">
+            {places.length ? (
+              places.slice(0, 4).map((p) => (
+                <span key={p.id} className={`tone-${p.tone}`}>
+                  {placePhoto(p.id) ? <img src={placePhoto(p.id)} alt="" decoding="async" /> : <NamedGlyph name={p.glyph} size={28} duo />}
+                </span>
+              ))
+            ) : (
+              <span>
+                <NamedGlyph name={col.glyph} size={40} duo live />
+              </span>
+            )}
+            <span className="list-hero__count">
+              <NamedGlyph name="lists" size={14} />
+              {places.length} {places.length === 1 ? 'place' : 'places'}
+            </span>
+          </div>
+          <div className="list-hero__content">
           <h1 className="list-hero__title" id="list-title">
             {col.title}
           </h1>
@@ -103,9 +119,8 @@ export default function ListDetail() {
               <Avatar who={{ ...owner, verified: false }} size={26} />
               {own ? 'Your list' : t('people.by', { name: owner.name })}
             </Link>
-            <span className="list-hero__meta">
-              {places.length} places · {compact(col.followers + (followed ? 1 : 0))} followers
-            </span>
+            <span className="list-hero__meta">{compact(col.followers + (followed ? 1 : 0))} followers</span>
+          </div>
           </div>
         </section>
 
@@ -136,15 +151,14 @@ export default function ListDetail() {
               const note = col.notes?.[p.id];
               return (
                 <li key={p.id} className="card list-place glyph-host">
-                  <span className="list-place__num" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  <Link to={`/place/${p.id}`} className="row grow" style={{ textDecoration: 'none', color: 'inherit', alignItems: 'flex-start', minWidth: 0 }}>
-                    <Tile glyph={p.glyph} tone={p.tone} size="lg" />
-                    <span className="stack grow" style={{ gap: 4, minWidth: 0 }}>
-                      <span className="strong" style={{ fontSize: '0.96875rem' }}>
-                        {p.name}
+                  <Link to={`/place/${p.id}`} className="row grow" style={{ textDecoration: 'none', color: 'inherit', alignItems: 'flex-start', minWidth: 0, gap: 12 }}>
+                    <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="list-place__photo">
+                      <span className="list-place__num" aria-hidden="true">
+                        {i + 1}
                       </span>
+                    </Cover>
+                    <span className="stack grow" style={{ gap: 4, minWidth: 0 }}>
+                      <span className="list-place__name">{p.name}</span>
                       <span className="meta">
                         {p.kind} · {p.area} · {km(p.distanceKm)}
                       </span>

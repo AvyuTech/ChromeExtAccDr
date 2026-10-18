@@ -7,6 +7,7 @@
 .checkin-header .page-header__title {
   flex-grow: 0;
   text-align: center;
+  font-size: clamp(1rem, 4.8vw, 1.1875rem);
 }
 .checkin-header__spacer {
   width: 72px;
@@ -48,27 +49,121 @@
   gap: 12px;
 }
 
+.checkin-target__photo {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+}
+.checkin-result__photo {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+}
+
 .guess-card {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 18px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 22px;
   border: 1.5px dashed var(--accent-line);
   background: var(--accent-tint-2);
   color: var(--ink);
 }
+.guess-card__photo {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+}
 .guess-card__pin {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 20px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  background: var(--accent-fill);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(108, 82, 238, 0.28);
+  animation: guess-ping 2s ease-out infinite;
+}
+@keyframes guess-ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(108, 82, 238, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(108, 82, 238, 0);
+  }
+}
+.guess-card__add {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-fill);
+  color: var(--on-accent);
+}
+
+/* Nearby places as photo cards */
+.checkin-picks {
+  gap: 10px;
+}
+.checkin-pick {
+  flex-shrink: 0;
+  width: 132px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 0 0 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
   background: var(--surface);
-  color: var(--accent);
+  color: var(--ink);
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.checkin-pick:active {
+  transform: scale(0.97);
+}
+.checkin-pick:hover {
+  border-color: var(--accent-line);
+}
+.checkin-pick__photo {
+  width: 100%;
+  height: 84px;
+  border-radius: 0;
+  margin-bottom: 8px;
+}
+.checkin-pick__name {
+  padding: 0 10px;
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-size: 0.84375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.checkin-pick__meta {
+  padding: 0 10px;
+  max-width: 100%;
+  font-size: 0.71875rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chip--person {
@@ -82,17 +177,19 @@
   gap: 10px;
 }
 .verdict-option {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  min-height: 112px;
-  padding: 14px 6px 12px 6px;
-  border-radius: 20px;
+  min-height: 124px;
+  padding: 16px 6px 14px 6px;
+  border-radius: 22px;
   border: 1.5px solid var(--border);
   background: var(--surface);
   color: var(--ink);
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 .verdict-option:active {
   transform: scale(0.97);
@@ -109,8 +206,9 @@
 }
 .verdict-option__label {
   font-family: var(--font-display);
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: 0.96875rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   text-align: center;
 }
 .verdict-option__sub {
@@ -121,9 +219,21 @@
 .verdict-option[aria-checked='true'] {
   border-color: var(--tone-ink);
   background: var(--tone-bg);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--tone-ink) 22%, transparent);
 }
 .verdict-option[aria-checked='true'] .verdict-option__glyph {
   background: var(--surface);
+  animation: badge-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.verdict-option[aria-checked='true']::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--tone-ink);
 }
 
 /* Optional details */
@@ -159,21 +269,69 @@
 
 .photo-preview {
   position: relative;
-  align-self: flex-start;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--surface-3);
 }
 .photo-preview img {
-  width: 140px;
-  height: 140px;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: 16px;
-  max-width: 100%;
 }
-.photo-preview .icon-btn {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 36px;
-  height: 36px;
+.photo-preview .checkin-card__items {
+  left: 12px;
+  right: 60px;
+  bottom: 12px;
+}
+
+/* Photo picker */
+.photo-drop {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 10px;
+}
+.photo-drop__option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 132px;
+  padding: 14px;
+  border-radius: 22px;
+  border: 1.5px dashed var(--accent-line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.photo-drop__option:hover,
+.photo-drop__option:focus-within {
+  border-color: var(--accent);
+  background: var(--accent-tint-2);
+}
+.photo-drop__option--main {
+  background: var(--accent-tint-2);
+}
+.photo-drop__option .meta {
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+.photo-drop__icon {
+  width: 46px;
+  height: 46px;
+  margin-bottom: auto;
+  border-radius: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-fill);
+  color: var(--on-accent);
+}
+.photo-drop__option:not(.photo-drop__option--main) .photo-drop__icon {
+  background: var(--accent-tint);
+  color: var(--accent);
 }
 
 /* Sticky share bar */
@@ -221,9 +379,21 @@
 .place-mini {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  padding: 10px 14px 10px 10px;
   text-decoration: none;
   color: inherit;
+}
+.place-mini__photo {
+  width: 76px;
+  height: 76px;
+  border-radius: 18px;
+}
+.place-mini__name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 .place-mini__score {
   display: inline-flex;

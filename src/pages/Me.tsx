@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Avatar } from '../components/cards';
-import { CheckInCard, CollectionCard } from '../components/friends';
-import { DoneRing, TabStrip, useListEdits, WantRow } from '../components/people';
-import { EmptyState, Sheet, Tile } from '../components/ui';
+import { itemPhoto, placePhoto } from '../assets/photos';
+import { Cover } from '../components/cards';
+import { AvatarStack, CheckInCard, CheckInGrid, CollectionCard } from '../components/friends';
+import { DoneRing, ProfileHero, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
+import { EmptyState, Sheet } from '../components/ui';
 import { REPORTS } from '../data/city';
 import { PEOPLE, neighbourhoodName } from '../data/core';
 import { PLACES } from '../data/places';
@@ -34,6 +35,9 @@ import { useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 import { GlyphTile, SettingLink } from './settings/parts';
 
+/* A peek at what a first check-in looks like. */
+const FIRST_PHOTOS = [itemPhoto('Cold brew'), itemPhoto('Dosa'), itemPhoto('Sunrise yoga')].filter((x): x is string => !!x);
+
 /* Sample totals from before this device; the person's own activity adds on top. */
 const BASE = { helpful: 318 };
 const CHAMPION_AT = 3;
@@ -50,6 +54,7 @@ export default function Me() {
   const { data, toggleWant, setWantDone, removeWant, addCollection } = useAppData();
   const { apply } = useListEdits();
   const [confirm, setConfirm] = useState(false);
+  const [view, setView] = useState<'grid' | 'list'>('grid');
   const [newList, setNewList] = useState(false);
 
   // Add-to-list form
@@ -155,72 +160,59 @@ export default function Me() {
           </div>
         </header>
 
-        <section className="card me-profile" aria-label={profile.name}>
-          <span className="me-avatar">
-            <svg className="me-avatar__ring" viewBox="0 0 100 100" aria-hidden="true">
-              <circle cx="50" cy="50" r="47" fill="none" stroke="var(--accent)" strokeWidth="2.2" strokeDasharray="6 8" strokeLinecap="round" />
-            </svg>
-            <Avatar who={{ ...me, verified: false }} size={76} />
-            <span className="me-avatar__dot" aria-hidden="true" />
-          </span>
-          <div className="stack" style={{ gap: 4, alignItems: 'center' }}>
-            <h2 className="display" style={{ fontSize: '1.375rem' }}>
-              {profile.name}
-            </h2>
-            <span className="meta">
-              @{profile.handle} · {neighbourhoodName(settings.location.home)}, {settings.location.city}
-            </span>
-          </div>
-          <div className="row row--wrap" style={{ justifyContent: 'center', gap: 6 }}>
-            {PEOPLE.me.badge ? (
-              <span className="badge tone-violet">
-                <UsersGlyph size={14} /> {PEOPLE.me.badge}
+        <ProfileHero
+          who={me}
+          label={profile.name}
+          name={profile.name}
+          sub={`@${profile.handle}`}
+          place={`${neighbourhoodName(settings.location.home)}, ${settings.location.city}`}
+          online
+          badges={
+            <>
+              {PEOPLE.me.badge ? (
+                <span className="badge tone-violet">
+                  <UsersGlyph size={14} /> {PEOPLE.me.badge}
+                </span>
+              ) : null}
+              {profile.verifiedResident ? (
+                <span className="badge tone-mint">
+                  <ShieldGlyph size={14} /> {t('settings.account.verified')}
+                </span>
+              ) : null}
+            </>
+          }
+          bio={profile.bio || undefined}
+          actions={
+            <>
+              <Link to="/settings/account" className="btn btn--outline btn--sm">
+                {t('me.editProfile')}
+              </Link>
+              <Link to="/checkin" className="btn btn--primary btn--sm">
+                <PlusGlyph size={14} />
+                Check in
+              </Link>
+            </>
+          }
+          stats={stats.map((st) => ({
+            label: st.label,
+            value: st.to ? (
+              <Link to={st.to} className="me-stat__link">
+                {st.value}
+              </Link>
+            ) : (
+              st.value
+            ),
+          }))}
+          footer={
+            <Link to="/friends?tab=following" className="me-friends-row">
+              <AvatarStack ids={data.following.filter((id) => isFriend(data, id)).slice(0, 4)} size={26} max={4} />
+              <span className="grow">
+                <b>{friends}</b> {friends === 1 ? 'friend' : 'friends'} · following {data.following.length}
               </span>
-            ) : null}
-            {profile.verifiedResident ? (
-              <span className="badge tone-mint">
-                <ShieldGlyph size={14} /> {t('settings.account.verified')}
-              </span>
-            ) : null}
-          </div>
-          {profile.bio ? (
-            <p className="body-sm" style={{ textAlign: 'center' }}>
-              {profile.bio}
-            </p>
-          ) : null}
-          <div className="profile-actions">
-            <Link to="/settings/account" className="btn btn--soft btn--sm">
-              {t('me.editProfile')}
+              <span className="section__link">{t('people.friends')}</span>
             </Link>
-            <Link to="/checkin" className="btn btn--primary btn--sm">
-              <PlusGlyph size={14} />
-              Check in
-            </Link>
-          </div>
-          <dl className="me-stats">
-            {stats.map((s) => (
-              <div key={s.label} className="me-stat">
-                <dt>{s.label}</dt>
-                <dd className="num">
-                  {s.to ? (
-                    <Link to={s.to} className="me-stat__link">
-                      {s.value}
-                    </Link>
-                  ) : (
-                    s.value
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <Link to="/friends?tab=following" className="me-friends-row">
-            <FriendsGlyph size={18} duo />
-            <span className="grow">
-              <b>{friends}</b> {friends === 1 ? 'friend' : 'friends'} · following {data.following.length}
-            </span>
-            <span className="section__link">{t('people.friends')}</span>
-          </Link>
-        </section>
+          }
+        />
 
         <TabStrip
           idPrefix="me"
@@ -245,19 +237,33 @@ export default function Me() {
         <div id="me-panel" role="tabpanel" aria-labelledby={`me-tab-${tab}`} className="stack stack--lg">
           {tab === 'checkins' ? (
             data.myCheckIns.length ? (
-              data.myCheckIns.map((c) => <CheckInCard key={c.id} c={c} />)
+              <>
+                <div className="row row--between">
+                  <span className="meta strong">
+                    {data.myCheckIns.length} {data.myCheckIns.length === 1 ? 'check-in' : 'check-ins'}
+                  </span>
+                  <ViewToggle value={view} onChange={setView} />
+                </div>
+                {view === 'grid' ? <CheckInGrid items={data.myCheckIns} /> : data.myCheckIns.map((c) => <CheckInCard key={c.id} c={c} />)}
+              </>
             ) : (
-              <EmptyState
-                glyph="checkin"
-                title={t('people.firstCheckin')}
-                body={t('people.firstCheckinBody')}
-                action={
-                  <Link to="/checkin" className="btn btn--primary btn--sm">
+              <section className="first-checkin" aria-labelledby="first-ci">
+                <span className="first-checkin__photos" aria-hidden="true">
+                  {FIRST_PHOTOS.map((src) => (
+                    <img key={src} src={src} alt="" loading="lazy" decoding="async" />
+                  ))}
+                </span>
+                <div className="first-checkin__body">
+                  <h2 className="first-checkin__title" id="first-ci">
+                    {t('people.firstCheckin')}
+                  </h2>
+                  <p className="body-sm muted">{t('people.firstCheckinBody')}</p>
+                  <Link to="/checkin" className="btn btn--primary btn--sm" style={{ alignSelf: 'flex-start' }}>
                     <PlusGlyph size={14} />
                     Check in
                   </Link>
-                }
-              />
+                </div>
+              </section>
             )
           ) : null}
 
@@ -477,7 +483,7 @@ export default function Me() {
                     className="list-row"
                     onClick={() => setListPlaces((xs) => (on ? xs.filter((x) => x !== p.id) : [...xs, p.id]))}
                   >
-                    <Tile glyph={p.glyph} tone={p.tone} size="sm" />
+                    <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="pick-thumb" />
                     <span className="list-row__body">
                       <span className="list-row__title">{p.name}</span>
                       <span className="list-row__meta">

@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CheckInCard, PersonRow } from '../components/friends';
-import { PlanCard, shareOrCopy, TabStrip } from '../components/people';
+import { scenePhoto } from '../assets/photos';
+import { CheckInCard, PersonCard, PersonRow } from '../components/friends';
+import { coverPhoto, PlanCard, shareOrCopy, TabStrip } from '../components/people';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { PEOPLE } from '../data/core';
 import type { CheckIn, WantItem } from '../data/types';
@@ -200,28 +201,26 @@ export default function Friends() {
                 )
               ) : (
                 <>
-                  <section className="card invite-card" aria-labelledby="invite-title">
-                    <span className="tile tile--lg tone-violet">
-                      <FriendsGlyph size={24} duo live />
-                    </span>
-                    <div className="stack grow" style={{ gap: 4 }}>
-                      <h2 className="section__title" id="invite-title">
+                  <section className="invite-card" aria-labelledby="invite-title">
+                    <img className="invite-card__photo" src={scenePhoto('friends')} alt="" />
+                    <div className="invite-card__body">
+                      <h2 className="invite-card__title" id="invite-title">
                         {t('people.invite')}
                       </h2>
                       <p className="body-sm">{t('people.inviteBody')}</p>
+                      <button type="button" className="btn btn--lime" onClick={invite}>
+                        <LinkGlyph size={18} />
+                        {t('people.shareInvite')}
+                      </button>
                     </div>
-                    <button type="button" className="btn btn--primary btn--block" onClick={invite}>
-                      <LinkGlyph size={18} />
-                      {t('people.shareInvite')}
-                    </button>
                   </section>
 
                   <section className="section" aria-labelledby="suggested-title">
                     <SectionHead id="suggested-title" title={t('people.suggested')} />
                     {suggested.length ? (
-                      <div className="list">
+                      <div className="hscroll">
                         {suggested.map((s) => (
-                          <PersonRow key={s.id} personId={s.id} meta={`${s.reason} · ${profileInfo(s.id).checkIns} check-ins`} />
+                          <PersonCard key={s.id} personId={s.id} reason={s.reason} cover={coverPhoto(s.id)} />
                         ))}
                       </div>
                     ) : (

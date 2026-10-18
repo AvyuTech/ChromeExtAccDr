@@ -1,13 +1,14 @@
 import { useCallback, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { eventPhoto, photo, placePhoto, scenePhoto } from '../assets/photos';
 import { person } from '../data/core';
 import { eventById } from '../data/events';
 import { placeById } from '../data/places';
-import type { Collection, WantItem } from '../data/types';
+import type { Collection, Person, Tone, WantItem } from '../data/types';
 import { useT } from '../i18n';
-import { CheckGlyph, NamedGlyph, TrashGlyph, type GlyphName } from '../icons';
+import { CheckGlyph, PinGlyph, TrashGlyph, type GlyphName } from '../icons';
 import { useAppData } from '../state/appData';
-import { Avatar } from './cards';
+import { Avatar, Cover } from './cards';
 import { AvatarStack, WantButton } from './friends';
 
 /* Pieces shared by the Friends hub, profiles, lists and Me. */
@@ -18,7 +19,7 @@ export function chatLink(personId: string, draft?: string) {
 }
 
 /** Where a list entry leads, and which glyph and tone it wears. */
-export function wantTarget(item: WantItem): { to?: string; glyph: GlyphName; tone: string } {
+export function wantTarget(item: WantItem): { to?: string; glyph: GlyphName; tone: Tone } {
   const place = item.refId ? placeById(item.refId) : undefined;
   const event = item.refId ? eventById(item.refId) : undefined;
   if (item.kind === 'event' && event) return { to: `/event/${event.id}`, glyph: event.glyph, tone: event.tone };
@@ -28,6 +29,119 @@ export function wantTarget(item: WantItem): { to?: string; glyph: GlyphName; ton
   }
   const fallback: Record<WantItem['kind'], GlyphName> = { place: 'pin', event: 'events', dish: 'food', activity: 'checkin' };
   return { glyph: fallback[item.kind], tone: 'violet' };
+}
+
+/** Photo for a list entry: the event, else the place. */
+export function wantPhoto(item: WantItem): string | undefined {
+  if (item.kind === 'event' && item.refId) return eventPhoto(item.refId);
+  return item.refId ? placePhoto(item.refId) : undefined;
+}
+
+/* ---------- Profile header ---------- */
+
+/** A cover photo for each profile, picked from where they spend their time. */
+const COVER: Record<string, string> = {
+  me: 'scene-promenade',
+  riya: 'place-quiet-cup',
+  karan: 'place-pickle-play',
+  aditi: 'place-seoul-bowl',
+  nikhil: 'place-brew-lab',
+  farah: 'event-sunrise-yoga',
+  meera: 'place-spice-courtyard',
+  harsh: 'place-corner-table',
+  sana: 'place-manek-chowk',
+  dev: 'place-law-garden',
+  kavya: 'place-vastrapur-lake',
+  arjun: 'scene-concert',
+  zoya: 'dish-spicy-ramen',
+  priyank: 'place-polo-forest',
+};
+
+export const coverPhoto = (personId: string) => photo(COVER[personId] ?? '') ?? scenePhoto('sunset-friends');
+
+/** Cover photo, overlapping avatar, name, badges, bio, actions and a stat row. */
+export function ProfileHero({
+  who,
+  label,
+  name,
+  sub,
+  place,
+  badges,
+  bio,
+  actions,
+  stats,
+  online,
+  footer,
+}: {
+  who: Person;
+  label: string;
+  name: string;
+  sub: ReactNode;
+  place?: string;
+  badges?: ReactNode;
+  bio?: string;
+  actions: ReactNode;
+  stats: Array<{ label: string; value: ReactNode }>;
+  online?: boolean;
+  footer?: ReactNode;
+}) {
+  return (
+    <section className="card profile-hero" aria-label={label}>
+      <div className="profile-hero__cover">
+        <img src={coverPhoto(who.id)} alt="" />
+        {place ? (
+          <span className="photo-pill profile-hero__place">
+            <PinGlyph size={13} />
+            {place}
+          </span>
+        ) : null}
+      </div>
+      <div className="profile-hero__top">
+        <span className="profile-hero__avatar">
+          <Avatar who={{ ...who, verified: false }} size={84} />
+          {online ? <span className="profile-hero__online" aria-hidden="true" /> : null}
+        </span>
+        <div className="profile-hero__actions">{actions}</div>
+      </div>
+      <div className="profile-hero__body">
+        <h2 className="profile-hero__name">{name}</h2>
+        <span className="meta">{sub}</span>
+        {badges ? <div className="row row--wrap profile-hero__badges">{badges}</div> : null}
+        {bio ? <p className="profile-hero__bio">{bio}</p> : null}
+      </div>
+      <dl className="profile-hero__stats">
+        {stats.map((st) => (
+          <div key={st.label} className="profile-hero__stat">
+            <dt>{st.label}</dt>
+            <dd className="num">{st.value}</dd>
+          </div>
+        ))}
+      </dl>
+      {footer}
+    </section>
+  );
+}
+
+/** Grid / list switch for check-in tabs. */
+export function ViewToggle({ value, onChange }: { value: 'grid' | 'list'; onChange: (v: 'grid' | 'list') => void }) {
+  return (
+    <div className="view-toggle" role="radiogroup" aria-label="Layout">
+      <button type="button" role="radio" aria-checked={value === 'grid'} aria-label="Photo grid" onClick={() => onChange('grid')}>
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <rect x="2" y="2" width="6" height="6" rx="1.8" fill="currentColor" />
+          <rect x="10" y="2" width="6" height="6" rx="1.8" fill="currentColor" />
+          <rect x="2" y="10" width="6" height="6" rx="1.8" fill="currentColor" />
+          <rect x="10" y="10" width="6" height="6" rx="1.8" fill="currentColor" />
+        </svg>
+      </button>
+      <button type="button" role="radio" aria-checked={value === 'list'} aria-label="Full cards" onClick={() => onChange('list')}>
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <rect x="2" y="2" width="14" height="8" rx="2" fill="currentColor" />
+          <rect x="2" y="12" width="14" height="4" rx="1.6" fill="currentColor" opacity=".55" />
+        </svg>
+      </button>
+    </div>
+  );
 }
 
 /** A small "x of y" progress ring. */
@@ -97,11 +211,8 @@ export function WantRow({
         >
           {item.done ? <CheckGlyph size={16} /> : null}
         </button>
-      ) : (
-        <span className={`tile tone-${target.tone}`} aria-hidden="true">
-          <NamedGlyph name={target.glyph} size={20} duo />
-        </span>
-      )}
+      ) : null}
+      <Cover src={wantPhoto(item)} glyph={target.glyph} tone={target.tone} className={`want-row__thumb${mode === 'mine' ? ' want-row__thumb--sm' : ''}`} />
       <span className="list-row__body">
         {title}
         <span className="list-row__meta">
@@ -135,9 +246,13 @@ export function PlanCard({ personId, items }: { personId: string; items: WantIte
     new Set(items.map((i) => (i.kind === 'dish' || i.kind === 'activity') && i.refId ? (placeById(i.refId)?.name ?? i.title) : i.title)),
   );
   const text = titles.length > 1 ? `${titles.slice(0, -1).join(', ')} and ${titles[titles.length - 1]}` : titles[0];
+  const target = wantTarget(items[0]);
   return (
     <div className="plan-together">
-      <AvatarStack ids={['me', personId]} size={32} />
+      <span className="plan-together__media">
+        <Cover src={wantPhoto(items[0])} glyph={target.glyph} tone={target.tone} className="plan-together__photo" />
+        <AvatarStack ids={['me', personId]} size={26} />
+      </span>
       <p className="body-sm grow">
         You and <b>{first}</b> both want to try <b>{text}</b>.
       </p>
