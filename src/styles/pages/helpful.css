@@ -1,1 +1,643 @@
 /* gamification: helpful points, levels, city heroes */
+
+/* ---------- Level tags and badges ---------- */
+.level-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  color: var(--ink-3);
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.level-tag .glyph,
+.level-badge .glyph,
+.helpful-line__level .glyph {
+  color: var(--amber-ink);
+}
+.level-tag--hero {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  color: var(--ink);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+.helpful-stat {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+.helpful-stat b {
+  color: var(--ink);
+}
+
+/* One line on profiles: level · points · rank */
+.helpful-line {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.helpful-line__row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.helpful-line__row .grow {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.helpful-line__level {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  color: var(--ink);
+  font-weight: 800;
+}
+.helpful-line__next {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.helpful-line__next .meta {
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+.helpful-line__bar {
+  flex: 1;
+  height: 3px;
+  max-width: 160px;
+  border-radius: 2px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.helpful-line__bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--ink);
+}
+
+/* ---------- Progress to the next level ---------- */
+.level-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.level-progress__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+.level-progress__bar {
+  height: 6px;
+}
+.level-progress__bar > span {
+  background: var(--ink);
+}
+.level-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+.level-checks li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.level-checks li.is-done {
+  color: var(--ink);
+}
+.level-checks__mark {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-strong);
+}
+.is-done > .level-checks__mark {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--ground);
+}
+
+/* ---------- Known for ---------- */
+.known-for {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 0 var(--gutter) 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.known-for::-webkit-scrollbar {
+  display: none;
+}
+.known-for__label {
+  flex-shrink: 0;
+  margin-right: 2px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.known-for__chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  color: var(--ink);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.known-for__chip .num {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* ---------- Leaderboard rows ---------- */
+.hero-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0 calc(var(--gutter) * -1);
+}
+.hero-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px var(--gutter);
+  border-bottom: 1px solid var(--divider);
+  color: var(--ink);
+  text-decoration: none;
+}
+.hero-row:last-child {
+  border-bottom: none;
+}
+.hero-row--me {
+  background: var(--surface-2);
+}
+.hero-row__rank {
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+.hero-row--top .hero-row__rank {
+  color: var(--ink);
+  font-weight: 800;
+}
+.hero-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.hero-row__name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.hero-row__body .meta {
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hero-row__value {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+}
+.hero-row__value b {
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+.hero-row__value .meta {
+  font-size: 0.6875rem;
+}
+.hero-list--you {
+  margin-top: 6px;
+  border-top: 1px dashed var(--border-strong);
+}
+
+/* ---------- City heroes page ---------- */
+.heroes {
+  gap: 10px;
+}
+.heroes__intro {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.heroes__intro a,
+.heroes__you a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+.chip--sm {
+  height: 28px;
+  padding: 0 11px;
+  font-size: 0.75rem;
+}
+.chip--quiet {
+  border-color: transparent;
+  background: var(--surface-3);
+}
+.chip--quiet[aria-pressed='true'] {
+  border-color: var(--selected-bg);
+}
+.heroes__topics {
+  margin-top: -4px;
+}
+.heroes__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0 4px;
+}
+.heroes__period {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--surface-3);
+}
+.heroes__period button {
+  height: 26px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.7188rem;
+  font-weight: 700;
+}
+.heroes__period button[aria-checked='true'] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.heroes__period button:disabled {
+  opacity: 0.4;
+}
+.heroes__you {
+  margin: 8px 0 0;
+}
+.heroes__note {
+  margin: 10px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--divider);
+  font-size: 0.6875rem;
+}
+
+/* ---------- Your impact ---------- */
+.impact {
+  gap: 12px;
+}
+.impact-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.impact-head__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.impact-head__level {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.impact-head__points {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.impact-head__points b {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.impact-held {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+.impact-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 4px calc(var(--gutter) * -1) 0;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+}
+.impact-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 10px 4px;
+  color: var(--ink);
+  text-decoration: none;
+  text-align: center;
+}
+.impact-stat + .impact-stat {
+  border-left: 1px solid var(--divider);
+}
+.impact-stat b {
+  font-size: 1.0625rem;
+  font-weight: 800;
+}
+.impact-stat span {
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.impact-sub {
+  margin: 4px 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ledger {
+  display: flex;
+  flex-direction: column;
+  margin: 0 calc(var(--gutter) * -1);
+}
+.ledger-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px var(--gutter);
+  border-bottom: 1px solid var(--divider);
+  color: var(--ink);
+  text-decoration: none;
+}
+.ledger-row:last-child {
+  border-bottom: none;
+}
+.ledger-row__icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+  color: var(--ink-3);
+}
+.ledger-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.ledger-row__what {
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+.ledger-row__about {
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ledger-row__body .meta {
+  font-size: 0.6875rem;
+}
+.ledger-row__pts {
+  flex-shrink: 0;
+  min-width: 36px;
+  text-align: right;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--mint-ink);
+}
+.ledger-row__pts.is-neg,
+.rule-row__pts.is-neg {
+  color: var(--red-ink);
+}
+.ledger-row--older .ledger-row__pts {
+  color: var(--muted);
+}
+
+.rule-table {
+  display: flex;
+  flex-direction: column;
+  margin: 0 calc(var(--gutter) * -1);
+}
+.rule-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px var(--gutter);
+  border-bottom: 1px solid var(--divider);
+}
+.rule-row:last-child {
+  border-bottom: none;
+}
+.rule-row__what {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 0.8125rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+.rule-row__what .meta {
+  font-size: 0.6875rem;
+}
+.rule-row__pts {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.ladder {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ladder__step {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding-bottom: 14px;
+}
+.ladder__step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 22px;
+  bottom: 2px;
+  width: 1.5px;
+  background: var(--border-strong);
+}
+.ladder__mark {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-strong);
+  background: var(--ground);
+  color: var(--muted);
+}
+.ladder__step.is-past .ladder__mark {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--ground);
+}
+.ladder__step.is-now .ladder__mark {
+  border-color: var(--ink);
+}
+.ladder__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--ink);
+}
+.ladder__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ladder__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ladder__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+.ladder__step:not(.is-past):not(.is-now) .ladder__name {
+  color: var(--ink-2);
+}
+.ladder__body > .meta {
+  font-size: 0.6875rem;
+}
+.ladder__unlocks {
+  margin: 2px 0 0;
+  padding-left: 16px;
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.fair-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.impact-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px calc(var(--gutter) * -1) 0;
+  padding: 12px var(--gutter);
+  border-top: 1px solid var(--divider);
+  color: var(--ink);
+  text-decoration: none;
+}
+.impact-cta .grow {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 0.875rem;
+}
+.impact-cta .meta {
+  font-size: 0.75rem;
+}
+
+/* Me › City impact cells are links now */
+a.me-impact__cell {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* Anchored sections clear the sticky header */
+.impact .dsec[id] {
+  scroll-margin-top: 64px;
+}

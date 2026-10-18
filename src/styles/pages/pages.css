@@ -1,1 +1,385 @@
-/* pages: add a page, claim a page */
+/* pages: one template for every page, adding a page, claiming a page */
+
+/* ---------- On the page ---------- */
+/* Public place: a quiet line instead of a claim */
+.claim-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.claim-chip--pending {
+  background: var(--surface-3);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* Facts with plain icons in ink, no coloured tiles */
+.fact-list--quiet li > .glyph {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--ink);
+}
+.fact-list--quiet li {
+  color: var(--ink-2, var(--ink));
+}
+.fact-list--never li > .glyph {
+  color: var(--muted);
+}
+
+/* An update from a claimed page: flat, like a post */
+.page-update {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--divider);
+}
+.page-update:last-of-type {
+  border-bottom: none;
+}
+.page-update__head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.page-update__icon {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 15px;
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.page-update__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.page-update__name {
+  font-size: 0.8438rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.page-update__text {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.page-update__photo {
+  display: block;
+  width: calc(100% + var(--gutter) * 2);
+  max-width: none;
+  margin: 0 calc(var(--gutter) * -1);
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+.page-update__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  align-self: flex-start;
+  color: var(--accent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ---------- Add a page / claim a page: full-screen steps ---------- */
+.page-flow {
+  gap: 14px;
+}
+.page-flow__set {
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+.page-flow__ideas {
+  margin-top: 8px;
+  gap: 6px;
+}
+.page-flow__ideas .chip {
+  height: 30px;
+  padding: 0 11px;
+  font-size: 0.78rem;
+}
+
+/* A gentle stop: verify first, or "can't be claimed" */
+.flow-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 4px 0;
+}
+.flow-block__icon,
+.flow-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.flow-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+}
+
+/* Radio choices as flat list rows */
+.flow-option {
+  width: 100%;
+  border: none;
+  background: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  align-items: flex-start;
+}
+.flow-option__radio {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 2px solid var(--border-strong);
+}
+.flow-option[aria-checked='true'] .flow-option__radio {
+  border-color: var(--accent);
+}
+.flow-option[aria-checked='true'] .flow-option__radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--accent-fill);
+}
+.flow-option[aria-checked='true'] .list-row__title {
+  font-weight: 700;
+}
+
+.flow-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 0 10px 12px;
+  border-left: 2px solid var(--accent);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.flow-note > .glyph {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.flow-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+  cursor: pointer;
+}
+.flow-upload.is-done .flow-icon {
+  background: var(--selected-bg, var(--accent));
+  color: var(--selected-ink, #fff);
+}
+
+.claim-code {
+  height: 52px;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+/* The page being claimed, as one row */
+.claim-page {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--divider);
+  color: inherit;
+  text-decoration: none;
+}
+.claim-page__photo {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 12px;
+}
+
+.claim-review {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  margin: 0;
+  font-size: 0.875rem;
+}
+.claim-review dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+.claim-review dd {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Claim progress: a quiet vertical line of steps */
+.claim-timeline {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.claim-timeline li {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding-bottom: 16px;
+  color: var(--muted);
+}
+.claim-timeline li:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 24px;
+  bottom: 2px;
+  width: 2px;
+  background: var(--border-strong);
+}
+.claim-timeline li.is-done:not(:last-child)::before {
+  background: var(--ink);
+}
+.claim-timeline__dot {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  border: 2px solid var(--border-strong);
+  background: var(--ground);
+}
+.claim-timeline li.is-done .claim-timeline__dot {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--ground);
+}
+.claim-timeline li.is-now .claim-timeline__dot {
+  border-color: var(--accent);
+}
+.claim-timeline li.is-done .strong,
+.claim-timeline li.is-now .strong {
+  color: var(--ink);
+}
+
+/* Done screen after adding a page */
+.page-added {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.page-added__photo {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  margin-bottom: 6px;
+  border-radius: 18px;
+  overflow: visible;
+  background: var(--surface-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-added__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
+}
+.page-added__tick {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 3px solid var(--ground);
+  background: var(--accent-fill);
+  color: var(--on-accent);
+}
+.page-added__progress small {
+  margin-left: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.flow-next {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 4px 0;
+  padding: 0 0 0 18px;
+  font-size: 0.8438rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+/* ---------- Entry points ---------- */
+.spotted-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0 2px;
+  color: var(--accent);
+  font-size: 0.8438rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.explore-found {
+  margin-top: -4px;
+}
+.explore-found__icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--ink);
+}
+a.claim-link {
+  text-decoration: none;
+}
+.page-flow.page--with-header {
+  padding-top: 14px;
+}

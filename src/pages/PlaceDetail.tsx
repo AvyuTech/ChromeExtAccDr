@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ownItemPhoto, placePhoto } from '../assets/photos';
+import { ownItemPhoto, photo, placePhoto } from '../assets/photos';
 import { AnswerCard, PlaceRow, PostCard } from '../components/cards';
 import { FriendVerdictRow, RecommendSheet, TrustSheet } from '../components/community';
-import { AwayLine, IconAction, PlaceClaim, PlaceOriginLine, ProfileHead, useShare } from '../components/discover';
+import { AwayLine, EventLinkRow, IconAction, PageUpdateRow, PlaceClaim, PlaceOriginLine, ProfileHead, useShare } from '../components/discover';
 import { CheckInCard, TasteMatchPill, VerdictBar, WantButton } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
+import { EVENTS } from '../data/events';
+import { updatesFor } from '../data/pages';
 import { PLACES, placeById } from '../data/places';
 import { POSTS } from '../data/social';
 import { useT } from '../i18n';
@@ -51,15 +53,17 @@ export default function PlaceDetail() {
   const sources = place.sources.filter(enabledSources(settings));
   const related = POSTS.filter((p) => p.answer?.placeIds?.includes(place.id));
   const away = !!place.origin.outsideCity;
-  // Places outside the city only suggest each other; city places never suggest day trips.
+  // Pages outside the city only suggest each other; city pages never suggest day trips.
   const similar = PLACES.filter((p) => p.id !== place.id && !!p.origin.outsideCity === away && (away || p.category === place.category)).slice(0, 3);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, ${place.area}, Ahmedabad`)}`;
   const askQuery = `${place.name} ${place.kind.toLowerCase()} ${place.area}`;
   const community = placeCommunity(place.id, data, settings);
-  const isFood = place.category === 'food' || place.category === 'cafe';
   const friendCheckIns = community.reviews.filter((c) => c.authorId === 'me' || data.following.includes(c.authorId));
   const reviews = allReviews ? community.reviews : community.reviews.slice(0, 4);
-  const checkInLink = `/checkin?place=${place.id}${isFood ? '' : '&kind=did'}`;
+  const checkInLink = `/checkin?place=${place.id}`;
+  // Posts from the page itself: owner updates once claimed, and events it hosts (they link out, never booked here).
+  const updates = place.origin.claimed ? updatesFor(place.id) : [];
+  const hosted = EVENTS.filter((e) => e.host?.kind === 'page' && e.host.id === place.id);
   // Dishes and activities that have their own photo, most-ordered first.
   const gallery = Array.from(new Set([...community.items.map((i) => i.name), ...itemsFor(place.id)]))
     .map((name) => ({ name, src: ownItemPhoto(name), mustPct: community.items.find((i) => i.name === name)?.mustPct }))
@@ -174,7 +178,7 @@ export default function PlaceDetail() {
 
         {community.items.length || gallery.length ? (
           <section className="dsec" aria-labelledby="order-title">
-            <SectionHead id="order-title" title={isFood ? t('community.whatPeopleOrder') : t('community.whatPeopleDo')} />
+            <SectionHead id="order-title" title={t('discover.place.mostLoved')} />
             {gallery.length ? (
               <div className="hscroll item-gallery" role="list" aria-label={t('discover.place.photos')}>
                 {gallery.map((g) => (
@@ -192,7 +196,7 @@ export default function PlaceDetail() {
               </div>
             ) : null}
             {community.items.length ? (
-            <div className="list">
+              <div className="list">
               {community.items.slice(0, 5).map((item) => (
                 <div key={item.name} className="list-row order-row">
                   <span className="list-row__body">
@@ -203,12 +207,12 @@ export default function PlaceDetail() {
                     <span className="list-row__meta">{t('community.orders', { n: item.count < 1000 ? item.count : compact(item.count), pct: item.mustPct })}</span>
                   </span>
                   <WantButton
-                    item={{ id: `w-${place.id}-${item.name}`, kind: isFood ? 'dish' : 'activity', refId: place.id, title: item.name, sub: `at ${place.name}` }}
+                    item={{ id: `w-${place.id}-${item.name}`, kind: 'activity', refId: place.id, title: item.name, sub: `at ${place.name}` }}
                     variant="icon"
                   />
                 </div>
               ))}
-            </div>
+              </div>
             ) : null}
           </section>
         ) : null}
@@ -219,38 +223,27 @@ export default function PlaceDetail() {
           {!settings.ai.answers ? <p className="body-sm">{place.summary}</p> : null}
         </section>
 
-        <section className="dsec" aria-labelledby="loved-title">
-          <h2 className="section__title" id="loved-title">
-            {t('discover.place.loved')}
-          </h2>
-          <ul className="fact-list">
-            {place.highlights.map((h) => (
-              <li key={h}>
-                <span className="tile tone-mint">
-                  <CheckGlyph size={14} />
-                </span>
-                <span>{h}</span>
-              </li>
-            ))}
-          </ul>
-          {place.watchOuts.length ? (
-            <>
-              <h3 className="strong" style={{ fontSize: '0.875rem', marginTop: 4 }}>
-                {t('discover.place.watchOut')}
-              </h3>
-              <ul className="fact-list">
-                {place.watchOuts.map((w) => (
-                  <li key={w}>
-                    <span className="tile tone-amber">
-                      <InfoGlyph size={14} />
-                    </span>
-                    <span>{w}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-        </section>
+        {place.highlights.length || place.watchOuts.length ? (
+          <section className="dsec" aria-labelledby="know-title">
+            <h2 className="section__title" id="know-title">
+              {t('discover.place.watchOut')}
+            </h2>
+            <ul className="fact-list fact-list--quiet">
+              {place.highlights.map((h) => (
+                <li key={h}>
+                  <CheckGlyph size={15} />
+                  <span>{h}</span>
+                </li>
+              ))}
+              {place.watchOuts.map((w) => (
+                <li key={w}>
+                  <InfoGlyph size={15} />
+                  <span>{w}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         <section className="dsec" aria-labelledby="hours-title">
           <h2 className="section__title" id="hours-title">
@@ -285,6 +278,22 @@ export default function PlaceDetail() {
             ))}
           </div>
         </section>
+
+        {updates.length || hosted.length ? (
+          <section className="dsec" aria-labelledby="from-page-title">
+            <SectionHead id="from-page-title" title={t('discover.place.fromPage')} />
+            {updates.map((u) => (
+              <PageUpdateRow key={u.id} update={u} place={place} photo={u.photo ? photo(u.photo) : undefined} />
+            ))}
+            {hosted.length ? (
+              <div className="list">
+                {hosted.map((e) => (
+                  <EventLinkRow key={e.id} event={e} />
+                ))}
+              </div>
+            ) : null}
+          </section>
+        ) : null}
 
         <section className="dsec" aria-labelledby="reviews-title">
           <SectionHead id="reviews-title" title={t('community.reviewsTrust')} />

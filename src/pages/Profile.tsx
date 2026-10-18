@@ -2,10 +2,11 @@ import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import { CheckInCard, CheckInGrid, CollectionCard, FollowButton, TasteMatchPill, useFollow } from '../components/friends';
 import { chatLink, ClubRows, clubsOf, DoneRing, PlanCard, ProfileAction, ProfileHero, shareOrCopy, TabStrip, ViewToggle, WantRow } from '../components/people';
+import { KnownFor } from '../components/helpful';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { PEOPLE } from '../data/core';
 import { useT } from '../i18n';
-import { ChatGlyph, CheckGlyph, CopyGlyph, FlagGlyph, LockGlyph, MoreGlyph, PlusGlyph, ShareGlyph, UserGlyph, UsersGlyph } from '../icons';
+import { ChatGlyph, CheckGlyph, CopyGlyph, FlagGlyph, LockGlyph, MoreGlyph, PlusGlyph, ShareGlyph, UserGlyph } from '../icons';
 import { compact } from '../lib/format';
 import { allCheckIns, canSee, collectionsFor, isFollowing, profileInfo, sharedWants } from '../lib/friends';
 import { useAppData } from '../state/appData';
@@ -119,11 +120,6 @@ export default function Profile() {
             <>
               {info.followsMe ? <span className="badge">{t('people.followsYou')}</span> : null}
               <TasteMatchPill personId={id} />
-              {p.badge ? (
-                <span className="badge">
-                  <UsersGlyph size={12} /> {p.badge}
-                </span>
-              ) : null}
             </>
           }
           bio={info.bio}
@@ -143,6 +139,8 @@ export default function Profile() {
           }
           stats={stats.map((st) => ({ label: st.label, value: compact(st.value) }))}
         />
+
+        <KnownFor personId={id} />
 
         {info.tasteTags.length ? (
           <section className="taste-row" aria-label={`${first} is into`}>

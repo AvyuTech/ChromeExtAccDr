@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaceStack, GroupRow, PlaceRow } from '../components/cards';
+import { Cover, FaceStack, GroupRow, PlaceRow } from '../components/cards';
 import { CollectionCard } from '../components/friends';
 import { CityMap, eventPos, NEIGHBOURHOOD_POS, PLACE_POS, type MapPin } from '../components/CityMap';
 import { FriendPickCard } from '../components/community';
@@ -14,10 +14,10 @@ import { GROUPS } from '../data/social';
 import { WEB_PICKS } from '../data/web';
 import type { Place, PlaceCategory, Tone } from '../data/types';
 import { useT } from '../i18n';
-import { CheckGlyph, ChevronDownGlyph, HeartGlyph, ChevronRightGlyph, NamedGlyph, PinGlyph, SaveGlyph, SearchGlyph, SquiggleMark, StarGlyph, type GlyphName } from '../icons';
+import { CheckGlyph, ChevronDownGlyph, HeartGlyph, ChevronRightGlyph, NamedGlyph, PinGlyph, PlusGlyph, SaveGlyph, SearchGlyph, SparkGlyph, SquiggleMark, StarGlyph, type GlyphName } from '../icons';
 import { km } from '../lib/format';
 import { friendsMustTries, placeCommunity } from '../lib/friends';
-import { spottedPlaces } from '../lib/places';
+import { pageMatches, spotPhoto, spottedPlaces } from '../lib/places';
 import { visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
@@ -128,6 +128,10 @@ export default function Explore() {
     .filter((c) => c.ownerId !== 'me')
     .sort((a, b) => Number(data.following.includes(b.ownerId)) - Number(data.following.includes(a.ownerId)) || b.followers - a.followers);
 
+  // Typing shows pages straight away; nothing found means it's time to add one.
+  const typed = query.trim();
+  const found = typed.length >= 2 ? pageMatches(typed, data, 4) : undefined;
+
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
     const q = query.trim();
@@ -173,6 +177,53 @@ export default function Explore() {
             />
           </label>
         </form>
+
+        {found ? (
+          <div className="list explore-found" aria-live="polite">
+            {found.listed.map((p) => (
+              <Link key={p.id} to={`/place/${p.id}`} className="list-row">
+                <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="checkin-result__photo" />
+                <span className="list-row__body">
+                  <span className="list-row__title">{p.name}</span>
+                  <span className="list-row__meta">
+                    {p.kind} · {p.area}
+                  </span>
+                </span>
+              </Link>
+            ))}
+            {found.spotted.map((sp) => (
+              <a key={sp.id} href="#spotted-title" className="list-row" onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('spotted-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}>
+                <Cover src={spotPhoto(sp)} glyph={sp.glyph} tone={sp.tone} className="checkin-result__photo" />
+                <span className="list-row__body">
+                  <span className="list-row__title">{sp.name}</span>
+                  <span className="list-row__meta">
+                    {sp.kind} · {sp.area} · being confirmed
+                  </span>
+                </span>
+              </a>
+            ))}
+            <Link to={`/ask?q=${encodeURIComponent(typed)}`} className="list-row">
+              <span className="explore-found__icon">
+                <SparkGlyph size={17} />
+              </span>
+              <span className="list-row__body">
+                <span className="list-row__title">Ask Nearhood about “{typed}”</span>
+              </span>
+            </Link>
+            <Link to={`/pages/new?name=${encodeURIComponent(typed)}`} className="list-row">
+              <span className="explore-found__icon">
+                <PlusGlyph size={17} />
+              </span>
+              <span className="list-row__body">
+                <span className="list-row__title">{found.listed.length + found.spotted.length ? 'Not the one? Add a page' : `Can’t find “${typed}”? Add a page`}</span>
+                <span className="list-row__meta">Verified residents add pages. Three locals confirm them.</span>
+              </span>
+            </Link>
+          </div>
+        ) : null}
 
         <div className="chip-row" role="group" aria-label={t('discover.explore.mood')}>
           {MOODS.map((m) => (
@@ -294,7 +345,7 @@ export default function Explore() {
           </p>
           <div>
             {spotted.map((sp) => {
-              const pic = sp.photo ? photo(sp.photo) : undefined;
+              const pic = spotPhoto(sp);
               const done = sp.count >= sp.needed;
               return (
                 <div key={sp.id} className="spotted-row">
@@ -338,6 +389,11 @@ export default function Explore() {
               );
             })}
           </div>
+          <Link to="/pages/new" className="spotted-add">
+            <PlusGlyph size={16} />
+            <span className="grow">Spotted something new? Add a page</span>
+            <ChevronRightGlyph size={15} />
+          </Link>
         </section>
 
         <section className="section" aria-labelledby="reels-title">

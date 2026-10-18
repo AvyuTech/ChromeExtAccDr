@@ -1,17 +1,15 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { categoryPhoto, placePhoto } from '../assets/photos';
-import { Cover, PlaceRow } from '../components/cards';
+import { categoryPhoto } from '../assets/photos';
+import { PlaceRow } from '../components/cards';
 import { EventLinkRow, eventFriends } from '../components/discover';
 import { EmptyState, PageHeader, Segmented } from '../components/ui';
 import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
 import type { CityEvent, Place, Tone } from '../data/types';
 import { useT } from '../i18n';
-import { NamedGlyph, type GlyphName } from '../icons';
-import { km } from '../lib/format';
+import { ChevronRightGlyph, NamedGlyph, PlusGlyph, type GlyphName } from '../icons';
 import { placeCommunity } from '../lib/friends';
-import { placeOrigin } from '../lib/places';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 
@@ -69,12 +67,6 @@ const EVENT_CHIPS: Array<{ id: string; label: string; test: (e: CityEvent) => bo
   { id: 'kids', label: 'Kids', test: (e) => e.tags.includes('kids') || e.tags.includes('family') },
   { id: 'couples', label: 'Couples', test: (e) => e.tags.includes('couples') },
 ];
-
-/** Rough drive time at city-highway speeds, for getaways. */
-function driveTime(distance: number) {
-  const mins = Math.round((distance / 50) * 60);
-  return mins < 60 ? `${mins} min drive` : `${(mins / 60).toFixed(1).replace(/\.0$/, '')} hr drive`;
-}
 
 export default function Category() {
   const { category = '' } = useParams();
@@ -194,42 +186,19 @@ export default function Category() {
 
         {category === 'food' || category === 'places' || category === 'getaways' ? (
           places.length ? (
-            category === 'getaways' ? (
-              <div className="getaways">
-                {places.map((p) => (
-                  <Link key={p.id} to={`/place/${p.id}`} className="getaway-card glyph-host">
-                    <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="getaway-card__media">
-                      <span className="photo-pill" style={{ top: 12, left: 'var(--gutter)' }}>
-                        {driveTime(p.distanceKm)}
-                      </span>
-                    </Cover>
-                    <span className="getaway-card__body">
-                      <span className="row" style={{ gap: 8, alignItems: 'baseline' }}>
-                        <span className="getaway-card__title grow">{p.name}</span>
-                        <span className="meta" style={{ flexShrink: 0 }}>
-                          {km(p.distanceKm)}
-                        </span>
-                      </span>
-                      <span className="meta">
-                        {p.kind} · {t('discover.origin.outside')}
-                      </span>
-                      <span className="meta" style={{ color: 'var(--accent)', fontWeight: 600 }}>
-                        {placeOrigin(p).added}
-                      </span>
-                      <span className="body-sm" style={{ color: 'var(--ink-3)', marginTop: 2 }}>
-                        {p.summary}
-                      </span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
+            <>
+              {/* Every page lists the same way, whatever it is. */}
               <div className="list">
                 {places.map((p, i) => (
                   <PlaceRow key={p.id} place={p} last={i === places.length - 1} />
                 ))}
               </div>
-            )
+              <Link to="/pages/new" className="spotted-add">
+                <PlusGlyph size={16} />
+                <span className="grow">Not listed? Add a page</span>
+                <ChevronRightGlyph size={15} />
+              </Link>
+            </>
           ) : (
             <EmptyState glyph={config.glyph} title="Nothing matches" body="Try another filter or switch more sources on in Settings." />
           )

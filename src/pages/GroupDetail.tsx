@@ -3,12 +3,14 @@ import { Link, useParams } from 'react-router-dom';
 import { FaceStack, PostCard } from '../components/cards';
 import { buysOf, BuyRow, clubById, clubPhoto, meetupsOf, memberCount, MeetupRow, PlanSheet, type PlanMode } from '../components/clubs';
 import { IconAction, ProfileHead, useShare } from '../components/discover';
+import { HeroRow, useBoardContext } from '../components/helpful';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { person } from '../data/core';
 import { POSTS } from '../data/social';
 import { useT } from '../i18n';
 import { CalendarGlyph, ChatGlyph, CheckGlyph, GlobeGlyph, LockGlyph, NamedGlyph, ShareGlyph, UsersGlyph } from '../icons';
 import { compact } from '../lib/format';
+import { clubMemberIds, leaderboard } from '../lib/helpful';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
 
@@ -21,6 +23,7 @@ export default function GroupDetail() {
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [plan, setPlan] = useState<PlanMode | null>(null);
   const club = clubById(id, data);
+  const boardCtx = useBoardContext();
 
   if (!club) {
     return (
@@ -48,6 +51,7 @@ export default function GroupDetail() {
   const admins = club.admins.map((a) => (a === 'me' ? 'you' : person(a).name)).join(' and ');
   // Faces people will recognise: admins, then whoever is turning up to meetups.
   const people = Array.from(new Set([...(joined ? ['me'] : []), ...club.admins, ...meetups.flatMap((m) => m.going)])).filter((x) => x !== 'me' || joined);
+  const helpers = leaderboard({ scope: 'clubs', members: [...(joined ? ['me'] : []), ...clubMemberIds(club)], period: 'month', sortBy: 'points' }, boardCtx);
   const startPlan = (mode: PlanMode) => {
     if (!joined) toast(t('clubs.joinFirst'));
     else setPlan(mode);
@@ -163,6 +167,25 @@ export default function GroupDetail() {
             </span>
           </div>
         </section>
+
+        {helpers.length ? (
+          <section className="dsec" aria-labelledby="club-helpers">
+            <div className="dsec__head">
+              <h2 className="section__title" id="club-helpers">
+                Most helpful here
+              </h2>
+              <Link to="/heroes?scope=clubs" className="section__link">
+                City heroes
+              </Link>
+            </div>
+            <p className="clubs-note">Members ranked by helpful points this month.</p>
+            <div className="hero-list">
+              {helpers.slice(0, 5).map((r) => (
+                <HeroRow key={r.personId} row={r} sortBy="points" me={r.personId === 'me'} />
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="dsec" aria-labelledby="club-posts">
           <div className="dsec__head">

@@ -13,6 +13,8 @@ import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 import { identityOf } from '../data/identity';
+import { LevelTag } from '../components/helpful';
+import { levelFor } from '../lib/helpful';
 
 const REASONS = ['spam', 'wrong', 'rude', 'private', 'other'] as const;
 
@@ -76,11 +78,14 @@ function PostView({ post }: { post: Post }) {
   const allowed = enabledSources(settings);
 
   const mine = data.myReplies[post.id];
-  // Most helpful: marked helpful first, then by upvotes. Newest: yours, then the latest replies.
+  // Most helpful: marked helpful first, then people known for helping (by level), then upvotes.
+  // Newest: yours, then the latest replies.
   const replies = useMemo(
     () =>
       order === 'helpful'
-        ? [...post.replies].sort((a, b) => Number(!!b.helpful) - Number(!!a.helpful) || b.upvotes - a.upvotes).concat(mine ?? [])
+        ? [...post.replies]
+            .sort((a, b) => Number(!!b.helpful) - Number(!!a.helpful) || levelFor(b.authorId).index - levelFor(a.authorId).index || b.upvotes - a.upvotes)
+            .concat(mine ?? [])
         : [...(mine ?? [])].reverse().concat([...post.replies].reverse()),
     [post.replies, mine, order],
   );
@@ -127,6 +132,7 @@ function PostView({ post }: { post: Post }) {
                   {author.name}
                 </Link>
                 {group ? <ClubTag club={group} /> : null}
+                <LevelTag personId={post.authorId} topic={post.topic} />
               </span>
               <span className="meta">
                 {work ? `${work.title} · ` : ''}
@@ -233,6 +239,7 @@ function PostView({ post }: { post: Post }) {
                           {r.authorId === 'me' ? t('social.you') : who.name}
                         </span>
                         {identityOf(r.authorId).work ? <span className="meta">· {identityOf(r.authorId).work!.title}</span> : null}
+                        <LevelTag personId={r.authorId} topic={post.topic} />
                         {r.helpful ? <span className="badge badge--sm">{t('social.helpful')}</span> : null}
                         <span className="meta">· {r.ago}</span>
                       </div>

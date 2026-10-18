@@ -12,6 +12,7 @@ import { CheckGlyph, PinGlyph, TrashGlyph, type GlyphName } from '../icons';
 import { useAppData } from '../state/appData';
 import { Avatar, Cover } from './cards';
 import { AvatarStack, WantButton } from './friends';
+import { HelpfulLine } from './helpful';
 import { AskMeAbout, IdentitySheet, TrustLine, useIdentity, WorkLine } from './identity';
 
 /* Pieces shared by the Friends hub, profiles, lists and Me. */
@@ -125,6 +126,7 @@ export function ProfileHero({
         <h2 className="profile-hero__name">{name}</h2>
         <span className="profile-hero__sub">{sub}</span>
         <WorkLine identity={identity} />
+        <HelpfulLine personId={who.id} />
         {bio ? <p className="profile-hero__bio">{bio}</p> : null}
         <TrustLine identity={identity} area={who.area} onOpen={() => setIdOpen(true)} />
         <AskMeAbout identity={identity} />

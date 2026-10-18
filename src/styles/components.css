@@ -1628,6 +1628,9 @@ button.list-row:active {
 .feed-post__line {
   font-size: 0.875rem;
 }
+.feed-post__line .level-tag {
+  margin-left: 6px;
+}
 .feed-post__name {
   font-size: 0.875rem;
   font-weight: 700;

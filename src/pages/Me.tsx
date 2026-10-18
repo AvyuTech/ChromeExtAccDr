@@ -4,9 +4,11 @@ import { itemPhoto, placePhoto } from '../assets/photos';
 import { Cover } from '../components/cards';
 import { AvatarStack, CheckInCard, CheckInGrid, CollectionCard } from '../components/friends';
 import { ClubRows, DoneRing, myClubs, ProfileAction, ProfileHero, shareOrCopy, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
+import { LevelProgress } from '../components/helpful';
 import { EmptyState, Sheet } from '../components/ui';
 import { REPORTS } from '../data/city';
 import { PEOPLE, neighbourhoodName } from '../data/core';
+import { HELPFUL } from '../data/helpful';
 import { PLACES } from '../data/places';
 import type { WantItem } from '../data/types';
 import { useT } from '../i18n';
@@ -27,8 +29,9 @@ import {
   SaveGlyph,
   ShareGlyph,
   SlidersGlyph,
+  StarGlyph,
   StepRing,
-  UsersGlyph,
+  UpvoteGlyph,
 } from '../icons';
 import { collectionFor, collectionsFor, isFriend, isWanted, profileInfo } from '../lib/friends';
 import { unreadMessageCount, unreadNotificationCount } from '../lib/selectors';
@@ -40,9 +43,6 @@ import { GlyphTile, SettingLink } from './settings/parts';
 /* A peek at what a first check-in looks like. */
 const FIRST_PHOTOS = [itemPhoto('Cold brew'), itemPhoto('Dosa'), itemPhoto('Sunrise yoga')].filter((x): x is string => !!x);
 
-/* Sample totals from before this device; the person's own activity adds on top. */
-const BASE = { helpful: 318 };
-const CHAMPION_AT = 3;
 
 type Tab = 'checkins' | 'want' | 'clubs' | 'lists' | 'impact';
 const TABS: Tab[] = ['checkins', 'want', 'clubs', 'lists', 'impact'];
@@ -96,7 +96,7 @@ export default function Me() {
     { label: t('people.checkins'), value: data.myCheckIns.length, to: undefined as string | undefined },
     { label: t('people.followers'), value: info.followers, to: '/friends?tab=find' },
     { label: t('people.following'), value: data.following.length, to: '/friends?tab=following' },
-    { label: t('me.helpful'), value: BASE.helpful, to: undefined },
+    { label: t('me.helpful'), value: HELPFUL.me.lifetime, to: '/me/impact' },
   ];
 
   const addItem = (e: FormEvent) => {
@@ -180,15 +180,6 @@ export default function Me() {
           place={`${neighbourhoodName(settings.location.home)}, ${settings.location.city}`}
           online
           mine
-          badges={
-            <>
-              {PEOPLE.me.badge ? (
-                <span className="badge">
-                  <UsersGlyph size={14} /> {PEOPLE.me.badge}
-                </span>
-              ) : null}
-            </>
-          }
           bio={profile.bio || undefined}
           actions={
             <>
@@ -425,47 +416,32 @@ export default function Me() {
                 <h2 className="section__title" id="impact-title">
                   {t('me.impact')}
                 </h2>
-                <Link to="/city/reports" className="section__link">
-                  {t('common.seeAll')}
+                <Link to="/me/impact" className="section__link">
+                  Points history
                 </Link>
               </div>
               <div className="grid-3 me-impact">
-                <div className="me-impact__cell">
+                <Link to="/city/reports" className="me-impact__cell">
                   <StepRing step={4} steps={5} size={48}>
                     <span className="num">{fixed}</span>
                   </StepRing>
                   <span className="meta">{t('me.streetsFixed')}</span>
-                </div>
-                <div className="me-impact__cell">
+                </Link>
+                <Link to="/city/reports" className="me-impact__cell">
                   <StepRing step={2} steps={5} size={48}>
                     <span className="num">{open}</span>
                   </StepRing>
                   <span className="meta">{t('me.inProgress')}</span>
-                </div>
-                <div className="me-impact__cell">
-                  <span className="me-impact__big num">{BASE.helpful}</span>
-                  <span className="meta">{t('me.neighboursHelped')}</span>
-                </div>
+                </Link>
+                <Link to="/me/impact" className="me-impact__cell">
+                  <span className="me-impact__big num">{HELPFUL.me.thisMonth}</span>
+                  <span className="meta">Helpful this month</span>
+                </Link>
               </div>
-              <div className="stack" style={{ gap: 6 }}>
-                <div className="row row--between">
-                  <span className="body-sm strong">{t('me.nextBadge', { badge: t('me.champion') })}</span>
-                  <span className="meta">
-                    {Math.min(fixed, CHAMPION_AT)}/{CHAMPION_AT}
-                  </span>
-                </div>
-                <div
-                  className="progress"
-                  role="progressbar"
-                  aria-label="City champion progress"
-                  aria-valuemin={0}
-                  aria-valuemax={CHAMPION_AT}
-                  aria-valuenow={Math.min(fixed, CHAMPION_AT)}
-                >
-                  <span style={{ width: `${(Math.min(fixed, CHAMPION_AT) / CHAMPION_AT) * 100}%` }} />
-                </div>
-                <span className="meta">Get {Math.max(0, CHAMPION_AT - fixed)} more reports resolved in your ward.</span>
-              </div>
+              <LevelProgress personId="me" />
+              <Link to="/heroes" className="section__link" style={{ alignSelf: 'flex-start' }}>
+                See City heroes
+              </Link>
             </section>
           ) : null}
         </div>
@@ -526,6 +502,8 @@ export default function Me() {
             {t('me.shortcuts')}
           </h2>
           <div className="list list--grouped">
+            <SettingLink to="/me/impact" G={UpvoteGlyph} title="Your impact" trail={<span className="set-trail">{HELPFUL.me.lifetime}</span>} />
+            <SettingLink to="/heroes" G={StarGlyph} title="City heroes" />
             <SettingLink to="/me/saved" G={SaveGlyph} tone="violet" title={t('me.saved')} trail={<span className="set-trail">{savedCount}</span>} />
             <SettingLink to="/friends" G={FriendsGlyph} tone="mint" title={t('people.friends')} trail={<span className="set-trail">{data.following.length}</span>} />
             <SettingLink to="/city/reports" G={ReportGlyph} tone="amber" title={t('me.myReports')} trail={<span className="set-trail">{myReports.length}</span>} />

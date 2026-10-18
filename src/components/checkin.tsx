@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { itemPhoto } from '../assets/photos';
 import { person } from '../data/core';
 import { placeById } from '../data/places';
-import type { CheckIn, CheckInKind, Verdict } from '../data/types';
+import type { CheckIn, Verdict } from '../data/types';
 import { useT } from '../i18n';
 import { GoodGlyph, MustGlyph, NamedGlyph, SkipGlyph, type GlyphProps } from '../icons';
 import { VERDICT_META } from './friends';
@@ -18,9 +18,9 @@ const VERDICTS: Array<{ id: Verdict; G: ComponentType<GlyphProps>; sub: string }
 ];
 
 /** Three big one-tap verdict buttons: Must try / Good / Skip. */
-export function VerdictPicker({ value, kind, onChange }: { value: Verdict | null; kind: CheckInKind; onChange: (v: Verdict) => void }) {
+export function VerdictPicker({ value, onChange }: { value: Verdict | null; onChange: (v: Verdict) => void }) {
   const t = useT();
-  const label = (v: Verdict) => (v === 'must' ? t(kind === 'ate' ? 'checkin.must' : 'checkin.mustDo') : t(`checkin.${v}`));
+  const label = (v: Verdict) => t(`checkin.${v}`);
   return (
     <div className="verdict-picker" role="radiogroup" aria-label={t('checkin.verdict')}>
       {VERDICTS.map(({ id, G, sub }) => {

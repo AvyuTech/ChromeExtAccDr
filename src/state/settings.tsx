@@ -75,6 +75,8 @@ export interface Settings {
     listVisibility: 'everyone' | 'friends' | 'only-me';
     /** New followers need approval. */
     approveFollowers: boolean;
+    /** Appear on City heroes boards. Your level shows on your profile either way. */
+    showOnBoards: boolean;
   };
   sources: {
     enabled: Record<'tickets' | 'instagram' | 'maps' | 'news' | 'neighbours', boolean>;
@@ -164,6 +166,7 @@ export const DEFAULT_SETTINGS: Settings = {
     checkInAudience: 'friends',
     listVisibility: 'friends',
     approveFollowers: false,
+    showOnBoards: true,
   },
   sources: {
     enabled: { tickets: true, instagram: true, maps: true, news: true, neighbours: true },

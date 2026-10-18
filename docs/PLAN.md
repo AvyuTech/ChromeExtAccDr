@@ -57,8 +57,8 @@ Claiming exists so owners can keep facts right, not to buy attention.
 2. **Your role:** owner, partner or manager.
 3. **You:** your Nearhood ID must be verified (DigiLocker, once).
 4. **Proof in the page's name:** one of GST certificate, FSSAI licence, Shop & Establishment (Gumasta) registration or Udyam certificate.
-5. **Reach the venue:** we call the phone number locals listed for the page with a 6-digit code; you enter it.
-6. **Review:** the Nearhood team checks within 2 working days; if anything is unclear, a local guide visits. The page shows *Claim pending* to you meanwhile.
+5. **Reach the venue:** we call the phone number locals listed for the page with a 6-digit code; you enter it, then send the claim.
+6. **Review:** the Nearhood team checks the documents within 2 working days; if anything is unclear, a local guide visits. The page shows *Claim pending · you* with a timeline: sent ▸ venue phone confirmed ▸ documents checked ▸ approved.
 7. **Approved:** the page says *Run by Name, owner*.
 
 Owners can edit hours, phone, address, what's offered and the cover photo, post updates and events (with a link out), reply once in public to a check-in, and see simple counts (saves, check-ins). They can never edit or remove reviews or verdicts, pay for ranking or placement, see who saved them, or message people who didn't write first. If a business changes hands, the new owner claims it with fresh proof and the old owner is told. A second claim on the same page gets both sides asked for proof.
@@ -112,7 +112,7 @@ Nearhood rewards being useful to other people, not posting a lot. Points only co
 
 | Level | Points | Also needs | Unlocks |
 | --- | --- | --- | --- |
-| Newcomer | 0 | | Ask, check in, reply |
+| Newcomer | 0 | | Ask, reply, check in, join clubs |
 | Neighbour | 50 | Phone | Add pages, plan meetups |
 | Regular | 200 | Home neighbourhood verified | Start clubs and group buys |
 | Local expert | 600 | ID verified | *Local expert in Food* on answers in that topic; shown first in replies and in *Nearhood says* |

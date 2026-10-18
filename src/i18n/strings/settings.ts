@@ -160,6 +160,7 @@ export const settings: Dict = {
   'settings.privacy.cityOnly': { en: 'City', gu: 'શહેર', hi: 'शहर' },
   'settings.privacy.messages': { en: 'Who can message you', gu: 'તમને કોણ સંદેશ મોકલી શકે', hi: 'आपको कौन संदेश भेज सकता है' },
   'settings.privacy.showGoing': { en: "Show events I'm going to", gu: 'હું જે ઇવેન્ટમાં જાઉં છું તે બતાવો', hi: 'मैं जिन इवेंट में जा रहा हूँ, वे दिखाएँ' },
+  'settings.privacy.showOnBoards': { en: 'Show me on City heroes boards', gu: 'સિટી હીરો બોર્ડ પર મને બતાવો', hi: 'सिटी हीरो बोर्ड पर मुझे दिखाएँ' },
   'settings.privacy.showArea': { en: 'Show my area on posts', gu: 'પોસ્ટ પર મારો વિસ્તાર બતાવો', hi: 'पोस्ट पर मेरा इलाका दिखाएँ' },
   'settings.privacy.personalised': { en: 'Personalised suggestions', gu: 'વ્યક્તિગત સૂચનો', hi: 'व्यक्तिगत सुझाव' },
   'settings.privacy.analytics': { en: 'Share usage analytics', gu: 'ઉપયોગ વિશ્લેષણ શેર કરો', hi: 'उपयोग विश्लेषण साझा करें' },

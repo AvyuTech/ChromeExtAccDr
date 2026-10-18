@@ -22,6 +22,7 @@ import {
   ServicesGlyph,
   ShieldGlyph,
   SparkGlyph,
+  StarGlyph,
   TrashGlyph,
   TrustRing,
   UsersGlyph,
@@ -103,6 +104,14 @@ export function PrivacySection() {
         />
         <SettingToggle G={EventsGlyph} tone="peach" title={t('settings.privacy.showGoing')} meta="Friends see you in the Going list." checked={p.showGoing} onChange={(v) => update('privacy', { showGoing: v })} />
         <SettingToggle G={PinGlyph} tone="teal" title={t('settings.privacy.showArea')} meta="Shown next to your name on posts and replies." checked={p.showArea} onChange={(v) => update('privacy', { showArea: v })} />
+        <SettingToggle
+          G={StarGlyph}
+          tone="violet"
+          title={t('settings.privacy.showOnBoards')}
+          meta={p.showOnBoards ? 'Neighbours can see your rank. Your level shows on your profile either way.' : 'You’re off the boards. You still earn points and levels.'}
+          checked={p.showOnBoards}
+          onChange={(v) => update('privacy', { showOnBoards: v })}
+        />
       </Group>
 
       <Group title={t('settings.privacy.friendsGroup')} note="Friends are people you follow who follow you back.">

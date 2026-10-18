@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Avatar } from '../../components/cards';
+import { LevelBadge } from '../../components/helpful';
 import { EmptyState, PageHeader, Sheet } from '../../components/ui';
 import { ALERT_KIND_META } from '../../data/city';
 import { PEOPLE, TOGGLEABLE_SOURCES, neighbourhoodName } from '../../data/core';
@@ -83,7 +84,7 @@ export default function SettingsHome() {
                   {t('settings.home.verified')}
                 </span>
               ) : null}
-              {PEOPLE.me.badge ? <span className="badge badge--sm">{PEOPLE.me.badge}</span> : null}
+              <LevelBadge personId="me" />
             </span>
           </span>
           <ChevronRightGlyph size={18} style={{ color: 'var(--muted)', flexShrink: 0 }} />

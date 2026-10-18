@@ -30,6 +30,7 @@ import { useToast } from '../state/toast';
 import { RichText, Sheet } from './ui';
 import { useIdentity } from './identity';
 import { eventHost } from '../lib/hosts';
+import { LevelTag } from './helpful';
 
 /* ---------- Avatar: a real photo when we have one, initials otherwise ---------- */
 export function Avatar({ who, size = 40, ring }: { who: Person; size?: number; ring?: boolean }) {
@@ -195,6 +196,7 @@ export function PostCard({ post }: { post: Post }) {
           <span className="feed-post__line">
             <span className="feed-post__name">{author.name}</span>
             {club ? <ClubTag club={club} /> : null}
+            <LevelTag personId={post.authorId} topic={post.topic} />
           </span>
           <span className="meta">
             {work ? `${work.title} · ` : ''}

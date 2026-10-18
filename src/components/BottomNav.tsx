@@ -24,6 +24,7 @@ const TABS: Tab[] = [
 const CREATE: Array<{ to: string; glyph: GlyphName; tone: Tone; title: string; meta: string }> = [
   { to: '/compose?type=question', glyph: 'question', tone: 'violet', title: 'Ask friends & neighbours', meta: 'Where to go, what to order, who to call' },
   { to: '/compose?type=recommendation', glyph: 'recommend', tone: 'mint', title: 'Recommend something', meta: 'A longer tip for people nearby' },
+  { to: '/pages/new', glyph: 'pin', tone: 'violet', title: 'Add a page', meta: 'A café, court, shop or spot that’s missing' },
   { to: '/clubs?create=meetup', glyph: 'calendar', tone: 'blue', title: 'Plan a meetup in a club', meta: 'Cricket on Sunday, a founders’ breakfast…' },
   { to: '/clubs?create=buy', glyph: 'users', tone: 'teal', title: 'Buy something together', meta: 'Gather people for a better price, no payments here' },
   { to: '/city/report', glyph: 'report', tone: 'amber', title: 'Report a city issue', meta: 'Pothole, garbage, streetlight and more' },
@@ -71,7 +72,7 @@ export function BottomNav() {
             <span className="display strong" style={{ fontSize: '1.0625rem' }}>
               Quick check-in
             </span>
-            <span style={{ fontSize: '0.84375rem', opacity: 0.85 }}>What did you eat or do? Three taps, about ten seconds.</span>
+            <span style={{ fontSize: '0.84375rem', opacity: 0.85 }}>Where were you, and was it worth it? Three taps, about ten seconds.</span>
           </span>
           <ChevronRightGlyph size={18} />
         </button>

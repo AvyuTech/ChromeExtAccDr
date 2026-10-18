@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { eventPhoto, groupPhoto } from '../assets/photos';
+import { eventPhoto, groupPhoto, placePhoto } from '../assets/photos';
 import { EMERGENCY, FACILITIES, ISSUE_TYPES, REPORT_STEPS, reportById } from '../data/city';
 import { eventById } from '../data/events';
 import { placeById } from '../data/places';
 import { groupById, postById } from '../data/social';
 import { alertById } from '../data/city';
 import type { CityEvent, CityPulse, Corridor, Group, Place, Tone } from '../data/types';
-import { CheckGlyph, ChevronRightGlyph, NamedGlyph, PhoneGlyph, ShieldGlyph, TrafficGlyph, UsersGlyph } from '../icons';
+import { CheckGlyph, ChevronRightGlyph, ClockGlyph, NamedGlyph, PhoneGlyph, ShieldGlyph, TrafficGlyph, UsersGlyph } from '../icons';
+import type { PageUpdate } from '../data/pages';
 import { TRAFFIC_LABEL } from '../icons/live';
 import type { ResultRef } from '../lib/askEngine';
 import { compact, km } from '../lib/format';
@@ -532,12 +533,13 @@ export function IconAction({
 /* ---------- Where a place came from, and claiming it ---------- */
 
 const ORIGIN_RULES = [
-  'People add places when they check in. Nothing is imported or bought.',
-  'A place is listed after 3 verified visits, or once a Nearhood guide checks it.',
-  'Owners can claim a page to fix hours, menu and photos, and to reply to people.',
+  'Verified residents add pages: from the + button, from search, or while checking in. Nothing is imported or bought.',
+  'A new page is listed after 3 verified visits, or once a Nearhood guide checks it.',
+  'Every page is built the same way, whether it’s a café, a court or a lake.',
+  'Owners claim a page with a licence and a code to the venue’s phone, then fix facts and post updates.',
   'Owners can’t post verdicts, pay for placement or hide reviews.',
   'Parks, lakes, markets and streets belong to everyone and can’t be claimed.',
-  'AI only merges duplicates and flags fakes. It never adds places or reviews.',
+  'AI only merges duplicates and flags fakes. It never adds pages or reviews.',
 ];
 
 /** "Added by Riya S. · Jan 2024 · Confirmed by 39 locals": opens the full story. */
@@ -605,15 +607,15 @@ export function PlaceOriginLine({ place }: { place: Place }) {
   );
 }
 
-/** Claimed chip, "Public place", or a quiet link to claim the page. */
+/** Who runs the page: the claimed owner, "public place", your pending claim, or a quiet link to claim it. */
 export function PlaceClaim({ place }: { place: Place }) {
   const t = useT();
-  const toast = useToast();
-  const [open, setOpen] = useState(false);
+  const { data } = useAppData();
   const o = place.origin;
+  const mine = data.myClaims[place.id];
   if (o.publicPlace) {
     return (
-      <span className="claim-chip claim-chip--public">
+      <span className="claim-line">
         <UsersGlyph size={13} />
         {t('discover.claim.public')}
       </span>
@@ -627,34 +629,45 @@ export function PlaceClaim({ place }: { place: Place }) {
       </span>
     );
   }
+  if (mine) {
+    return (
+      <Link to={`/claim/${place.id}`} className="claim-chip claim-chip--pending">
+        <ClockGlyph size={13} />
+        {t(mine.status === 'approved' ? 'discover.claim.yours' : 'discover.claim.pending')}
+      </Link>
+    );
+  }
   return (
-    <>
-      <button type="button" className="claim-link" onClick={() => setOpen(true)} aria-haspopup="dialog">
-        {t('discover.claim.ask')}
-      </button>
-      <Sheet open={open} onClose={() => setOpen(false)} title={t('discover.claim.title', { name: place.name })}>
-        <p className="body-sm muted">{t('discover.claim.intro')}</p>
-        <ol className="rules">
-          <li>Show you run it: a trade licence, FSSAI or GST certificate in the venue’s name.</li>
-          <li>We send a code to the venue’s landline that locals listed. Read it back to us.</li>
-          <li>Then you can update hours, menu and photos, and reply to check-ins.</li>
-        </ol>
-        <p className="notice tone-mint" style={{ margin: 0 }}>
-          <ShieldGlyph size={16} />
-          <span>{t('discover.claim.note')}</span>
-        </p>
-        <button
-          type="button"
-          className="btn btn--primary btn--block"
-          onClick={() => {
-            setOpen(false);
-            toast(t('discover.claim.started'));
-          }}
-        >
-          {t('discover.claim.start')}
-        </button>
-      </Sheet>
-    </>
+    <Link to={`/claim/${place.id}`} className="claim-link">
+      {t('discover.claim.ask')}
+    </Link>
+  );
+}
+
+/** One post from a claimed page: who wrote it for the page, the words, an optional photo and a link out. */
+export function PageUpdateRow({ update, place, photo }: { update: PageUpdate; place: Place; photo?: string }) {
+  return (
+    <article className="page-update">
+      <div className="page-update__head">
+        <span className={`page-update__icon tone-${place.tone}`}>
+          {placePhoto(place.id) ? <img src={placePhoto(place.id)} alt="" /> : <NamedGlyph name={place.glyph} size={16} />}
+        </span>
+        <span className="stack grow" style={{ gap: 0, minWidth: 0 }}>
+          <span className="page-update__name">{place.name}</span>
+          <span className="meta">
+            {update.by} · {update.ago}
+          </span>
+        </span>
+      </div>
+      <p className="page-update__text">{update.text}</p>
+      {photo ? <img className="page-update__photo" src={photo} alt="" loading="lazy" /> : null}
+      {update.link ? (
+        <a className="page-update__link" href={update.link.url} target="_blank" rel="noopener noreferrer">
+          {update.link.label}
+          <ChevronRightGlyph size={14} />
+        </a>
+      ) : null}
+    </article>
   );
 }
 

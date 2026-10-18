@@ -143,9 +143,14 @@ export default function Groups() {
         ) : (
           <>
             <section className="clubs-sec" aria-labelledby="club-mine">
-              <h2 className="section__title" id="club-mine">
-                {t('clubs.yours')}
-              </h2>
+              <div className="section__head">
+                <h2 className="section__title" id="club-mine">
+                  {t('clubs.yours')}
+                </h2>
+                <Link to="/heroes?scope=clubs" className="section__link">
+                  Most helpful
+                </Link>
+              </div>
               {mine.length ? (
                 <div>
                   {mine.map((c, i) => (

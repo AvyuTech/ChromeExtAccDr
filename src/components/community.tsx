@@ -25,7 +25,7 @@ export function FriendPickCard({ c }: { c: CheckIn }) {
   const src = itemPhoto(c.items[0], c.placeId, c.eventId);
   return (
     <article className="pick-card">
-      <Link to={`/checkin/${c.id}`} className="pick-card__link" aria-label={`${who.name}: ${c.items.join(', ')} at ${c.placeName}, ${VERDICT_LABEL[c.verdict][c.kind]}`}>
+      <Link to={`/checkin/${c.id}`} className="pick-card__link" aria-label={`${who.name}: ${c.items.join(', ')} at ${c.placeName}, ${VERDICT_LABEL[c.verdict]}`}>
         <span className={`pick-card__photo tone-${place?.tone ?? VERDICT_META[c.verdict].tone}`}>
           {src ? (
             <img src={src} alt="" loading="lazy" decoding="async" />

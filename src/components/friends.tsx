@@ -20,12 +20,13 @@ export const VERDICT_META: Record<Verdict, { tone: Tone; glyph: GlyphName }> = {
   skip: { tone: 'peach', glyph: 'skip' },
 };
 
-export function VerdictBadge({ verdict, kind = 'ate', size = 'md' }: { verdict: Verdict; kind?: CheckIn['kind']; size?: 'sm' | 'md' }) {
+/** The same three words on every page, whatever it is. `kind` is accepted for older callers and ignored. */
+export function VerdictBadge({ verdict, size = 'md' }: { verdict: Verdict; kind?: CheckIn['kind']; size?: 'sm' | 'md' }) {
   const meta = VERDICT_META[verdict];
   return (
     <span className={`badge tone-${meta.tone}${size === 'sm' ? ' badge--sm' : ''}`} style={{ gap: 5 }}>
       <NamedGlyph name={meta.glyph} size={size === 'sm' ? 13 : 15} duo />
-      {VERDICT_LABEL[verdict][kind]}
+      {VERDICT_LABEL[verdict]}
     </span>
   );
 }
@@ -121,7 +122,7 @@ export function FollowButton({ personId, size = 'sm' }: { personId: string; size
 export function wantFromCheckIn(c: CheckIn): WantItem {
   const first = c.items[0];
   if (first && c.placeId) {
-    return { id: `w-${c.id}`, kind: c.kind === 'ate' ? 'dish' : 'activity', refId: c.placeId, title: first, sub: `at ${c.placeName}`, fromId: c.authorId };
+    return { id: `w-${c.id}`, kind: 'activity', refId: c.placeId, title: first, sub: `at ${c.placeName}`, fromId: c.authorId };
   }
   return { id: `w-${c.id}`, kind: c.eventId ? 'event' : 'place', refId: c.placeId ?? c.eventId, title: c.placeName, sub: c.area, fromId: c.authorId };
 }
@@ -159,7 +160,6 @@ export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { 
   const liked = has('likedCheckIns', c.id);
   const likes = c.likes + (liked ? 1 : 0) - (DEFAULT_APP_DATA.likedCheckIns.includes(c.id) ? 1 : 0);
   const comments = c.comments.length + (data.checkInComments[c.id]?.length ?? 0);
-  const verb = c.kind === 'ate' ? 'ate at' : 'went to';
   const tone = place?.tone ?? (c.kind === 'ate' ? 'peach' : 'teal');
   const glyph: GlyphName = place?.glyph ?? (c.kind === 'ate' ? 'food' : 'events');
   const friend = data.following.includes(c.authorId);
@@ -207,7 +207,7 @@ export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { 
             <Link to={profile} className="feed-post__name">
               {c.authorId === 'me' ? 'You' : author.name}
             </Link>{' '}
-            <span className="muted">{showPlace ? verb : c.kind === 'ate' ? 'had' : 'did'}</span>
+            {showPlace ? <span className="muted">at</span> : null}
             {showPlace ? (
               <>
                 {' '}
@@ -298,7 +298,7 @@ export function CheckInGrid({ items }: { items: CheckIn[] }) {
             key={c.id}
             to={`/checkin/${c.id}`}
             className={`checkin-tile tone-${place?.tone ?? (c.kind === 'ate' ? 'peach' : 'teal')}`}
-            aria-label={`${c.items.join(', ')} at ${c.placeName}, ${VERDICT_LABEL[c.verdict][c.kind]}, ${c.ago}`}
+            aria-label={`${c.items.join(', ')} at ${c.placeName}, ${VERDICT_LABEL[c.verdict]}, ${c.ago}`}
           >
             {src ? (
               <img src={src} alt="" loading="lazy" decoding="async" />

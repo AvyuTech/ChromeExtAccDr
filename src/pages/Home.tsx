@@ -32,6 +32,8 @@ import { unreadMessageCount, unreadNotificationCount, visibleAlerts } from '../l
 import { useAppData } from '../state/appData';
 import { useLiveCity } from '../state/live';
 import { enabledSources, useSettings } from '../state/settings';
+import { HeroRow, useBoardContext } from '../components/helpful';
+import { leaderboard } from '../lib/helpful';
 
 type Topic = 'all' | 'food' | 'events' | 'clubs' | 'alerts';
 type Show = 'latest' | 'trending' | 'questions';
@@ -180,6 +182,7 @@ export default function Home() {
       if (i === 2 && tab === 'for-you' && clubBuys[0]) feed.push(<BuyPost key={`b-${clubBuys[0].b.id}`} buy={clubBuys[0].b} club={clubBuys[0].club} />);
       if (i === 4 && tab === 'for-you' && clubMeetups[1]) feed.push(<MeetupPost key={`m-${clubMeetups[1].m.id}`} meetup={clubMeetups[1].m} club={clubMeetups[1].club} />);
       if (i === 3 && tab === 'for-you' && friendCard) feed.push(<CheckInCard key={`friend-${friendCard.id}`} c={friendCard} />);
+      if (i === 3 && tab === 'for-you') feed.push(<HelpfulThisMonth key="heroes" />);
       if (i === 4 && tab === 'for-you' && plans.length) feed.push(<PlanTogetherCard key="plans" plans={plans} />);
       if (i === 5 && tab === 'for-you')
         feed.push(
@@ -391,5 +394,22 @@ export default function Home() {
         </Link>
       </Sheet>
     </>
+  );
+}
+
+/** The three most helpful people in the city this month, as a nudge towards City heroes. */
+function HelpfulThisMonth() {
+  const ctx = useBoardContext();
+  const rows = leaderboard({ scope: 'city', period: 'month', sortBy: 'points' }, ctx).slice(0, 3);
+  if (!rows.length) return null;
+  return (
+    <section className="section" aria-labelledby="heroes-title">
+      <SectionHead id="heroes-title" title="Most helpful this month" to="/heroes" linkLabel="City heroes" />
+      <div className="list">
+        {rows.map((r) => (
+          <HeroRow key={r.personId} row={r} sortBy="points" />
+        ))}
+      </div>
+    </section>
   );
 }

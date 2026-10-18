@@ -42,10 +42,10 @@ export function neighbourhoodName(id: string) {
 export const ME_ID = 'me';
 
 export const PEOPLE: Record<string, Person> = {
-  me: { id: 'me', name: 'Jay Mehta', initials: 'J', area: 'Bodakdev', tone: 'violet', badge: 'Nearhood guide' },
+  me: { id: 'me', name: 'Jay Mehta', initials: 'J', area: 'Bodakdev', tone: 'violet' },
   riya: { id: 'riya', name: 'Riya S.', initials: 'R', area: 'Prahlad Nagar', tone: 'peach' },
   karan: { id: 'karan', name: 'Karan M.', initials: 'K', area: 'Thaltej', tone: 'green' },
-  aditi: { id: 'aditi', name: 'Aditi', initials: 'A', area: 'Bodakdev', tone: 'violet', verified: true, badge: 'Top replier' },
+  aditi: { id: 'aditi', name: 'Aditi', initials: 'A', area: 'Bodakdev', tone: 'violet', verified: true },
   nikhil: { id: 'nikhil', name: 'Nikhil P.', initials: 'N', area: 'Satellite', tone: 'blue' },
   farah: { id: 'farah', name: 'Farah K.', initials: 'F', area: 'Vastrapur', tone: 'teal', verified: true },
   meera: { id: 'meera', name: 'Meera D.', initials: 'M', area: 'Navrangpura', tone: 'amber' },
@@ -54,7 +54,7 @@ export const PEOPLE: Record<string, Person> = {
   dev: { id: 'dev', name: 'Dev A.', initials: 'D', area: 'Paldi', tone: 'yellow' },
   kavya: { id: 'kavya', name: 'Kavya R.', initials: 'K', area: 'Satellite', tone: 'teal' },
   arjun: { id: 'arjun', name: 'Arjun T.', initials: 'A', area: 'Navrangpura', tone: 'blue' },
-  zoya: { id: 'zoya', name: 'Zoya H.', initials: 'Z', area: 'Vastrapur', tone: 'peach', verified: true, badge: 'Food explorer' },
+  zoya: { id: 'zoya', name: 'Zoya H.', initials: 'Z', area: 'Vastrapur', tone: 'peach', verified: true },
   priyank: { id: 'priyank', name: 'Priyank S.', initials: 'P', area: 'Prahlad Nagar', tone: 'green' },
   ward: { id: 'ward', name: 'Bodakdev ward desk', initials: 'W', area: 'Bodakdev', tone: 'blue', verified: true, badge: 'Official' },
 };

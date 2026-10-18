@@ -1,6 +1,7 @@
+import { photo } from '../assets/photos';
 import { person } from '../data/core';
 import { collectionById } from '../data/friends';
-import { SPOTTED } from '../data/places';
+import { PLACES, SPOTTED } from '../data/places';
 import type { Place, SpottedPlace } from '../data/types';
 import type { AppData } from '../state/appData';
 
@@ -27,4 +28,20 @@ export function spottedPlaces(data: AppData): Array<SpottedPlace & { count: numb
     const mine = data.mySpots.some((m) => m.id === s.id);
     return { ...s, count: Math.min(s.needed, s.confirmedBy.length + (confirmedByMe && !s.confirmedBy.includes('me') ? 1 : 0)), mine, confirmedByMe };
   });
+}
+
+/** A spotted page's photo: a library photo for the samples, the person's own for pages they added. */
+export const spotPhoto = (s: Pick<SpottedPlace, 'photo'>) => (s.photo?.startsWith('data:') ? s.photo : s.photo ? photo(s.photo) : undefined);
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+/** Pages, listed or still being confirmed, whose name, kind or area matches a search. */
+export function pageMatches(query: string, data: AppData, limit = 5) {
+  const q = norm(query);
+  if (!q) return { listed: [] as Place[], spotted: [] as SpottedPlace[] };
+  const hit = (text: string) => norm(text).includes(q) || q.split(' ').every((w) => norm(text).includes(w));
+  return {
+    listed: PLACES.filter((p) => hit(`${p.name} ${p.kind} ${p.area}`)).slice(0, limit),
+    spotted: [...data.mySpots, ...SPOTTED].filter((s) => hit(`${s.name} ${s.kind} ${s.area}`)).slice(0, limit),
+  };
 }

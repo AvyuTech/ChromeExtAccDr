@@ -25,8 +25,6 @@ export const friendsFeed: Dict = {
 
   'community.verdict': { en: 'Community verdict', gu: 'સમુદાયનો મત', hi: 'समुदाय की राय' },
   'community.friendsBeen': { en: 'Friends who’ve been', gu: 'જઈ આવેલા મિત્રો', hi: 'जो दोस्त जा चुके हैं' },
-  'community.whatPeopleOrder': { en: 'What people order', gu: 'લોકો શું મંગાવે છે', hi: 'लोग क्या मंगाते हैं' },
-  'community.whatPeopleDo': { en: 'What people do here', gu: 'લોકો અહીં શું કરે છે', hi: 'लोग यहाँ क्या करते हैं' },
   'community.reviewsTrust': { en: 'Reviews from people you trust', gu: 'વિશ્વાસપાત્ર લોકોના રિવ્યૂ', hi: 'भरोसेमंद लोगों के रिव्यू' },
   'community.whyTrust': { en: 'Why trust these?', gu: 'આના પર વિશ્વાસ કેમ?', hi: 'इन पर भरोसा क्यों?' },
   'community.whyTrustIntro': {

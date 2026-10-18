@@ -7,10 +7,11 @@ import type { Settings } from '../state/settings';
 /* Friends layer logic: who you follow, what they checked in, community
    verdicts per place, taste match and shared plans. */
 
-export const VERDICT_LABEL: Record<Verdict, { ate: string; did: string }> = {
-  must: { ate: 'Must try', did: 'Must do' },
-  good: { ate: 'Good', did: 'Good' },
-  skip: { ate: 'Skip', did: 'Skip' },
+/** The same three words for every page, whatever it is. */
+export const VERDICT_LABEL: Record<Verdict, string> = {
+  must: 'Must try',
+  good: 'Good',
+  skip: 'Skip',
 };
 
 export function profileInfo(id: string): ProfileInfo {
