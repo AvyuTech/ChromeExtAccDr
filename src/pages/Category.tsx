@@ -1,20 +1,19 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { categoryPhoto, placePhoto } from '../assets/photos';
-import { Cover, DealCard, EventRow, PlaceRow } from '../components/cards';
-import { EmptyState, PageHeader, SectionHead, Segmented } from '../components/ui';
-import { EVENTS, MOVIES } from '../data/events';
+import { Cover, PlaceRow } from '../components/cards';
+import { EventLinkRow, eventFriends } from '../components/discover';
+import { EmptyState, PageHeader, Segmented } from '../components/ui';
+import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
-import { DEALS } from '../data/social';
 import type { CityEvent, Place, Tone } from '../data/types';
 import { useT } from '../i18n';
-import { ClockGlyph, MoviesGlyph, NamedGlyph, type GlyphName } from '../icons';
+import { NamedGlyph, type GlyphName } from '../icons';
 import { km } from '../lib/format';
 import { placeCommunity } from '../lib/friends';
 import { placeOrigin } from '../lib/places';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
-import { useToast } from '../state/toast';
 
 type Sort = 'popular' | 'nearest' | 'top';
 
@@ -27,9 +26,13 @@ interface Config {
 
 const CONFIG: Record<string, Config> = {
   food: { titleKey: 'discover.cat.food', glyph: 'food', tone: 'peach', blurb: 'Restaurants, cafés and street food, ranked by what neighbours say.' },
-  events: { titleKey: 'discover.cat.events', glyph: 'events', tone: 'violet', blurb: 'Merged from ticketing sites, reels, news and neighbours.' },
-  movies: { titleKey: 'discover.cat.movies', glyph: 'movies', tone: 'night', blurb: 'Showtimes at halls near you today.' },
-  getaways: { titleKey: 'discover.cat.getaways', glyph: 'getaways', tone: 'teal', blurb: 'Day trips and weekends within a few hours of the city.' },
+  events: {
+    titleKey: 'discover.cat.events',
+    glyph: 'events',
+    tone: 'violet',
+    blurb: 'Found on organisers’ pages, ticketing sites, reels and news. Nearhood doesn’t sell tickets: every event links out.',
+  },
+  getaways: { titleKey: 'discover.cat.getaways', glyph: 'getaways', tone: 'teal', blurb: 'Day trips and weekends your friends added to their lists.' },
   places: { titleKey: 'discover.cat.places', glyph: 'pin', tone: 'green', blurb: 'Lakes, markets, heritage and things to do around you.' },
 };
 
@@ -76,12 +79,10 @@ function driveTime(distance: number) {
 export default function Category() {
   const { category = '' } = useParams();
   const t = useT();
-  const toast = useToast();
   const { settings } = useSettings();
   const { data } = useAppData();
   const [chip, setChip] = useState('all');
   const [sort, setSort] = useState<Sort>('popular');
-  const [reminders, setReminders] = useState<string[]>([]);
   const config = CONFIG[category];
   const allowed = useMemo(() => enabledSources(settings), [settings]);
 
@@ -108,10 +109,15 @@ export default function Category() {
     if (category !== 'events') return [];
     const test = EVENT_CHIPS.find((c) => c.id === chip)?.test ?? (() => true);
     const list = EVENTS.filter((e) => (e.confirmed || settings.sources.showUnconfirmed) && e.sources.some(allowed)).filter(test);
+    // "Popular" means popular with your friends first, then how many places it was seen on.
+    const keen = (e: CityEvent) => {
+      const f = eventFriends(e.id, data);
+      return f.want.length + f.went.length;
+    };
     return [...list].sort((a, b) =>
-      sort === 'nearest' ? a.distanceKm - b.distanceKm : sort === 'top' ? b.sources.length - a.sources.length : b.going + (b.interested ?? 0) / 4 - (a.going + (a.interested ?? 0) / 4),
+      sort === 'nearest' ? a.distanceKm - b.distanceKm : sort === 'top' ? b.sources.length - a.sources.length : keen(b) - keen(a) || b.sources.length - a.sources.length,
     );
-  }, [category, chip, sort, allowed, settings.sources.showUnconfirmed]);
+  }, [category, chip, sort, allowed, settings.sources.showUnconfirmed, data]);
 
   if (!config) {
     return (
@@ -134,7 +140,7 @@ export default function Category() {
 
   const chips = category === 'events' ? EVENT_CHIPS : PLACE_CHIPS[category];
   const banner = categoryPhoto(category);
-  const count = category === 'events' ? events.length : category === 'movies' ? MOVIES.length : places.length;
+  const count = category === 'events' ? events.length : places.length;
 
   return (
     <>
@@ -147,7 +153,7 @@ export default function Category() {
           </span>
           <span className="cat-banner__text">
             <span className="cat-banner__count">
-              {count} {category === 'events' ? 'events' : category === 'movies' ? 'films' : 'places'}
+              {count} {category === 'events' ? 'events' : 'places'}
             </span>
             <span className="cat-banner__blurb">{config.blurb}</span>
           </span>
@@ -163,85 +169,27 @@ export default function Category() {
           </div>
         ) : null}
 
-        {category !== 'movies' ? (
-          <Segmented<Sort>
-            label={t('discover.sort.label')}
-            value={sort}
-            onChange={setSort}
-            options={[
-              { value: 'popular', label: t('discover.sort.popular') },
-              { value: 'nearest', label: t('discover.sort.nearest') },
-              { value: 'top', label: category === 'events' ? t('common.verified') : t('community.mostMust') },
-            ]}
-          />
-        ) : null}
+        <Segmented<Sort>
+          label={t('discover.sort.label')}
+          value={sort}
+          onChange={setSort}
+          options={[
+            { value: 'popular', label: category === 'events' ? t('discover.sort.friends') : t('discover.sort.popular') },
+            { value: 'nearest', label: t('discover.sort.nearest') },
+            { value: 'top', label: category === 'events' ? t('common.verified') : t('community.mostMust') },
+          ]}
+        />
 
         {category === 'events' ? (
           events.length ? (
-            <div className="results">
+            <div className="list">
               {events.map((e) => (
-                <EventRow key={e.id} event={e} />
+                <EventLinkRow key={e.id} event={e} />
               ))}
             </div>
           ) : (
             <EmptyState glyph="events" title="No events match" body="Try another filter." />
           )
-        ) : null}
-
-        {category === 'movies' ? (
-          <>
-            <section className="section" aria-labelledby="movies-title">
-              <SectionHead id="movies-title" title={t('discover.movies.showing')} />
-              {MOVIES.map((m) => (
-                <article key={m.id} className="movie-row">
-                  <span className={`movie-poster tone-${m.tone}`}>
-                    <MoviesGlyph size={26} duo live />
-                  </span>
-                  <div className="stack grow" style={{ gap: 8 }}>
-                    <div className="stack" style={{ gap: 2 }}>
-                      <span className="strong" style={{ fontSize: '0.9375rem' }}>
-                        {m.title}
-                      </span>
-                      <span className="meta">
-                        {m.hall} · {m.rating}
-                      </span>
-                    </div>
-                    <div className="chip-wrap" role="group" aria-label={`Showtimes for ${m.title}`}>
-                      {m.shows.map((s) => {
-                        const id = `${m.id}-${s}`;
-                        const on = reminders.includes(id);
-                        return (
-                          <button
-                            key={s}
-                            type="button"
-                            className="chip chip--accent"
-                            aria-pressed={on}
-                            style={{ height: 30, padding: '0 10px', fontSize: '0.75rem' }}
-                            onClick={() => {
-                              setReminders((r) => (on ? r.filter((x) => x !== id) : [...r, id]));
-                              toast(on ? `Reminder removed for ${s}` : `We'll remind you 45 min before ${s}`);
-                            }}
-                          >
-                            <ClockGlyph size={13} />
-                            {s}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </article>
-              ))}
-              <p className="meta">Tap a showtime for a reminder. Tickets are booked with the cinema.</p>
-            </section>
-            <section className="dsec" aria-labelledby="matinee-title">
-              <SectionHead id="matinee-title" title={t('discover.movies.matinee')} to="/deals" />
-              <div className="results">
-                {DEALS.filter((d) => d.category === 'movies').map((d) => (
-                  <DealCard key={d.id} deal={d} />
-                ))}
-              </div>
-            </section>
-          </>
         ) : null}
 
         {category === 'food' || category === 'places' || category === 'getaways' ? (

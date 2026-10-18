@@ -1,24 +1,25 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { groupPhoto } from '../assets/photos';
-import { EMERGENCY, FACILITIES, ISSUE_TYPES, REPORT_STEPS, reportById, SERVICES } from '../data/city';
+import { eventPhoto, groupPhoto } from '../assets/photos';
+import { EMERGENCY, FACILITIES, ISSUE_TYPES, REPORT_STEPS, reportById } from '../data/city';
 import { eventById } from '../data/events';
 import { placeById } from '../data/places';
-import { dealById, groupById, postById } from '../data/social';
+import { groupById, postById } from '../data/social';
 import { alertById } from '../data/city';
 import type { CityEvent, CityPulse, Corridor, Group, Place, Tone } from '../data/types';
 import { CheckGlyph, ChevronRightGlyph, NamedGlyph, PhoneGlyph, ShieldGlyph, TrafficGlyph, UsersGlyph } from '../icons';
 import { TRAFFIC_LABEL } from '../icons/live';
 import type { ResultRef } from '../lib/askEngine';
-import { compact, km, rupees } from '../lib/format';
+import { compact, km } from '../lib/format';
 import { placeOrigin } from '../lib/places';
-import { person } from '../data/core';
+import { allCheckIns, profileInfo } from '../lib/friends';
+import { person, SOURCES } from '../data/core';
 import { collectionById } from '../data/friends';
-import { AlertCard, Avatar, Cover, DealCard, EventRow, GroupRow, PlaceRow, PostCard } from './cards';
+import { AlertCard, Avatar, Cover, FaceStack, GroupRow, PlaceRow, PostCard } from './cards';
 import { CheckInCard } from './friends';
 import { checkInById } from '../data/friends';
-import { useAppData } from '../state/appData';
+import { useAppData, type AppData } from '../state/appData';
 import { useToast } from '../state/toast';
 import { useT } from '../i18n';
 import { LinkRow, Sheet, Tile } from './ui';
@@ -54,7 +55,7 @@ export function CorridorRow({ corridor }: { corridor: Corridor }) {
 
 /* ---------- Render any answer result ---------- */
 
-const LIST_TYPES = new Set<ResultRef['type']>(['place', 'corridor', 'emergency', 'facility', 'service', 'report']);
+const LIST_TYPES = new Set<ResultRef['type']>(['place', 'corridor', 'emergency', 'facility', 'report', 'event']);
 
 function renderListItem(ref: ResultRef, pulse: CityPulse, last: boolean): ReactNode {
   switch (ref.type) {
@@ -97,19 +98,9 @@ function renderListItem(ref: ResultRef, pulse: CityPulse, last: boolean): ReactN
         </Link>
       ) : null;
     }
-    case 'service': {
-      const s = SERVICES.find((x) => x.id === ref.id);
-      return s ? (
-        <LinkRow
-          key={ref.id}
-          to="/city/services"
-          glyph={s.glyph}
-          tone={s.tone}
-          title={s.name}
-          meta={s.due ? `${s.provider} · ${s.due}` : s.provider}
-          trail={s.amount ? <span className="strong" style={{ color: 'var(--ink)' }}>{rupees(s.amount)}</span> : undefined}
-        />
-      ) : null;
+    case 'event': {
+      const e = eventById(ref.id);
+      return e ? <EventLinkRow key={ref.id} event={e} /> : null;
     }
     case 'report': {
       const r = reportById(ref.id);
@@ -133,14 +124,6 @@ function renderListItem(ref: ResultRef, pulse: CityPulse, last: boolean): ReactN
 
 function renderCard(ref: ResultRef): ReactNode {
   switch (ref.type) {
-    case 'event': {
-      const e = eventById(ref.id);
-      return e ? <EventRow key={ref.id} event={e} /> : null;
-    }
-    case 'deal': {
-      const d = dealById(ref.id);
-      return d ? <DealCard key={ref.id} deal={d} /> : null;
-    }
     case 'alert': {
       const a = alertById(ref.id);
       return a ? <AlertCard key={ref.id} alert={a} /> : null;
@@ -182,6 +165,64 @@ export function ResultList({ refs, pulse }: { refs: ResultRef[]; pulse: CityPuls
     }
   }
   return <div className="results">{blocks}</div>;
+}
+
+/* ---------- City events: found on the web, never sold here ---------- */
+
+/** Friends who want to go (on their list) or already went (checked in). */
+export function eventFriends(eventId: string, data: AppData) {
+  const went = data.following.filter((fid) => allCheckIns(data).some((c) => c.authorId === fid && c.eventId === eventId));
+  const want = data.following.filter((fid) => !went.includes(fid) && profileInfo(fid).wantToTry.some((w) => w.refId === eventId && !w.done));
+  return { want, went };
+}
+
+/** "Riya and Aditi want to go", "Karan went". */
+export function friendsLine(ids: string[], verb: { one: string; many: string }) {
+  const names = ids.map((id) => person(id).name.split(' ')[0]);
+  if (!names.length) return '';
+  const who = names.length > 2 ? `${names.slice(0, 2).join(', ')} and ${names.length - 2} more` : names.join(' and ');
+  return `${who} ${names.length === 1 ? verb.one : verb.many}`;
+}
+
+/** Brand names keep their capital mid-sentence; generic sources ("Local news") don't. */
+const PROPER_SOURCES = new Set(['instagram', 'maps']);
+
+/** Where an event was found, e.g. "ticketing sites · Instagram". */
+export function eventSourceLine(e: CityEvent) {
+  return e.sources
+    .filter((s) => s !== 'neighbours' && s !== 'maps')
+    .map((s) => (PROPER_SOURCES.has(s) ? SOURCES[s].label : SOURCES[s].label.charAt(0).toLowerCase() + SOURCES[s].label.slice(1)))
+    .join(' · ');
+}
+
+/** A city event as a flat row: when and where, then friends, else where it was found. */
+export function EventLinkRow({ event }: { event: CityEvent }) {
+  const { data } = useAppData();
+  const { want, went } = eventFriends(event.id, data);
+  const friends = [...went, ...want];
+  const from = eventSourceLine(event);
+  return (
+    <Link to={`/event/${event.id}`} className={`list-row glyph-host event-link-row${event.confirmed ? '' : ' event-link-row--unconfirmed'}`}>
+      <Cover src={eventPhoto(event.id)} glyph={event.glyph} tone={event.tone} className="event-link-row__thumb" />
+      <span className="list-row__body">
+        <span className="list-row__title">{event.title}</span>
+        <span className="list-row__meta">
+          {event.day}, {event.time.split(' – ')[0]} · {event.area}
+        </span>
+        {friends.length ? (
+          <span className="row" style={{ gap: 6 }}>
+            <FaceStack ids={friends} size={18} />
+            <span className="event-link-row__friends">
+              {went.length ? friendsLine(went, { one: 'went', many: 'went' }) : friendsLine(want, { one: 'wants to go', many: 'want to go' })}
+            </span>
+          </span>
+        ) : (
+          <span className="event-link-row__from">{event.confirmed ? `From ${from || 'the web'}` : (event.unconfirmedNote ?? 'Not confirmed yet')}</span>
+        )}
+      </span>
+      <ChevronRightGlyph size={16} style={{ color: 'var(--muted)', flexShrink: 0 }} />
+    </Link>
+  );
 }
 
 /* ---------- Groups ---------- */
@@ -318,7 +359,7 @@ export function downloadEventIcs(e: CityEvent): boolean {
 }
 
 /**
- * Top-of-page hero for places, events, deals and groups. With a photo it runs
+ * Top-of-page hero for places, events and clubs. With a photo it runs
  * edge to edge with a soft scrim; without one, a tinted panel with the glyph.
  */
 export function DetailHero({

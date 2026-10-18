@@ -1,4 +1,4 @@
-/* discover pages: Ask, Explore, Category, Deals, Place, Event, Groups */
+/* discover pages: Ask, Explore, Category, Place, Event, Groups */
 
 /* ---------- Ask ---------- */
 .ask-page {
@@ -595,180 +595,6 @@
   color: var(--accent);
 }
 
-/* ---------- Deals: flat rows, thumbnail + text + claim ---------- */
-.deal-list {
-  display: flex;
-  flex-direction: column;
-}
-.deal-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--divider);
-}
-.deal-row:last-child {
-  border-bottom: none;
-}
-.deal-row__main {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-grow: 1;
-  min-width: 0;
-  color: inherit;
-  text-decoration: none;
-}
-.deal-row__thumb {
-  width: 76px;
-  height: 76px;
-  border-radius: 12px;
-}
-.deal-row__thumb .deal-ribbon {
-  right: 4px;
-  max-width: max-content;
-  line-height: 1.15;
-  white-space: normal;
-}
-.deal-row__title {
-  font-family: var(--font-display);
-  font-size: 0.9375rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
-}
-.deal-row__meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 2px 8px;
-  font-size: 0.75rem;
-  color: var(--muted);
-  font-weight: 500;
-}
-.deal-row__meta > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-}
-.deal-row .btn {
-  flex-shrink: 0;
-}
-.deal-hero {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 170px;
-  margin: -4px calc(var(--gutter) * -1) 0;
-  padding: 24px var(--gutter);
-  border-radius: 0;
-  background:
-    radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.55) 0, rgba(255, 255, 255, 0) 45%),
-    linear-gradient(135deg, var(--lime) 0%, #c9f25a 100%);
-  color: var(--lime-ink);
-  overflow: hidden;
-}
-.deal-hero::before,
-.deal-hero::after {
-  content: '';
-  position: absolute;
-  border-radius: 999px;
-  border: 1.5px dashed rgba(61, 79, 0, 0.25);
-}
-.deal-hero::before {
-  width: 220px;
-  height: 220px;
-  right: -80px;
-  top: -90px;
-}
-.deal-hero::after {
-  width: 150px;
-  height: 150px;
-  left: -60px;
-  bottom: -70px;
-}
-.deal-hero__icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #1d2330;
-  color: var(--lime);
-  flex-shrink: 0;
-}
-.deal-hero__big {
-  font-family: var(--font-display);
-  font-size: 2.75rem;
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 1;
-  color: #2b3800;
-}
-.deal-hero__big--long {
-  font-size: 2rem;
-  max-width: 9ch;
-}
-/* The big discount sticker on a deal photo */
-.deal-burst {
-  position: absolute;
-  left: var(--gutter);
-  bottom: 14px;
-  z-index: 1;
-  padding: 7px 12px;
-  border-radius: 13px;
-  background: var(--lime);
-  color: #2b3800;
-  font-family: var(--font-display);
-  font-size: 1.375rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  transform: rotate(-3deg);
-}
-.deal-code {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 10px 10px 14px;
-  border-radius: 14px;
-  border: 1.5px dashed var(--mint-strong);
-  background: var(--surface);
-}
-.deal-code__value {
-  flex-grow: 1;
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-/* ---------- Movies ---------- */
-.movie-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--divider);
-}
-.movie-row:last-of-type {
-  border-bottom: none;
-}
-.movie-poster {
-  width: 60px;
-  height: 84px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 60%), var(--tone-bg);
-  color: var(--tone-ink);
-}
-
 /* ---------- Groups ---------- */
 /* Suggested group: photo edge to edge, text under it */
 .group-card {
@@ -1010,21 +836,61 @@
   accent-color: var(--accent-fill);
 }
 
-/* Event CTA: Going and Interested, calendar and share as icons */
-.event-cta {
+/* An event's outside link: details and tickets live on the organiser's page */
+.linkout-row {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid var(--divider);
+  color: var(--ink);
+  text-decoration: none;
 }
-.event-cta > .btn {
-  flex: 1 1 0;
-  height: 42px;
-}
-.event-cta > .icon-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 21px;
+.linkout-row > .glyph {
   flex-shrink: 0;
+  color: var(--accent);
 }
+.linkout-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex-grow: 1;
+  min-width: 0;
+}
+.linkout-row__title {
+  font-size: 0.9063rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.linkout-row__host {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.linkout-note {
+  margin-top: -10px;
+}
+
+/* City events as flat rows: when and where, then friends or where it was found */
+.event-link-row__thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+}
+.event-link-row--unconfirmed .event-link-row__thumb {
+  outline: 1.5px dashed var(--amber-line);
+  outline-offset: 2px;
+}
+.event-link-row__friends {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.event-link-row__from {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
 /* Friends interested in an event: one flat line */
 .friends-going {
   display: flex;

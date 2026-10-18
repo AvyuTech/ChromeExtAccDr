@@ -1,16 +1,17 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { eventPhoto } from '../assets/photos';
-import { EventTile, SourceChips } from '../components/cards';
-import { downloadEventIcs, IconAction, ProfileHead, useShare } from '../components/discover';
+import { SourceChips } from '../components/cards';
+import { RecommendSheet } from '../components/community';
+import { downloadEventIcs, EventLinkRow, eventFriends, eventSourceLine, friendsLine, IconAction, ProfileHead, useShare } from '../components/discover';
 import { AvatarStack } from '../components/friends';
-import { person } from '../data/core';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { EVENTS, eventById } from '../data/events';
 import { useT } from '../i18n';
-import { AlertGlyph, FriendsGlyph, CalendarGlyph, CheckGlyph, EyeGlyph, LockGlyph, NavigateGlyph, ShareGlyph, StarGlyph, TrustRing, UsersGlyph, WantGlyph } from '../icons';
-import { compact, price } from '../lib/format';
-import { allCheckIns, isWanted, profileInfo } from '../lib/friends';
-import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
+import { AlertGlyph, CalendarGlyph, ExternalGlyph, FriendsGlyph, GlobeGlyph, NavigateGlyph, SendGlyph, ShareGlyph, TrustRing, WantGlyph } from '../icons';
+import { km, price } from '../lib/format';
+import { isWanted } from '../lib/friends';
+import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 
@@ -28,13 +29,28 @@ const CATEGORY_LABEL: Record<string, string> = {
 
 const DAY_NAME: Record<string, string> = { Sat: 'Saturday', Sun: 'Sunday', Fri: 'Friday', 'Sat–Sun': 'Saturday & Sunday', Today: 'Today', Tomorrow: 'Tomorrow' };
 
+/** "in.bookmyshow.com" from a URL, for the link-out row. */
+function host(url: string) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * A city event, found on ticketing sites, organisers' pages, reels and news.
+ * Nearhood doesn't sell tickets or take RSVPs: it links out, and shows which
+ * friends want to go or went.
+ */
 export default function EventDetail() {
   const { id = '' } = useParams();
   const t = useT();
   const toast = useToast();
   const share = useShare();
   const { settings } = useSettings();
-  const { data, has, toggle, toggleWant } = useAppData();
+  const { data, toggleWant } = useAppData();
+  const [sendOpen, setSendOpen] = useState(false);
   const event = eventById(id);
 
   if (!event) {
@@ -56,31 +72,16 @@ export default function EventDetail() {
     );
   }
 
-  const going = has('going', event.id);
-  const interested = has('interested', event.id);
-  // Sample counts already include this person when the seed data marks them.
-  const goingCount = event.going + (going ? 1 : 0) - (DEFAULT_APP_DATA.going.includes(event.id) ? 1 : 0);
-  const interestedCount = (event.interested ?? 0) + (interested ? 1 : 0) - (DEFAULT_APP_DATA.interested.includes(event.id) ? 1 : 0);
   const sources = event.sources.filter(enabledSources(settings));
   const agree = Math.min(sources.length, 4);
-  const similar = EVENTS.filter((e) => e.id !== event.id && (e.category === event.category || e.tags.some((tag) => event.tags.includes(tag)))).slice(0, 5);
+  const similar = EVENTS.filter((e) => e.id !== event.id && (e.category === event.category || e.tags.some((tag) => event.tags.includes(tag)))).slice(0, 4);
   const when = `${DAY_NAME[event.day] ?? event.day}, ${event.time}`;
   const startTime = event.time.split(' – ')[0];
-  const soldOutSoon = event.seatsLeft !== undefined && event.seatsLeft <= 12;
-  // People you follow who want to go (on their list) or already went (checked in).
-  const friendIds = data.following.filter(
-    (fid) =>
-      profileInfo(fid).wantToTry.some((w) => w.refId === event.id && !w.done) ||
-      allCheckIns(data).some((c) => c.authorId === fid && c.eventId === event.id),
-  );
+  const { want, went } = eventFriends(event.id, data);
   const wantItem = { id: `w-event-${event.id}`, kind: 'event' as const, refId: event.id, title: event.title, sub: `${event.day}, ${event.time}` };
   const wanted = isWanted(data, wantItem);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.venue}, ${event.area}, Ahmedabad`)}`;
-  const firstNames = friendIds.map((fid) => person(fid).name.split(' ')[0]);
-  const friendsText =
-    firstNames.length === 0
-      ? 'None of your friends have this on their list yet.'
-      : `${firstNames.length > 1 ? `${firstNames.slice(0, -1).join(', ')} and ${firstNames[firstNames.length - 1]}` : firstNames[0]} ${firstNames.length === 1 ? 'wants' : 'want'} to go`;
+  const from = eventSourceLine(event);
 
   return (
     <>
@@ -103,9 +104,9 @@ export default function EventDetail() {
             </span>
           }
           stats={[
-            { value: compact(goingCount), label: t('discover.stat.going'), tone: 'mint' as const },
-            { value: compact(interestedCount), label: t('discover.stat.interested') },
-            { value: price(event.price), label: t('discover.stat.entry') },
+            { value: String(want.length + went.length + (wanted ? 1 : 0)), label: t('discover.stat.friendsKeen'), tone: 'mint' as const },
+            { value: String(sources.length), label: t('discover.stat.sources') },
+            { value: km(event.distanceKm), label: t('discover.stat.away') },
           ]}
           title={event.title}
           sub={
@@ -115,36 +116,24 @@ export default function EventDetail() {
           }
         >
           <p className="profile-head__sub" style={{ fontWeight: 500 }}>
-            {event.venue}, {event.area} · {event.distanceKm} km away
-            {soldOutSoon ? <b style={{ color: 'var(--peach-ink)' }}> · {event.seatsLeft} seats left</b> : null}
+            {event.venue}, {event.area} · {event.price === 0 ? 'Free entry' : `Entry ${price(event.price)}`}
           </p>
           <p className="origin-line" style={{ cursor: 'default' }}>
-            <UsersGlyph size={14} />
-            <span className="grow">{t('discover.event.organisedBy', { name: event.organiser })}</span>
+            <GlobeGlyph size={14} />
+            <span className="grow">{from ? t('discover.event.foundOn', { sources: from }) : t('discover.event.organisedBy', { name: event.organiser })}</span>
           </p>
         </ProfileHead>
 
         <nav className="icon-row" aria-label={t('discover.event.actions')}>
-          {event.confirmed ? (
+          {event.link ? (
             <IconAction
               primary
-              pressed={going}
-              onClick={() => {
-                const on = toggle('going', event.id);
-                toast(on ? `You're going to ${event.title}` : 'Marked as not going');
-              }}
-              icon={going ? <CheckGlyph size={18} /> : <UsersGlyph size={18} />}
-              label={t('discover.action.going')}
-              ariaLabel={t('discover.event.going')}
+              href={event.link.url}
+              icon={<ExternalGlyph size={18} />}
+              label={t('discover.action.details')}
+              ariaLabel={`${event.link.label} (opens in a new tab)`}
             />
           ) : null}
-          <IconAction
-            pressed={interested}
-            onClick={() => toggle('interested', event.id)}
-            icon={<StarGlyph size={18} />}
-            label={event.confirmed ? t('discover.action.interested') : interested ? 'Notifying' : 'Notify me'}
-            ariaLabel={event.confirmed ? t('discover.event.interested') : interested ? 'We’ll tell you when it’s confirmed' : 'Notify me when confirmed'}
-          />
           <IconAction
             pressed={wanted}
             onClick={() => {
@@ -152,9 +141,10 @@ export default function EventDetail() {
               toast(added ? `Added "${event.title}" to Want to try` : 'Removed from Want to try');
             }}
             icon={<WantGlyph size={18} active={wanted} />}
-            label={t('discover.action.want')}
+            label={t('discover.action.wantToGo')}
             ariaLabel={wanted ? 'On your Want to try list' : 'Add to Want to try'}
           />
+          <IconAction onClick={() => setSendOpen(true)} icon={<SendGlyph size={17} />} label={t('discover.action.send')} ariaLabel={t('discover.event.send')} />
           <IconAction
             onClick={() => toast(downloadEventIcs(event) ? 'Calendar file downloaded' : 'Could not create a calendar file')}
             icon={<CalendarGlyph size={18} />}
@@ -165,24 +155,29 @@ export default function EventDetail() {
           <IconAction onClick={() => share(event.title, `/event/${event.id}`)} icon={<ShareGlyph size={17} />} label={t('common.share')} />
         </nav>
 
-        <Link to="/settings/privacy" className="row meta" style={{ gap: 6, textDecoration: 'none', marginTop: -2 }}>
-          {settings.privacy.showGoing ? <EyeGlyph size={13} /> : <LockGlyph size={13} />}
-          <span>
-            {settings.privacy.showGoing ? 'Neighbours can see your RSVP.' : 'Your RSVP is private.'}{' '}
-            <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Change</span>
-          </span>
-        </Link>
+        {event.link ? (
+          <a className="linkout-row" href={event.link.url} target="_blank" rel="noopener noreferrer">
+            <span className="linkout-row__body">
+              <span className="linkout-row__title">{event.link.label}</span>
+              <span className="linkout-row__host">{host(event.link.url)}</span>
+            </span>
+            <ExternalGlyph size={16} />
+          </a>
+        ) : null}
+        <p className="meta linkout-note">{t('discover.event.noTickets')}</p>
 
         <section className="friends-going" aria-label={t('community.friendsInterested')}>
-          {friendIds.length ? (
-            <AvatarStack ids={friendIds} size={26} />
+          {want.length || went.length ? (
+            <AvatarStack ids={[...went, ...want]} size={26} />
           ) : (
             <span className="tile tone-violet" style={{ width: 30, height: 30, borderRadius: 15 }}>
               <FriendsGlyph size={16} duo />
             </span>
           )}
           <span className="grow body-sm" style={{ minWidth: 0 }}>
-            {friendsText}
+            {want.length || went.length
+              ? [friendsLine(went, { one: 'went', many: 'went' }), friendsLine(want, { one: 'wants to go', many: 'want to go' })].filter(Boolean).join(' · ')
+              : t('discover.event.noFriends')}
           </span>
         </section>
 
@@ -191,6 +186,7 @@ export default function EventDetail() {
             {t('discover.event.about')}
           </h2>
           <p className="body">{event.description}</p>
+          <p className="meta">{t('discover.event.organisedBy', { name: event.organiser })}</p>
           <div className="chip-wrap" style={{ gap: 6 }}>
             {event.tags.map((tag) => (
               <Link key={tag} to={`/ask?q=${encodeURIComponent(`${tag} events this weekend`)}`} className="chip" style={{ height: 28, padding: '0 11px', fontSize: '0.75rem' }}>
@@ -217,19 +213,21 @@ export default function EventDetail() {
             </div>
           ) : null}
           <SourceChips sources={sources} label="Seen on" />
+          <p className="meta">{t('discover.event.fromWeb')}</p>
         </section>
 
         {similar.length ? (
           <section className="dsec" aria-labelledby="similar-title">
             <SectionHead id="similar-title" title={t('discover.event.similar')} to="/explore/events" />
-            <div className="hscroll">
+            <div className="list">
               {similar.map((e) => (
-                <EventTile key={e.id} event={e} />
+                <EventLinkRow key={e.id} event={e} />
               ))}
             </div>
           </section>
         ) : null}
       </main>
+      <RecommendSheet open={sendOpen} onClose={() => setSendOpen(false)} placeName={event.title} area={event.area} />
     </>
   );
 }

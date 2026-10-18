@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ownItemPhoto, placePhoto } from '../assets/photos';
-import { AnswerCard, DealCard, PlaceRow, PostCard } from '../components/cards';
+import { AnswerCard, PlaceRow, PostCard } from '../components/cards';
 import { FriendVerdictRow, RecommendSheet, TrustSheet } from '../components/community';
 import { AwayLine, IconAction, PlaceClaim, PlaceOriginLine, ProfileHead, useShare } from '../components/discover';
 import { CheckInCard, TasteMatchPill, VerdictBar, WantButton } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { PLACES, placeById } from '../data/places';
-import { DEALS, POSTS } from '../data/social';
+import { POSTS } from '../data/social';
 import { useT } from '../i18n';
 import { CheckGlyph, CheckInGlyph, ClockGlyph, InfoGlyph, MustGlyph, NamedGlyph, NavigateGlyph, PinGlyph, SaveGlyph, SendGlyph, ShareGlyph, ShieldGlyph, SparkGlyph, WantGlyph } from '../icons';
 import { isWanted, itemsFor, placeCommunity } from '../lib/friends';
@@ -50,7 +50,6 @@ export default function PlaceDetail() {
   const saved = has('savedPlaces', place.id);
   const sources = place.sources.filter(enabledSources(settings));
   const related = POSTS.filter((p) => p.answer?.placeIds?.includes(place.id));
-  const deals = DEALS.filter((d) => d.placeId === place.id);
   const away = !!place.origin.outsideCity;
   // Places outside the city only suggest each other; city places never suggest day trips.
   const similar = PLACES.filter((p) => p.id !== place.id && !!p.origin.outsideCity === away && (away || p.category === place.category)).slice(0, 3);
@@ -330,17 +329,6 @@ export default function PlaceDetail() {
             {related.map((p) => (
               <PostCard key={p.id} post={p} />
             ))}
-          </section>
-        ) : null}
-
-        {deals.length ? (
-          <section className="dsec" aria-labelledby="deals-title">
-            <SectionHead id="deals-title" title={t('discover.place.deals')} to="/deals" />
-            <div className="results">
-              {deals.map((d) => (
-                <DealCard key={d.id} deal={d} />
-              ))}
-            </div>
           </section>
         ) : null}
 

@@ -16,6 +16,9 @@ import { enabledSources, useSettings } from '../state/settings';
 
 const THINK_MS = 600;
 
+/** Nearhood doesn't do deals, bills or bookings, so those prompts never show. */
+const OUT_OF_SCOPE = /\b(deal|deals|offer|discount|coupon|bill|bills|pay|tax|book|booking|tickets?)\b/i;
+
 function prefersReducedMotion() {
   try {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -56,7 +59,8 @@ function suggestionLook(q: string): { glyph: GlyphName; tone: string } {
   if (s.includes('weekend') || s.includes('happening')) return { glyph: 'events', tone: 'peach' };
   if (s.includes('café') || s.includes('cafe') || s.includes('coffee')) return { glyph: 'cafe', tone: 'clay' };
   if (s.includes('traffic')) return { glyph: 'car', tone: 'amber' };
-  if (s.includes('water') || s.includes('power')) return { glyph: 'services', tone: 'teal' };
+  if (s.includes('water') || s.includes('power')) return { glyph: 'bolt', tone: 'teal' };
+  if (s.includes('club') || s.includes('meet')) return { glyph: 'groups', tone: 'violet' };
   if (s.includes('kids')) return { glyph: 'kids', tone: 'mint' };
   return { glyph: 'spark', tone: 'violet' };
 }
@@ -227,7 +231,7 @@ export default function Ask() {
               {t('discover.ask.try')}
             </h2>
             <div className="ask-prompts">
-              {SUGGESTED_QUESTIONS.map((s) => {
+              {SUGGESTED_QUESTIONS.filter((s) => !OUT_OF_SCOPE.test(s)).map((s) => {
                 const look = suggestionLook(s);
                 return (
                   <button key={s} type="button" className="ask-prompt glyph-host" onClick={() => go(s)}>
