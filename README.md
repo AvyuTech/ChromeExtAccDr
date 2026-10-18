@@ -1,6 +1,6 @@
 # Nearhood
 
-**A little closer to your city.** Nearhood is a smart, city-level companion app, starting with Ahmedabad. Ask anything about the city and get one answer merged from ticketing sites, social posts, maps, local news, official feeds and your neighbours, with a clear signal of how many sources agree.
+**A little closer to your city.** Nearhood is a city app for friends, family and neighbours, starting with Ahmedabad: what your friends ate, did and recommend, places added and confirmed by people, clubs that meet up and buy things together, and a light city layer (weather, air, a traffic heat map, alerts, safety). It is not a booking, payments or deals app. See [docs/PLAN.md](docs/PLAN.md) for the Phase 1 scope and who creates what.
 
 It started from the Nearhood design canvas and now follows the **Porcelain** design: every screen, from the splash to the last settings page, uses the new palette, type, photography and icons.
 
@@ -8,15 +8,16 @@ It started from the Nearhood design canvas and now follows the **Porcelain** des
 
 | Area | Screens |
 | --- | --- |
-| **Home** | *Your neighbourhood, alive with possibilities*: ask bar, friends' check-in stories, today card (weather and plans tonight), For you / Friends / Nearby feed with *The neighbourhood says* summaries, city updates, friends' must-tries, weekend events and deals, plus a filter sheet |
-| **Ask** | On-device answer engine: detects intent (events, cafés, food, traffic, metro, weather, air, water, power, civic, deals, groups, safety, services), merges sources, shows how many agree, filters and follow-ups |
-| **Explore** | *Find your next favourite*: radius picker, mood chips (coffee, food, outdoors, culture), an illustrative map of west Ahmedabad with pins you can tap and a draggable view, *Worth stepping out for* picked from your friends' visits, tonight's events, *Spotted by locals* (new openings waiting for neighbours to confirm them), photo category tiles, category pages, deals, place and event pages with source trust panel, groups |
-| **City** | Live *City pulse* (weather, air, a traffic heat map, water and power, ward civic health), **Traffic**: a heat map of the roads with a from–to route planner that picks the best road right now, alerts and alert details, **report a civic issue** with duplicate detection and a tracker, city services, safety & SOS. Nearhood covers roads, not buses or the metro |
-| **Social** | Post details with replies, composer (question, recommendation, alert, lost & found, event, give away) with similar-question detection, updates, messages and chat |
-| **Friends & community reviews** | Follow friends; a strip on Home shows who checked in today. **Quick check-in** (place → what you had → Must try / Good / Skip, in about ten seconds) instead of long posts. Places show the share of locals who say *must try* and what people actually order, with friends' reviews first. Profiles with a **Want to try** list (a to-do list for the city), curated lists, taste match and "you both want to try" plans |
-| **Me & Settings** | Profile, saved items, onboarding, and full settings: account, location & commute, notifications, city alerts, appearance (light/dark/system, text size), language (English, ગુજરાતી, हिन्दी), accessibility, privacy, sources & AI answers, data & storage, safety contacts, help, about |
+| **Home** | Ask bar, friends' check-in stories, today card (weather and plans tonight, opens City pulse), For you / Friends / Nearby feed: posts with *Nearhood says* summaries, friends' check-ins, must-tries, meetups and group buys from your clubs, city updates, and city events labelled with where they came from |
+| **Explore** | *Find your next favourite*: radius and mood chips, an illustrative map of west Ahmedabad, *Worth stepping out for* from friends' visits, tonight's events, *Spotted by locals* (new openings waiting for neighbours to confirm them), *Seen on reels this week* (labelled public picks, never reviews), categories, curated lists. Switch to another city to see what your friends did there |
+| **Clubs** | Neighbours, founders, cricket lovers, parents, food lovers, book clubs: a map of clubs, your clubs, meetups with "I'm in", **buying together** (gather people for a better price; the deal and payment happen outside the app), club pages, and starting your own club |
+| **Places & events** | Place pages added and confirmed by people, with who added them, how many locals confirmed them and whether an owner claimed the page. Events come from public sources and link out for details and tickets |
+| **Ask** | On-device answer engine for events, cafés, food, places, traffic and trips, weather, air, water, power, civic issues, clubs and group buys, safety and friends; merges sources and shows how many agree |
+| **City** | *City pulse*: weather, air, a traffic heat map with the best way to work, verified alerts, water and power, ward civic health. **Traffic**: heat map with a from–to route planner. Report civic issues, safety & SOS. No bill payments or public transport |
+| **Friends & community reviews** | Follow friends; **Quick check-in** (place → what you had → Must try / Good / Skip); friends' reviews first; **Want to try** lists, curated lists, taste match, "you both want to try" plans; friends' trips in other cities |
+| **Me & Settings** | Page-style profile with a photo grid, clubs, saved items, onboarding, and full settings: account, location & commute, notifications, city alerts, appearance, language (English, ગુજરાતી, हिन्दी), accessibility, privacy, sources & AI answers, data & storage, safety contacts, help, *How Nearhood stays human*, photo credits |
 
-Settings change behaviour, not just switches: turning off a source removes its listings and chips from answers, alert preferences filter the alert feed and tab badge, *Data saver* pauses the live city feed, theme, contrast, motion and text size apply app-wide, and language switches the interface.
+Settings change behaviour, not just switches: turning off a source removes its listings and chips from answers, alert preferences filter the alert feed, *Data saver* pauses the live city feed, theme, contrast, motion and text size apply app-wide, and language switches the interface.
 
 ## Human-curated by design
 
@@ -84,7 +85,7 @@ The app is a PWA: open it on a phone and use *Add to Home Screen* to install it.
 src/
   assets/photos Photos (WebP) and sources.json with credits and licences
   icons/        Nearhood glyph family (nav, categories, live data, UI) + animations
-  data/         Sample Ahmedabad data: places, events, deals, posts, alerts, city pulse, services
+  data/         Sample Ahmedabad data: places, events, clubs, posts, alerts, city pulse, reel picks
   state/        Persisted settings, user activity, toasts, simulated live city feed
   lib/          Answer engine, selectors, formatting
   components/   Shared UI and cards
@@ -99,6 +100,6 @@ Most photos are from [Unsplash](https://unsplash.com) under the [Unsplash Licens
 
 ## About the data
 
-Everything in `src/data` is **sample data** for demonstrating the app. Neighbourhood names, metro lines and the national emergency numbers (112, 100, 101, 108, 181, 1098, 1930) are real; venues, people, prices, schedules and ticket numbers are illustrative, and `[bracketed]` values are placeholders. The live city feed is simulated in `src/state/live.ts`.
+Everything in `src/data` is **sample data** for demonstrating the app. Neighbourhood names and the national emergency numbers (112, 100, 101, 108, 181, 1098, 1930) are real; venues, people, clubs, prices and schedules are illustrative, and `[bracketed]` values are placeholders. The live city feed is simulated in `src/state/live.ts`.
 
 To connect real services, replace the modules in `src/data` and `ask()` in `src/lib/askEngine.ts` with API calls. The answer engine returns the same shape a hosted model would (`answer`, `sources`, `results`, `followUps`), so the screens do not need to change.
