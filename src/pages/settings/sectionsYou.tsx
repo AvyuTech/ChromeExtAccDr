@@ -14,6 +14,7 @@ import {
   BusGlyph,
   CarGlyph,
   EventsGlyph,
+  FriendsGlyph,
   GroupsGlyph,
   DealsGlyph,
   MailGlyph,
@@ -287,6 +288,7 @@ const CATEGORY_GLYPHS: Array<{ key: keyof Settings['notifications']['categories'
   { key: 'groups', G: GroupsGlyph, tone: 'teal' },
   { key: 'reports', G: ReportGlyph, tone: 'amber' },
   { key: 'alerts', G: AlertGlyph, tone: 'yellow' },
+  { key: 'friends', G: FriendsGlyph, tone: 'violet' },
 ];
 
 export function NotificationsSection() {

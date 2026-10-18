@@ -86,3 +86,53 @@
 .glyph-demo .segmented {
   width: 100%;
 }
+
+/* Friends' must-try cards */
+.pick-card {
+  flex-shrink: 0;
+  width: 168px;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+.pick-card__plate {
+  position: relative;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tone-bg);
+  color: var(--tone-ink);
+}
+.pick-card__who {
+  position: absolute;
+  left: 10px;
+  bottom: -14px;
+  border-radius: 999px;
+  border: 3px solid var(--surface);
+  display: inline-flex;
+}
+.pick-card__item {
+  font-size: 0.9375rem;
+  line-height: 1.25;
+}
+.pick-card__place {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Plan together */
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-color: var(--mint-line);
+}
+.plan-card .list-row__title {
+  font-size: 0.875rem;
+  line-height: 1.3;
+}

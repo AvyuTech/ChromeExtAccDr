@@ -358,3 +358,21 @@
   text-align: right;
   opacity: 0.78;
 }
+
+/* Follow notifications: main area plus an inline Follow back button */
+.notif-row__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-grow: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  text-align: left;
+}
+.notif-row__action {
+  flex-shrink: 0;
+  align-self: center;
+}

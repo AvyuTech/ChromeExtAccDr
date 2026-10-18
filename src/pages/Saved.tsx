@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { EventRow, PlaceRow, PostCard } from '../components/cards';
+import { CollectionCard } from '../components/friends';
 import { EmptyState, PageHeader } from '../components/ui';
 import { eventById } from '../data/events';
 import { placeById } from '../data/places';
 import { postById } from '../data/social';
 import type { CityEvent, Place, Post } from '../data/types';
 import { useT } from '../i18n';
+import { collectionFor } from '../lib/friends';
 import { useAppData } from '../state/appData';
 
-type Tab = 'places' | 'events' | 'posts';
+type Tab = 'places' | 'events' | 'posts' | 'lists';
 
 export default function Saved() {
   const t = useT();
@@ -19,11 +21,13 @@ export default function Saved() {
   const places = data.savedPlaces.map(placeById).filter((p): p is Place => !!p);
   const events = data.savedEvents.map(eventById).filter((e): e is CityEvent => !!e);
   const posts = data.savedPosts.map((id) => data.myPosts.find((p) => p.id === id) ?? postById(id)).filter((p): p is Post => !!p);
+  const lists = data.followedCollections.map((id) => collectionFor(data, id)).filter((c): c is NonNullable<typeof c> => !!c);
 
   const tabs: Array<{ id: Tab; key: string; n: number }> = [
     { id: 'places', key: 'saved.places', n: places.length },
     { id: 'events', key: 'saved.events', n: events.length },
     { id: 'posts', key: 'saved.posts', n: posts.length },
+    { id: 'lists', key: 'people.tab.lists', n: lists.length },
   ];
 
   return (
@@ -69,6 +73,25 @@ export default function Saved() {
                 action={
                   <Link to="/explore/events" className="btn btn--soft btn--sm">
                     {t('chip.events')}
+                  </Link>
+                }
+              />
+            ))}
+          {tab === 'lists' &&
+            (lists.length ? (
+              <div className="grid-2 people-list-grid">
+                {lists.map((c) => (
+                  <CollectionCard key={c.id} col={c} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                glyph="lists"
+                title="No lists followed yet"
+                body="Follow a friend’s list, like their favourite cafés, to keep it here."
+                action={
+                  <Link to="/friends" className="btn btn--soft btn--sm">
+                    {t('people.friends')}
                   </Link>
                 }
               />

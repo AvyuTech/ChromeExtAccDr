@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar } from '../components/cards';
 import { EmptyState, PageHeader } from '../components/ui';
-import { person } from '../data/core';
+import { PEOPLE, person } from '../data/core';
 import { CONVERSATIONS } from '../data/social';
+import type { Conversation } from '../data/types';
 import { useT } from '../i18n';
 import { LockGlyph, SearchGlyph } from '../icons';
 import { useAppData } from '../state/appData';
@@ -15,12 +16,22 @@ export default function Messages() {
   const { data } = useAppData();
   const [query, setQuery] = useState('');
 
-  const rows = CONVERSATIONS.map((c) => {
-    const messages = [...c.messages, ...(data.sentMessages[c.id] ?? [])];
-    const last = messages[messages.length - 1];
-    const unread = c.unread > 0 && !data.readConversations.includes(c.id) ? c.unread : 0;
-    return { c, who: person(c.withId), last, unread };
-  });
+  // Chats started in the app (a recommendation, "Plan it") exist only as sent messages.
+  const started: Conversation[] = Object.keys(data.sentMessages)
+    .filter((cid) => !CONVERSATIONS.some((c) => c.id === cid) && cid.startsWith('c-') && PEOPLE[cid.slice(2)])
+    .map((cid) => ({ id: cid, withId: cid.slice(2), unread: 0, messages: [] }));
+
+  // Chats you wrote in most recently float to the top.
+  const recent = Object.keys(data.sentMessages).reverse();
+  const rank = (id: string) => (recent.includes(id) ? recent.indexOf(id) : recent.length);
+  const rows = [...started, ...CONVERSATIONS]
+    .sort((a, b) => rank(a.id) - rank(b.id))
+    .map((c) => {
+      const messages = [...c.messages, ...(data.sentMessages[c.id] ?? [])];
+      const last = messages[messages.length - 1];
+      const unread = c.unread > 0 && !data.readConversations.includes(c.id) ? c.unread : 0;
+      return { c, who: person(c.withId), last, unread };
+    });
 
   const q = query.trim().toLowerCase();
   const shown = q

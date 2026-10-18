@@ -1,14 +1,18 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GroupRow, PlaceRow } from '../components/cards';
+import { FriendPickCard } from '../components/community';
+import { CollectionCard } from '../components/friends';
 import { SectionHead } from '../components/ui';
 import { neighbourhoodName } from '../data/core';
 import { EVENTS, MOVIES } from '../data/events';
 import { PLACES } from '../data/places';
+import { COLLECTIONS } from '../data/friends';
 import { DEALS, GROUPS } from '../data/social';
 import type { Tone } from '../data/types';
 import { useT } from '../i18n';
 import { NamedGlyph, PinGlyph, SearchGlyph, type GlyphName } from '../icons';
+import { friendsMustTries } from '../lib/friends';
 import { visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
@@ -49,6 +53,9 @@ export default function Explore() {
     .sort((a, b) => a.distanceKm - b.distanceKm)
     .slice(0, 4);
   const suggestedGroups = GROUPS.filter((g) => !data.joinedGroups.includes(g.id)).slice(0, 2);
+  const mustTries = friendsMustTries(data);
+  // Lists by other people first; your own lists live on your profile.
+  const lists = [...COLLECTIONS].filter((c) => c.ownerId !== 'me').sort((a, b) => Number(data.following.includes(b.ownerId)) - Number(data.following.includes(a.ownerId)) || b.followers - a.followers);
 
   const onSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -94,6 +101,26 @@ export default function Explore() {
           </Link>
         ))}
       </nav>
+
+      {mustTries.length ? (
+        <section className="section" aria-labelledby="friend-picks-title">
+          <SectionHead id="friend-picks-title" title={t('feed.friends.mustTriesWeek')} to="/friends" />
+          <div className="hscroll">
+            {mustTries.map((c) => (
+              <FriendPickCard key={c.id} c={c} />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      <section className="section" aria-labelledby="lists-title">
+        <SectionHead id="lists-title" title={t('feed.friends.curatedLists')} />
+        <div className="hscroll">
+          {lists.map((c) => (
+            <CollectionCard key={c.id} col={c} />
+          ))}
+        </div>
+      </section>
 
       <section className="section" aria-labelledby="new-title">
         <SectionHead id="new-title" title={t('discover.explore.newThisWeek')} to="/explore/places" />

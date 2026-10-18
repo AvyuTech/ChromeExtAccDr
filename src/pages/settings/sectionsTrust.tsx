@@ -11,6 +11,7 @@ import {
   DataGlyph,
   DownloadGlyph,
   EventsGlyph,
+  FriendsGlyph,
   LayersGlyph,
   NewsGlyph,
   PinGlyph,
@@ -103,6 +104,42 @@ export function PrivacySection() {
         />
         <SettingToggle G={EventsGlyph} tone="peach" title={t('settings.privacy.showGoing')} meta="Friends see you in the Going list." checked={p.showGoing} onChange={(v) => update('privacy', { showGoing: v })} />
         <SettingToggle G={PinGlyph} tone="teal" title={t('settings.privacy.showArea')} meta="Shown next to your name on posts and replies." checked={p.showArea} onChange={(v) => update('privacy', { showArea: v })} />
+      </Group>
+
+      <Group title={t('settings.privacy.friendsGroup')} note="Friends are people you follow who follow you back.">
+        <SegmentRow
+          label={t('settings.privacy.checkInAudience')}
+          value={p.checkInAudience}
+          onChange={(v) => update('privacy', { checkInAudience: v })}
+          options={[
+            { value: 'friends', label: t('settings.privacy.friends') },
+            { value: 'everyone', label: t('settings.privacy.everyone') },
+          ]}
+          hint={
+            p.checkInAudience === 'friends'
+              ? 'New check-ins go to friends. You can still pick Everyone on each one.'
+              : 'New check-ins are public and count towards each place’s community score.'
+          }
+        />
+        <SegmentRow
+          label={t('settings.privacy.listVisibility')}
+          value={p.listVisibility}
+          onChange={(v) => update('privacy', { listVisibility: v })}
+          options={[
+            { value: 'everyone', label: t('settings.privacy.everyone') },
+            { value: 'friends', label: t('settings.privacy.friends') },
+            { value: 'only-me', label: t('settings.privacy.onlyMe') },
+          ]}
+          hint="Friends can copy things from your list to theirs."
+        />
+        <SettingToggle
+          G={FriendsGlyph}
+          tone="violet"
+          title={t('settings.privacy.approveFollowers')}
+          meta={p.approveFollowers ? 'New followers wait for your OK.' : 'Anyone can follow you; friends-only posts still need you to follow back.'}
+          checked={p.approveFollowers}
+          onChange={(v) => update('privacy', { approveFollowers: v })}
+        />
       </Group>
 
       <Group title="Personalisation">

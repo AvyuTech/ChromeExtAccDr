@@ -1,10 +1,10 @@
-import { Fragment, useEffect, useState, type FormEvent } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Avatar } from '../components/cards';
 import { EmptyState, PageHeader } from '../components/ui';
-import { person } from '../data/core';
+import { PEOPLE, person } from '../data/core';
 import { CONVERSATIONS } from '../data/social';
-import type { ChatMessage } from '../data/types';
+import type { ChatMessage, Conversation } from '../data/types';
 import { useT } from '../i18n';
 import { BackGlyph, SendGlyph, ShieldGlyph } from '../icons';
 import { nowTime } from '../lib/format';
@@ -20,8 +20,21 @@ export default function Chat() {
   const t = useT();
   const navigate = useNavigate();
   const { data, add, sendMessage } = useAppData();
-  const [draft, setDraft] = useState('');
-  const convo = CONVERSATIONS.find((c) => c.id === id);
+  const [params] = useSearchParams();
+  const draftParam = params.get('draft') ?? '';
+  const [draft, setDraft] = useState(draftParam);
+  // Sample conversations, or a fresh one with anyone in the app at /messages/c-<personId>.
+  const convo = useMemo<Conversation | undefined>(() => {
+    const sample = CONVERSATIONS.find((c) => c.id === id);
+    if (sample) return sample;
+    const personId = id.startsWith('c-') ? id.slice(2) : '';
+    return personId && personId !== 'me' && PEOPLE[personId] ? { id, withId: personId, unread: 0, messages: [] } : undefined;
+  }, [id]);
+
+  // A ?draft= link (Recommend, Plan it) fills the composer but never sends on its own.
+  useEffect(() => {
+    if (draftParam) setDraft(draftParam);
+  }, [id, draftParam]);
   const messages = convo ? [...convo.messages, ...(data.sentMessages[convo.id] ?? [])] : [];
 
   useEffect(() => {
@@ -98,6 +111,14 @@ export default function Chat() {
           <ShieldGlyph size={16} style={{ flexShrink: 0, marginTop: 1 }} />
           {t('social.safetyNote')}
         </p>
+
+        {messages.length === 0 ? (
+          <div className="empty" style={{ padding: '20px 12px' }}>
+            <Avatar who={who} size={64} />
+            <h2 className="empty__title">{t('feed.friends.newChat', { name: who.name.split(' ')[0] })}</h2>
+            <p className="body-sm muted">{t('feed.friends.newChatBody')}</p>
+          </div>
+        ) : null}
 
         <div className="stack" role="log" aria-live="polite" style={{ gap: 8 }}>
           {messages.map((m, i) => {

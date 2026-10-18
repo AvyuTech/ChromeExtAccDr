@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AnswerCard, DealCard, PlaceRow, PostCard } from '../components/cards';
+import { FriendVerdictRow, RecommendSheet, TrustSheet } from '../components/community';
 import { DetailHero, useShare } from '../components/discover';
+import { CheckInCard, TasteMatchPill, VerdictBar, WantButton } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { PLACES, placeById } from '../data/places';
 import { DEALS, POSTS } from '../data/social';
 import { useT } from '../i18n';
-import { CheckGlyph, ClockGlyph, InfoGlyph, NavigateGlyph, PinGlyph, SaveGlyph, ShareGlyph, SparkGlyph, StarGlyph } from '../icons';
+import { CheckGlyph, CheckInGlyph, ClockGlyph, InfoGlyph, MustGlyph, NavigateGlyph, PinGlyph, SaveGlyph, SendGlyph, ShareGlyph, ShieldGlyph, SparkGlyph } from '../icons';
+import { placeCommunity } from '../lib/friends';
 import { compact, km, priceLevel } from '../lib/format';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
@@ -16,9 +20,12 @@ export default function PlaceDetail() {
   const t = useT();
   const toast = useToast();
   const { settings } = useSettings();
-  const { has, toggle } = useAppData();
+  const { data, has, toggle } = useAppData();
   const share = useShare();
   const place = placeById(id);
+  const [trustOpen, setTrustOpen] = useState(false);
+  const [recommendOpen, setRecommendOpen] = useState(false);
+  const [allReviews, setAllReviews] = useState(false);
 
   if (!place) {
     return (
@@ -46,6 +53,11 @@ export default function PlaceDetail() {
   const similar = PLACES.filter((p) => p.id !== place.id && p.category === place.category).slice(0, 3);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, ${place.area}, Ahmedabad`)}`;
   const askQuery = `${place.name} ${place.kind.toLowerCase()} ${place.area}`;
+  const community = placeCommunity(place.id, data, settings);
+  const isFood = place.category === 'food' || place.category === 'cafe';
+  const friendCheckIns = community.reviews.filter((c) => c.authorId === 'me' || data.following.includes(c.authorId));
+  const reviews = allReviews ? community.reviews : community.reviews.slice(0, 4);
+  const checkInLink = `/checkin?place=${place.id}${isFood ? '' : '&kind=did'}`;
 
   return (
     <>
@@ -59,10 +71,14 @@ export default function PlaceDetail() {
             {place.kind} · {place.area}
           </span>
           <div className="row row--wrap" style={{ gap: 6 }}>
-            <span className="badge tone-mint" style={{ gap: 4 }}>
-              <StarGlyph size={12} />
-              {place.rating.toFixed(1)} · {compact(place.reviews)} reviews
-            </span>
+            {community.total ? (
+              <span className="badge tone-mint" style={{ gap: 4 }}>
+                <MustGlyph size={13} duo />
+                {community.mustPct}% must try · {compact(community.total)} locals
+              </span>
+            ) : (
+              <span className="badge">New · no verdicts yet</span>
+            )}
             <span className="badge">{priceLevel(place.price)}</span>
             <span className="badge">{km(place.distanceKm)} away</span>
             <span className={`badge ${place.openNow ? 'tone-mint' : 'tone-amber'}`} style={{ gap: 6 }}>
@@ -70,6 +86,18 @@ export default function PlaceDetail() {
               {place.openNow ? t('common.open') : t('common.closed')}
             </span>
           </div>
+        </div>
+
+        <div className="place-cta">
+          <Link to={checkInLink} className="btn btn--primary grow">
+            <CheckInGlyph size={18} />
+            {t('community.checkInHere')}
+          </Link>
+          <WantButton item={{ id: `w-place-${place.id}`, kind: 'place', refId: place.id, title: place.name, sub: `${place.kind} · ${place.area}` }} variant="button" />
+          <button type="button" className="btn btn--sm btn--outline" onClick={() => setRecommendOpen(true)}>
+            <SendGlyph size={16} />
+            {t('community.recommend')}
+          </button>
         </div>
 
         <div className="detail-actions">
@@ -98,6 +126,58 @@ export default function PlaceDetail() {
             {t('common.share')}
           </button>
         </div>
+
+        <section className="card stack" aria-labelledby="verdict-title">
+          <div className="row row--between row--wrap" style={{ rowGap: 2 }}>
+            <h2 className="section__title" id="verdict-title">
+              {t('community.verdict')}
+            </h2>
+            <button type="button" className="btn btn--ghost btn--sm trust-link" onClick={() => setTrustOpen(true)}>
+              <ShieldGlyph size={15} />
+              {t('community.whyTrust')}
+            </button>
+          </div>
+          <VerdictBar c={community} />
+          {community.total === 0 ? (
+            <Link to={checkInLink} className="btn btn--soft btn--sm" style={{ alignSelf: 'flex-start' }}>
+              {t('community.beFirst')}
+            </Link>
+          ) : null}
+        </section>
+
+        {friendCheckIns.length ? (
+          <section className="section" aria-labelledby="friends-been-title">
+            <SectionHead id="friends-been-title" title={t('community.friendsBeen')} />
+            <div className="list">
+              {friendCheckIns.map((c) => (
+                <FriendVerdictRow key={c.id} c={c} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {community.items.length ? (
+          <section className="section" aria-labelledby="order-title">
+            <SectionHead id="order-title" title={isFood ? t('community.whatPeopleOrder') : t('community.whatPeopleDo')} />
+            <div className="list">
+              {community.items.slice(0, 5).map((item) => (
+                <div key={item.name} className="list-row order-row">
+                  <span className="list-row__body">
+                    <span className="list-row__title">{item.name}</span>
+                    <span className="order-row__bar" aria-hidden="true">
+                      <span style={{ width: `${item.mustPct}%` }} />
+                    </span>
+                    <span className="list-row__meta">{t('community.orders', { n: item.count < 1000 ? item.count : compact(item.count), pct: item.mustPct })}</span>
+                  </span>
+                  <WantButton
+                    item={{ id: `w-${place.id}-${item.name}`, kind: isFood ? 'dish' : 'activity', refId: place.id, title: item.name, sub: `at ${place.name}` }}
+                    variant="icon"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="section" aria-label={t('discover.place.whatLocalsSay')}>
           <SectionHead title={t('discover.place.whatLocalsSay')} />
@@ -173,6 +253,43 @@ export default function PlaceDetail() {
           </div>
         </section>
 
+        <section className="section" aria-labelledby="reviews-title">
+          <SectionHead id="reviews-title" title={t('community.reviewsTrust')} />
+          {community.reviews.length === 0 ? (
+            <div className="card stack" style={{ alignItems: 'flex-start' }}>
+              <span className="strong">{t('community.noReviews')}</span>
+              <span className="body-sm muted">{t('community.beFirst')}</span>
+              <Link to={checkInLink} className="btn btn--primary btn--sm">
+                <CheckInGlyph size={16} />
+                {t('community.checkInHere')}
+              </Link>
+            </div>
+          ) : (
+            <>
+              {reviews.map((c) => (
+                <CheckInCard
+                  key={c.id}
+                  c={c}
+                  showPlace={false}
+                  footer={
+                    c.authorId !== 'me' && !data.following.includes(c.authorId) ? (
+                      <span className="row meta" style={{ gap: 6 }}>
+                        <TasteMatchPill personId={c.authorId} />
+                        {t('community.tasteMatchNote')}
+                      </span>
+                    ) : null
+                  }
+                />
+              ))}
+              {community.reviews.length > 4 ? (
+                <button type="button" className="btn btn--outline btn--block" onClick={() => setAllReviews((v) => !v)}>
+                  {allReviews ? t('community.showFewer') : t('community.showAll', { n: community.reviews.length })}
+                </button>
+              ) : null}
+            </>
+          )}
+        </section>
+
         {related.length ? (
           <section className="section" aria-labelledby="talk-title">
             <SectionHead id="talk-title" title={t('discover.place.talk')} />
@@ -202,6 +319,8 @@ export default function PlaceDetail() {
           </section>
         ) : null}
       </main>
+      <TrustSheet open={trustOpen} onClose={() => setTrustOpen(false)} />
+      <RecommendSheet open={recommendOpen} onClose={() => setRecommendOpen(false)} placeName={place.name} area={place.area} />
     </>
   );
 }

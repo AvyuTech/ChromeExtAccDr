@@ -408,7 +408,7 @@ export function PlaceRow({ place, last }: { place: Place; last?: boolean }) {
       <span className="list-row__body">
         <span className="list-row__title">{place.name}</span>
         <span className="list-row__meta">
-          {place.kind} · {place.area} · {priceLevel(place.price)}
+          {place.kind} · {place.area} · <span style={{ whiteSpace: 'nowrap' }}>{priceLevel(place.price)}</span>
         </span>
         {friends ? (
           <span className="list-row__meta" style={{ color: 'var(--accent)', fontWeight: 600 }}>

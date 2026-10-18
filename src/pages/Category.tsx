@@ -9,6 +9,8 @@ import type { CityEvent, Place, Tone } from '../data/types';
 import { useT } from '../i18n';
 import { ClockGlyph, MoviesGlyph, NamedGlyph, type GlyphName } from '../icons';
 import { km } from '../lib/format';
+import { placeCommunity } from '../lib/friends';
+import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 
@@ -74,6 +76,7 @@ export default function Category() {
   const t = useT();
   const toast = useToast();
   const { settings } = useSettings();
+  const { data } = useAppData();
   const [chip, setChip] = useState('all');
   const [sort, setSort] = useState<Sort>('popular');
   const [reminders, setReminders] = useState<string[]>([]);
@@ -88,8 +91,16 @@ export default function Category() {
     list = list.filter((p) => p.sources.some(allowed));
     const test = PLACE_CHIPS[category]?.find((c) => c.id === chip)?.test ?? (() => true);
     list = list.filter(test);
-    return [...list].sort((a, b) => (sort === 'nearest' ? a.distanceKm - b.distanceKm : sort === 'top' ? b.rating - a.rating : b.reviews - a.reviews));
-  }, [category, chip, sort, allowed]);
+    // Popularity and "most must-tries" come from community check-ins, not star ratings.
+    const score = new Map(list.map((p) => [p.id, placeCommunity(p.id, data, settings)]));
+    return [...list].sort((a, b) => {
+      const ca = score.get(a.id)!;
+      const cb = score.get(b.id)!;
+      if (sort === 'nearest') return a.distanceKm - b.distanceKm;
+      if (sort === 'top') return cb.mustPct - ca.mustPct || cb.total - ca.total;
+      return cb.total - ca.total;
+    });
+  }, [category, chip, sort, allowed, data, settings]);
 
   const events = useMemo(() => {
     if (category !== 'events') return [];
@@ -156,7 +167,7 @@ export default function Category() {
             options={[
               { value: 'popular', label: t('discover.sort.popular') },
               { value: 'nearest', label: t('discover.sort.nearest') },
-              { value: 'top', label: category === 'events' ? t('common.verified') : t('discover.sort.top') },
+              { value: 'top', label: category === 'events' ? t('common.verified') : t('community.mostMust') },
             ]}
           />
         ) : null}

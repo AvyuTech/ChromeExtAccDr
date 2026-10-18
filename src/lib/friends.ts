@@ -138,7 +138,12 @@ export function itemsFor(placeId?: string): string[] {
 /** Items on both your list and theirs: "You both want to try". */
 export function sharedWants(data: AppData, personId: string): WantItem[] {
   const theirs = profileInfo(personId).wantToTry.filter((w) => !w.done);
-  return data.wantToTry.filter((m) => !m.done && theirs.some((t) => t.refId && t.refId === m.refId));
+  // Same place or event counts; for dishes and activities the item itself must match too.
+  const same = (m: WantItem, t: WantItem) =>
+    !!t.refId &&
+    t.refId === m.refId &&
+    (m.kind === 'place' || m.kind === 'event' ? t.kind === m.kind : t.title.toLowerCase() === m.title.toLowerCase());
+  return data.wantToTry.filter((m) => !m.done && theirs.some((t) => same(m, t)));
 }
 
 /** Friends who also want to do things on your list: plan-together suggestions. */

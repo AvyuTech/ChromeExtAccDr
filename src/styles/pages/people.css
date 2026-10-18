@@ -1,1 +1,257 @@
 /* Friends hub, profiles, lists */
+
+.people-group-title {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+.people-list-grid .collection-card {
+  width: auto;
+  min-width: 0;
+}
+
+/* Profile header extras (shares .me-profile / .me-avatar with Me) */
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.me-stat__link {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 2px solid var(--accent-line);
+}
+.me-friends-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+.me-friends-row .glyph {
+  color: var(--accent);
+}
+
+/* Plan together */
+.plan-together {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--mint-tint);
+  border: 1px solid var(--mint-line);
+}
+.plan-together .avatar-stack > .avatar {
+  border-color: var(--mint-tint);
+}
+.plan-together p {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+/* Invite */
+.invite-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+.invite-card > .stack {
+  flex: 1 1 200px;
+}
+
+/* Locked check-ins */
+.locked-note {
+  --tone-bg: var(--accent-tint-2);
+  --tone-ink: var(--ink-2);
+}
+.locked-note > .glyph {
+  flex-shrink: 0;
+  color: var(--accent);
+  margin-top: 1px;
+}
+
+/* Want to try rows */
+.want-row {
+  align-items: flex-start;
+}
+.want-row .list-row__body {
+  gap: 4px;
+}
+.want-row__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+a.want-row__title:hover {
+  text-decoration: underline;
+}
+.want-row.is-done .want-row__title {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+.want-row__from {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+}
+.want-check {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  margin: 8px;
+  border-radius: 9px;
+  border: 2px solid var(--border-strong);
+  background: var(--surface);
+  color: #062a1f;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.want-check[aria-checked='true'],
+.want-check.is-on {
+  background: var(--mint-strong);
+  border-color: var(--mint-strong);
+}
+.want-check[aria-checked='true'] .glyph {
+  animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+:root[data-targets='large'] .want-check {
+  margin: 10px;
+}
+
+.want-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+}
+.want-add .field {
+  gap: 0;
+}
+.want-add .grow {
+  flex: 1 1 120px;
+}
+.want-add__kind {
+  width: auto;
+  min-width: 96px;
+}
+
+/* Progress ring */
+.done-ring {
+  flex-shrink: 0;
+}
+.done-ring__arc {
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.done-ring__text {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* List detail */
+.list-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border-radius: var(--radius-xl);
+  background: var(--tone-bg);
+  color: var(--ink);
+}
+.list-hero__glyph {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  color: var(--tone-ink);
+}
+.tone-night.list-hero {
+  color: #ffffff;
+}
+.list-hero__title {
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.list-hero__body {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.tone-night .list-hero__body,
+.tone-night .list-hero__meta,
+.tone-night .list-hero__owner {
+  color: #e6e1ff;
+}
+.list-hero__owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84375rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+.list-hero__meta {
+  font-size: 0.78125rem;
+  color: var(--ink-3);
+}
+
+.list-places {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.list-place {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+}
+.list-place__num {
+  flex-shrink: 0;
+  width: 22px;
+  padding-top: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+}
+.list-place__note {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ink-2);
+}

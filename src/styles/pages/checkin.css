@@ -188,10 +188,9 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)) 16px;
-  background: color-mix(in srgb, var(--surface) 96%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--surface);
   border-top: 1px solid var(--border);
+  box-shadow: 0 -8px 24px rgba(23, 20, 43, 0.06);
 }
 .checkin-footer__progress {
   display: flex;

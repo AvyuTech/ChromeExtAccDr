@@ -1,6 +1,8 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertCard, DealCard, EventTile, GroupRow, PlaceRow, PostCard } from '../components/cards';
+import { FriendPickCard, PlanTogetherCard } from '../components/community';
+import { CheckInCard, FriendStrip } from '../components/friends';
 import { SectionHead, Sheet, EmptyState } from '../components/ui';
 import { NEIGHBOURHOODS, neighbourhoodName } from '../data/core';
 import { EVENTS } from '../data/events';
@@ -9,13 +11,14 @@ import { DEALS, GROUPS, POSTS } from '../data/social';
 import type { Post } from '../data/types';
 import { useT } from '../i18n';
 import { BellGlyph, ChatGlyph, CheckGlyph, ChevronDownGlyph, Logo, PinGlyph, SearchGlyph, SparkGlyph, WeatherGlyph } from '../icons';
+import { friendFeed, friendsMustTries, planTogether } from '../lib/friends';
 import { unreadMessageCount, unreadNotificationCount, visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
 import { useLiveCity } from '../state/live';
 import { enabledSources, useSettings } from '../state/settings';
 
 type Chip = 'weekend' | 'food' | 'events' | 'deals' | 'alerts';
-type FeedTab = 'for-you' | 'near' | 'trending' | 'questions';
+type FeedTab = 'for-you' | 'friends' | 'near' | 'trending' | 'questions';
 
 const CHIPS: Array<{ id: Chip; key: string }> = [
   { id: 'weekend', key: 'chip.weekend' },
@@ -27,6 +30,7 @@ const CHIPS: Array<{ id: Chip; key: string }> = [
 
 const TABS: Array<{ id: FeedTab; key: string }> = [
   { id: 'for-you', key: 'feed.forYou' },
+  { id: 'friends', key: 'feed.friends.tab' },
   { id: 'near', key: 'feed.nearMe' },
   { id: 'trending', key: 'feed.trending' },
   { id: 'questions', key: 'feed.questions' },
@@ -75,6 +79,10 @@ export default function Home() {
     }
   }, [tab, data.myPosts, homeName, settings.interests]);
 
+  const friendsCheckIns = useMemo(() => [...data.myCheckIns, ...friendFeed(data)], [data]);
+  const mustTries = useMemo(() => friendsMustTries(data), [data]);
+  const plans = useMemo(() => planTogether(data), [data]);
+
   const onAsk = (e: FormEvent) => {
     e.preventDefault();
     const q = query.trim();
@@ -95,12 +103,54 @@ export default function Home() {
   // Interleave posts with city cards the way the design does: post, alert, events, post, deal…
   const feed: ReactNode[] = [];
   const firstDeal = DEALS[0];
-  if (chip === 'weekend') {
+  const mustTriesSection =
+    mustTries.length > 0 ? (
+      <section key="must-tries" className="section" aria-labelledby="must-title">
+        <SectionHead id="must-title" title={t('feed.friends.mustTries')} to="/friends" />
+        <div className="hscroll">
+          {mustTries.map((c) => (
+            <FriendPickCard key={c.id} c={c} />
+          ))}
+        </div>
+      </section>
+    ) : null;
+  // A friend's check-in that is not already in the must-tries row, for variety further down the feed.
+  const friendCard = friendFeed(data).find((c) => c.verdict !== 'must') ?? friendFeed(data)[0];
+
+  if (chip === 'weekend' && tab === 'friends') {
+    if (friendsCheckIns.length === 0) {
+      feed.push(
+        <EmptyState
+          key="no-friends"
+          glyph="friends"
+          title={t('feed.friends.emptyTitle')}
+          body={t('feed.friends.emptyBody')}
+          action={
+            <Link className="btn btn--primary btn--sm" to="/friends?tab=find">
+              {t('feed.friends.find')}
+            </Link>
+          }
+        />,
+      );
+    } else {
+      if (plans.length) feed.push(<PlanTogetherCard key="plans" plans={plans} />);
+      friendsCheckIns.forEach((c) => feed.push(<CheckInCard key={c.id} c={c} />));
+    }
+  } else if (chip === 'weekend') {
     posts.forEach((p, i) => {
       feed.push(<PostCard key={p.id} post={p} />);
       if (i === 0 && alerts[0]) feed.push(<AlertCard key={`alert-${alerts[0].id}`} alert={alerts[0]} />);
+      if (i === 0 && tab === 'for-you' && mustTriesSection) feed.push(mustTriesSection);
       if (i === 0 && tab === 'for-you') feed.push(weekendSection);
       if (i === 1 && tab === 'for-you') feed.push(<DealCard key="deal" deal={firstDeal} />);
+      if (i === 2 && tab === 'for-you' && friendCard)
+        feed.push(
+          <div key={`friend-${friendCard.id}`} className="stack" style={{ gap: 8 }}>
+            <span className="eyebrow muted">{t('feed.friends.fromFriend')}</span>
+            <CheckInCard c={friendCard} />
+          </div>,
+        );
+      if (i === 4 && tab === 'for-you' && plans.length) feed.push(<PlanTogetherCard key="plans" plans={plans} />);
       if (i === 3 && tab === 'for-you')
         feed.push(
           <section key="groups" className="section" aria-labelledby="groups-title">
@@ -200,6 +250,8 @@ export default function Home() {
             </button>
           </label>
         </form>
+
+        <FriendStrip />
 
         <div className="chip-row" role="group" aria-label="Filter your feed">
           {CHIPS.map((c) => (

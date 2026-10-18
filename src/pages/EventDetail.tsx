@@ -1,11 +1,14 @@
 import { Link, useParams } from 'react-router-dom';
 import { EventTile, SourceChips } from '../components/cards';
 import { DetailHero, downloadEventIcs, useShare } from '../components/discover';
+import { AvatarStack, WantButton } from '../components/friends';
+import { person } from '../data/core';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { EVENTS, eventById } from '../data/events';
 import { useT } from '../i18n';
-import { AlertGlyph, CalendarGlyph, CheckGlyph, EyeGlyph, LockGlyph, PinGlyph, RupeeGlyph, ShareGlyph, StarGlyph, TrustRing, UsersGlyph } from '../icons';
+import { AlertGlyph, FriendsGlyph, CalendarGlyph, CheckGlyph, EyeGlyph, LockGlyph, PinGlyph, RupeeGlyph, ShareGlyph, StarGlyph, TrustRing, UsersGlyph } from '../icons';
 import { compact, price } from '../lib/format';
+import { allCheckIns, profileInfo } from '../lib/friends';
 import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
@@ -18,7 +21,7 @@ export default function EventDetail() {
   const toast = useToast();
   const share = useShare();
   const { settings } = useSettings();
-  const { has, toggle } = useAppData();
+  const { data, has, toggle } = useAppData();
   const event = eventById(id);
 
   if (!event) {
@@ -50,6 +53,17 @@ export default function EventDetail() {
   const similar = EVENTS.filter((e) => e.id !== event.id && (e.category === event.category || e.tags.some((tag) => event.tags.includes(tag)))).slice(0, 5);
   const when = `${DAY_NAME[event.day] ?? event.day}, ${event.time}`;
   const soldOutSoon = event.seatsLeft !== undefined && event.seatsLeft <= 12;
+  // People you follow who want to go (on their list) or already went (checked in).
+  const friendIds = data.following.filter(
+    (fid) =>
+      profileInfo(fid).wantToTry.some((w) => w.refId === event.id && !w.done) ||
+      allCheckIns(data).some((c) => c.authorId === fid && c.eventId === event.id),
+  );
+  const firstNames = friendIds.map((fid) => person(fid).name.split(' ')[0]);
+  const friendsText =
+    firstNames.length === 0
+      ? 'None of your friends have this on their list yet.'
+      : `${firstNames.length > 1 ? `${firstNames.slice(0, -1).join(', ')} and ${firstNames[firstNames.length - 1]}` : firstNames[0]} ${firstNames.length === 1 ? 'wants' : 'want'} to go`;
 
   return (
     <>
@@ -126,6 +140,20 @@ export default function EventDetail() {
             </span>
           </Link>
         </div>
+
+        <section className="card card--tight friends-going" aria-label={t('community.friendsInterested')}>
+          {friendIds.length ? (
+            <AvatarStack ids={friendIds} size={30} />
+          ) : (
+            <span className="tile tone-violet">
+              <FriendsGlyph size={20} duo />
+            </span>
+          )}
+          <span className="grow body-sm" style={{ minWidth: 0 }}>
+            {friendsText}
+          </span>
+          <WantButton item={{ id: `w-event-${event.id}`, kind: 'event', refId: event.id, title: event.title, sub: `${event.day}, ${event.time}` }} />
+        </section>
 
         <div className="grid-2">
           <button

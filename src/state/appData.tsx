@@ -33,6 +33,11 @@ export interface AppData {
   seenStories: string[];
   myCollections: Collection[];
   followedCollections: string[];
+  /** Renames, new descriptions and removed places for lists, keyed by list id. */
+  collectionEdits: Record<string, Partial<Pick<Collection, 'title' | 'description' | 'placeIds'>>>;
+  /** Follow requests handled while "Approve new followers" is on. */
+  approvedFollowers: string[];
+  declinedFollowers: string[];
 }
 
 export const DEFAULT_APP_DATA: AppData = {
@@ -62,6 +67,9 @@ export const DEFAULT_APP_DATA: AppData = {
   seenStories: [],
   myCollections: [],
   followedCollections: ['work-cafes'],
+  collectionEdits: {},
+  approvedFollowers: [],
+  declinedFollowers: [],
 };
 
 type ListKey = {
@@ -95,6 +103,7 @@ interface AppDataContextValue {
   setWantDone: (id: string, done: boolean) => void;
   removeWant: (id: string) => void;
   addCollection: (collection: Collection) => void;
+  editCollection: (id: string, patch: Partial<Pick<Collection, 'title' | 'description' | 'placeIds'>>) => void;
   reset: () => void;
 }
 
@@ -175,6 +184,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   );
   const removeWant = useCallback((id: string) => setData((d) => ({ ...d, wantToTry: d.wantToTry.filter((w) => w.id !== id) })), []);
   const addCollection = useCallback((c: Collection) => setData((d) => ({ ...d, myCollections: [c, ...d.myCollections] })), []);
+  const editCollection = useCallback<AppDataContextValue['editCollection']>(
+    (id, patch) => setData((d) => ({ ...d, collectionEdits: { ...d.collectionEdits, [id]: { ...(d.collectionEdits[id] ?? {}), ...patch } } })),
+    [],
+  );
   const reset = useCallback(() => {
     removeKey(KEY);
     setData(DEFAULT_APP_DATA);
@@ -200,9 +213,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       setWantDone,
       removeWant,
       addCollection,
+      editCollection,
       reset,
     }),
-    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, reset],
+    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, editCollection, reset],
   );
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

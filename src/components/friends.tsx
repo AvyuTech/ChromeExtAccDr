@@ -169,7 +169,7 @@ export function CheckInCard({ c, showPlace = true, footer }: { c: CheckIn; showP
         </Link>
         <div className="grow stack" style={{ gap: 1 }}>
           <span style={{ fontSize: '0.90625rem' }}>
-            <Link to={c.authorId === 'me' ? '/me' : `/people/${c.authorId}`} className="strong" style={{ color: 'var(--ink)', textDecoration: 'none' }}>
+            <Link to={c.authorId === 'me' ? '/me' : `/people/${c.authorId}`} className="strong checkin-card__link">
               {c.authorId === 'me' ? 'You' : author.name}
             </Link>{' '}
             <span className="muted">{showPlace ? verb : c.kind === 'ate' ? 'had' : 'did'}</span>
@@ -177,11 +177,11 @@ export function CheckInCard({ c, showPlace = true, footer }: { c: CheckIn; showP
               <>
                 {' '}
                 {c.placeId ? (
-                  <Link to={`/place/${c.placeId}`} className="strong" style={{ color: 'var(--ink)' }}>
+                  <Link to={`/place/${c.placeId}`} className="strong checkin-card__link">
                     {c.placeName}
                   </Link>
                 ) : c.eventId ? (
-                  <Link to={`/event/${c.eventId}`} className="strong" style={{ color: 'var(--ink)' }}>
+                  <Link to={`/event/${c.eventId}`} className="strong checkin-card__link">
                     {c.placeName}
                   </Link>
                 ) : (

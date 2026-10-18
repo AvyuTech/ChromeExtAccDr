@@ -233,3 +233,12 @@
   background: rgba(255, 255, 255, 0.16);
   color: #ffffff;
 }
+
+.checkin-card__link {
+  color: var(--ink);
+  text-decoration: none;
+}
+.checkin-card__link:hover,
+.checkin-card__link:focus-visible {
+  text-decoration: underline;
+}

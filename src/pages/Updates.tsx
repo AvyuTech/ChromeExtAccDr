@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { FollowButton } from '../components/friends';
 import { NOTIFICATION_META } from '../components/social';
 import { EmptyState, PageHeader } from '../components/ui';
+import { person } from '../data/core';
 import type { AppNotification } from '../data/types';
 import { useT } from '../i18n';
 import { BellOffGlyph, NamedGlyph } from '../icons';
@@ -10,10 +12,11 @@ import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 
-type Filter = 'all' | 'replies' | 'city' | 'events' | 'reports';
+type Filter = 'all' | 'friends' | 'replies' | 'city' | 'events' | 'reports';
 
 const FILTERS: Array<{ id: Filter; key: string; kinds: AppNotification['kind'][] | null }> = [
   { id: 'all', key: 'social.filter.all', kinds: null },
+  { id: 'friends', key: 'feed.friends.tab', kinds: ['follow', 'friend'] },
   { id: 'replies', key: 'social.filter.replies', kinds: ['reply', 'mention'] },
   { id: 'city', key: 'social.filter.city', kinds: ['alert', 'system'] },
   { id: 'events', key: 'social.filter.events', kinds: ['event', 'deal'] },
@@ -38,6 +41,13 @@ export default function Updates() {
     { id: 'today', key: 'social.today', items: shown.filter((n) => n.day === 'today') },
     { id: 'earlier', key: 'social.earlier', items: shown.filter((n) => n.day === 'earlier') },
   ];
+
+  const pendingRequest = (n: AppNotification) =>
+    n.kind === 'follow' &&
+    !!n.actorId &&
+    settings.privacy.approveFollowers &&
+    !data.approvedFollowers.includes(n.actorId) &&
+    !data.declinedFollowers.includes(n.actorId);
 
   const open = (n: AppNotification) => {
     add('readNotifications', n.id);
@@ -87,22 +97,45 @@ export default function Updates() {
                   {g.items.map((n) => {
                     const isUnread = !data.readNotifications.includes(n.id);
                     const meta = NOTIFICATION_META[n.kind];
+                    const content = (
+                      <>
+                        <span className={`tile tone-${meta.tone}`}>
+                          <NamedGlyph name={meta.glyph} size={20} duo live={(n.kind === 'alert' || n.kind === 'friend') && isUnread} />
+                        </span>
+                        <span className="list-row__body" style={{ gap: 3 }}>
+                          <span className="notif-row__title">{pendingRequest(n) ? `${person(n.actorId!).name} wants to follow you` : n.title}</span>
+                          <span className="notif-row__body">{pendingRequest(n) ? 'Approve to let them see your friends-only check-ins.' : n.body}</span>
+                          <span className="meta">{n.ago}</span>
+                        </span>
+                      </>
+                    );
+                    // A follow notification carries its own Follow back button, so the row can't be one big button.
+                    if (n.kind === 'follow' && n.actorId) {
+                      return (
+                        <div key={n.id} className={`list-row notif-row glyph-host${isUnread ? ' notif-row--unread' : ''}`}>
+                          <button
+                            type="button"
+                            className="notif-row__main"
+                            onClick={() => open(n)}
+                            aria-label={`${isUnread ? `${t('social.unread')}: ` : ''}${n.title}. ${n.body} · ${n.ago}`}
+                          >
+                            {content}
+                          </button>
+                          <span className="notif-row__action">
+                            <FollowRequestActions personId={n.actorId} />
+                          </span>
+                        </div>
+                      );
+                    }
                     return (
                       <button
                         key={n.id}
                         type="button"
                         className={`list-row notif-row glyph-host${isUnread ? ' notif-row--unread' : ''}`}
                         onClick={() => open(n)}
-                        aria-label={`${isUnread ? `${t('social.unread')}: ` : ''}${n.title}. ${n.body}. ${n.ago}`}
+                        aria-label={`${isUnread ? `${t('social.unread')}: ` : ''}${n.title}. ${n.body} · ${n.ago}`}
                       >
-                        <span className={`tile tone-${meta.tone}`}>
-                          <NamedGlyph name={meta.glyph} size={20} duo live={n.kind === 'alert' && isUnread} />
-                        </span>
-                        <span className="list-row__body" style={{ gap: 3 }}>
-                          <span className="notif-row__title">{n.title}</span>
-                          <span className="notif-row__body">{n.body}</span>
-                          <span className="meta">{n.ago}</span>
-                        </span>
+                        {content}
                         {isUnread ? <span className="unread-dot" aria-hidden="true" /> : null}
                       </button>
                     );
@@ -126,5 +159,42 @@ export default function Updates() {
         )}
       </main>
     </>
+  );
+}
+
+/**
+ * With "Approve new followers" on, a follow becomes a request to approve or decline;
+ * otherwise (or once approved) it offers Follow back.
+ */
+function FollowRequestActions({ personId }: { personId: string }) {
+  const { settings } = useSettings();
+  const { data, add } = useAppData();
+  const toast = useToast();
+  const name = person(personId).name.split(' ')[0];
+  if (data.declinedFollowers.includes(personId)) return <span className="meta">Declined</span>;
+  if (!settings.privacy.approveFollowers || data.approvedFollowers.includes(personId)) return <FollowButton personId={personId} />;
+  return (
+    <span className="row" style={{ gap: 6 }}>
+      <button
+        type="button"
+        className="btn btn--sm btn--primary"
+        onClick={() => {
+          add('approvedFollowers', personId);
+          toast(`${name} can now follow you`);
+        }}
+      >
+        Approve
+      </button>
+      <button
+        type="button"
+        className="btn btn--sm btn--outline"
+        onClick={() => {
+          add('declinedFollowers', personId);
+          toast(`Declined ${name}'s request`);
+        }}
+      >
+        Decline
+      </button>
+    </span>
   );
 }
