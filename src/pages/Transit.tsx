@@ -7,7 +7,7 @@ import { neighbourhoodName } from '../data/core';
 import { ALERTS } from '../data/city';
 import type { TransitArrival } from '../data/types';
 import { useT } from '../i18n';
-import { NamedGlyph, RouteGlyph } from '../icons';
+import { ChevronRightGlyph, NamedGlyph, RouteGlyph } from '../icons';
 import { useLiveCity } from '../state/live';
 import { useSettings, type CommuteMode } from '../state/settings';
 
@@ -56,36 +56,53 @@ export default function Transit() {
     <>
       <PageHeader title={t('city.transit')} fallback="/city" />
       <main className="page page--with-header">
-        <section className="card card--accent stack" aria-labelledby="commute-title" style={{ gap: 12 }}>
+        <section className="commute-card" aria-labelledby="commute-title">
           <div className="row" style={{ gap: 12 }}>
-            <Tile glyph={mode.glyph} tone="violet" size="lg" live={!pulse.paused} />
-            <div className="stack grow" style={{ gap: 2 }}>
-              <span id="commute-title" className="eyebrow muted">
+            <span className="commute-card__icon">
+              <NamedGlyph name={mode.glyph} size={24} live={!pulse.paused} />
+            </span>
+            <div className="stack grow" style={{ gap: 2, minWidth: 0 }}>
+              <span id="commute-title" className="eyebrow commute-card__eyebrow">
                 {t('city.commute')}
               </span>
               {loc.work ? (
-                <span className="strong row" style={{ gap: 6 }}>
+                <span className="commute-card__route">
                   {neighbourhoodName(loc.home)}
-                  <RouteGlyph size={16} style={{ color: 'var(--accent)' }} />
+                  <RouteGlyph size={16} />
                   {neighbourhoodName(loc.work)}
                 </span>
               ) : (
-                <span className="strong">Add your work area to see your commute</span>
+                <span className="commute-card__route">Add your work area to see your commute</span>
               )}
-              <span className="meta">
+              <span className="commute-card__muted">
                 {mode.label} · usually leave at {shiftClock(loc.leaveAt, 0)}
               </span>
             </div>
           </div>
           {loc.work ? (
             <>
-              <div className="row" style={{ alignItems: 'baseline', gap: 8 }}>
-                <span className="num" style={{ fontSize: '2rem', letterSpacing: '-0.03em' }}>
-                  {mine.now} min
-                </span>
-                <span className={`badge ${delay > 0 ? 'tone-amber' : 'tone-mint'}`}>{delay > 0 ? `+${delay} min today` : delay < 0 ? `${-delay} min faster` : 'Usual time'}</span>
+              <div className="row" style={{ alignItems: 'baseline', gap: 10 }}>
+                <span className="commute-card__time">{mine.now} min</span>
+                <span className={`commute-card__badge${delay > 0 ? ' is-late' : ''}`}>{delay > 0 ? `+${delay} min today` : delay < 0 ? `${-delay} min faster` : 'Usual time'}</span>
               </div>
-              <p className="body-sm">
+              <div className="commute-line" aria-hidden="true">
+                <span className="commute-line__end">
+                  <span className="commute-line__dot" />
+                  <b>{shiftClock(loc.leaveAt, delay > 0 ? -delay : 0)}</b>
+                  <span>Leave</span>
+                </span>
+                <span className="commute-line__track">
+                  <span className="commute-line__mode">
+                    <NamedGlyph name={mode.glyph} size={16} />
+                  </span>
+                </span>
+                <span className="commute-line__end commute-line__end--to">
+                  <span className="commute-line__dot commute-line__dot--to" />
+                  <b>{shiftClock(loc.leaveAt, delay > 0 ? mine.usual : mine.now)}</b>
+                  <span>Arrive</span>
+                </span>
+              </div>
+              <p className="commute-card__text">
                 {delay > 0 ? (
                   <>
                     Leave by <b>{shiftClock(loc.leaveAt, -delay)}</b> to arrive at your usual time ({shiftClock(loc.leaveAt, mine.usual)}).
@@ -97,14 +114,15 @@ export default function Transit() {
                 )}
               </p>
               {commuteAlert ? (
-                <Link to={`/city/alerts/${commuteAlert.id}`} className="notice tone-amber" style={{ textDecoration: 'none' }}>
+                <Link to={`/city/alerts/${commuteAlert.id}`} className="commute-card__alert">
                   <NamedGlyph name="alert" size={18} />
-                  <span>{commuteAlert.title}</span>
+                  <span className="grow">{commuteAlert.title}</span>
+                  <ChevronRightGlyph size={16} />
                 </Link>
               ) : null}
             </>
           ) : null}
-          <Link to="/settings/location" className="section__link">
+          <Link to="/settings/location" className="commute-card__link">
             Change commute
           </Link>
         </section>

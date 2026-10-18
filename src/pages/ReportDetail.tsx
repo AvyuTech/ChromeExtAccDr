@@ -57,15 +57,15 @@ export default function ReportDetail() {
       <main className="page page--with-header">
         <section className="report-hero" aria-labelledby="report-title">
           <StepRing step={report.status} size={104}>
-            <span className={`tile tile--xl tone-${meta.tone}`} style={{ width: 68, height: 68, borderRadius: 34 }}>
-              <NamedGlyph name={meta.glyph} size={34} duo live={!resolved} />
+            <span className={`report-hero__icon tone-${meta.tone}`}>
+              <NamedGlyph name={meta.glyph} size={34} live={!resolved} />
             </span>
           </StepRing>
           <span className={`badge ${resolved ? 'tone-mint' : report.status >= 2 ? 'tone-violet' : 'tone-amber'}`}>
             {resolved ? <CheckGlyph size={12} /> : null}
             {REPORT_STEPS[report.status]} · step {report.status + 1} of {REPORT_STEPS.length}
           </span>
-          <h2 id="report-title" style={{ fontSize: '1.25rem', textAlign: 'center' }}>
+          <h2 id="report-title" className="report-hero__title">
             {report.title}
           </h2>
           <span className="meta" style={{ textAlign: 'center' }}>
@@ -143,8 +143,8 @@ export default function ReportDetail() {
 
         <Link to="/messages/c-ward" className="list card card--link" style={{ padding: 0 }}>
           <span className="list-row">
-            <span className="tile tone-blue">
-              <ChatGlyph size={20} duo />
+            <span className="city-card__icon city-card__icon--sm tone-blue">
+              <ChatGlyph size={20} />
             </span>
             <span className="list-row__body">
               <span className="list-row__title">Message the ward desk</span>

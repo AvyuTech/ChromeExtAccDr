@@ -67,29 +67,31 @@ export default function Reports() {
         }
       />
       <main className="page page--with-header">
-        <section className="card stack" aria-label={`${civic.ward} ward`} style={{ gap: 10 }}>
-          <div className="row row--between">
-            <span className="strong">{civic.ward} ward</span>
-            <span className="meta">{civic.resolvedThisWeek} fixed this week</span>
+        <section className="city-ward city-ward--compact" aria-label={`${civic.ward} ward`}>
+          <div className="row row--between" style={{ alignItems: 'flex-end', gap: 12 }}>
+            <span className="stack" style={{ gap: 2 }}>
+              <span className="eyebrow city-ward__eyebrow">{t('city.ward')}</span>
+              <span className="city-ward__title">{civic.ward}</span>
+            </span>
+            <span className="city-ward__muted">{civic.resolvedThisWeek} fixed this week</span>
+          </div>
+          <div className="city-ward__bar" role="img" aria-label={`${civic.resolvedPct}% of reports resolved`}>
+            <span style={{ width: `${civic.resolvedPct}%` }} />
           </div>
           <div className="grid-3">
-            <div className="city-stat">
-              <span className="num" style={{ fontSize: '1.125rem', color: 'var(--mint-ink)' }}>
+            <div className="city-ward__stat">
+              <span className="num" style={{ color: '#dfff8a' }}>
                 {civic.resolvedPct}%
               </span>
-              <span className="meta">resolved</span>
+              <span>resolved</span>
             </div>
-            <div className="city-stat">
-              <span className="num" style={{ fontSize: '1.125rem' }}>
-                {civic.avgDays}d
-              </span>
-              <span className="meta">avg. fix</span>
+            <div className="city-ward__stat">
+              <span className="num">{civic.avgDays}d</span>
+              <span>avg. fix</span>
             </div>
-            <div className="city-stat">
-              <span className="num" style={{ fontSize: '1.125rem' }}>
-                {civic.open}
-              </span>
-              <span className="meta">open</span>
+            <div className="city-ward__stat">
+              <span className="num">{civic.open}</span>
+              <span>open</span>
             </div>
           </div>
         </section>

@@ -1,7 +1,8 @@
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { allReports, issueMeta, plusOneCount } from '../components/city';
-import { Sheet, Tile, ToggleRow } from '../components/ui';
+import { CityMap, NEIGHBOURHOOD_POS } from '../components/CityMap';
+import { Sheet, ToggleRow } from '../components/ui';
 import { ISSUE_TYPES } from '../data/city';
 import { NEIGHBOURHOODS } from '../data/core';
 import type { CivicReport, IssueCategory } from '../data/types';
@@ -127,7 +128,7 @@ export default function Report() {
       </div>
 
       <main className="page page--with-header page--no-nav">
-        <h2 style={{ fontSize: '1.375rem' }}>{titles[step]}</h2>
+        <h2 className="report-title">{titles[step]}</h2>
 
         {step === 0 ? (
           <>
@@ -144,7 +145,9 @@ export default function Report() {
                     setStep(1);
                   }}
                 >
-                  <Tile glyph={it.glyph} tone={it.tone} size="lg" />
+                  <span className={`issue-icon tone-${it.tone}`}>
+                    <NamedGlyph name={it.glyph} size={26} />
+                  </span>
                   <span>{it.label}</span>
                 </button>
               ))}
@@ -155,8 +158,13 @@ export default function Report() {
         {step === 1 && meta ? (
           <>
             <div className="row card card--tight" style={{ gap: 12 }}>
-              <Tile glyph={meta.glyph} tone={meta.tone} />
-              <span className="strong grow">{meta.label}</span>
+              <span className={`issue-icon issue-icon--sm tone-${meta.tone}`}>
+                <NamedGlyph name={meta.glyph} size={22} />
+              </span>
+              <span className="stack grow" style={{ gap: 1 }}>
+                <span className="eyebrow muted">Reporting</span>
+                <span className="strong">{meta.label}</span>
+              </span>
               <button type="button" className="btn btn--ghost btn--sm" style={{ color: 'var(--accent)' }} onClick={() => setStep(0)}>
                 Change
               </button>
@@ -244,23 +252,35 @@ export default function Report() {
               <span className="field__hint">Photos help the crew find the exact spot. Avoid people's faces and number plates.</span>
             </div>
 
-            <div className="card card--tight row" style={{ gap: 12 }}>
-              <span className="tile tone-violet">
-                <PinGlyph size={20} duo />
-              </span>
-              <span className="stack grow" style={{ gap: 2 }}>
-                <span className="strong" style={{ fontSize: '0.9375rem' }}>
-                  Near {nb.name}
+            <div className="field">
+              <span className="field__label">Where is it?</span>
+              <div className="report-map">
+                <CityMap
+                  pins={[]}
+                  home={NEIGHBOURHOOD_POS[nb.id] ?? NEIGHBOURHOOD_POS.bodakdev}
+                  radiusKm={precise ? 0.3 : 1}
+                  areaLabel={precise ? 'Precise location' : `Near ${nb.name}`}
+                  onArea={locate}
+                />
+              </div>
+              <div className="card card--tight row" style={{ gap: 12 }}>
+                <span className="issue-icon issue-icon--sm tone-violet">
+                  <PinGlyph size={20} />
                 </span>
-                <span className="meta">{precise ? `Precise location added (±${precise.accuracy} m)` : `${nb.ward} ward · neighbourhood only`}</span>
-              </span>
-              {precise ? (
-                <CheckGlyph size={20} style={{ color: 'var(--mint-ink)' }} />
-              ) : (
-                <button type="button" className="btn btn--soft btn--sm" onClick={locate} disabled={locating}>
-                  {locating ? 'Locating…' : 'Use precise'}
-                </button>
-              )}
+                <span className="stack grow" style={{ gap: 2 }}>
+                  <span className="strong" style={{ fontSize: '0.9375rem' }}>
+                    Near {nb.name}
+                  </span>
+                  <span className="meta">{precise ? `Precise location added (±${precise.accuracy} m)` : `${nb.ward} ward · neighbourhood only`}</span>
+                </span>
+                {precise ? (
+                  <CheckGlyph size={20} style={{ color: 'var(--mint-ink)' }} />
+                ) : (
+                  <button type="button" className="btn btn--soft btn--sm" onClick={locate} disabled={locating}>
+                    {locating ? 'Locating…' : 'Use precise'}
+                  </button>
+                )}
+              </div>
             </div>
           </>
         ) : null}
@@ -269,7 +289,9 @@ export default function Report() {
           <>
             <section className="card stack" aria-label="Your report" style={{ gap: 12 }}>
               <div className="row" style={{ gap: 12 }}>
-                <Tile glyph={meta.glyph} tone={meta.tone} size="lg" />
+                <span className={`issue-icon tone-${meta.tone}`}>
+                  <NamedGlyph name={meta.glyph} size={26} />
+                </span>
                 <span className="stack" style={{ gap: 2 }}>
                   <span className="strong">{meta.label}</span>
                   <span className="meta">

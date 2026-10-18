@@ -79,23 +79,26 @@ export default function AlertDetail() {
       <PageHeader title={`${kind.label} ${t('city.alert').toLowerCase()}`} fallback="/city/alerts" actions={<ShareButton title={alert.title} path={`/city/alerts/${alert.id}`} />} />
       <main className="page page--with-header">
         <section className={`alert-hero tone-${sev.tone}`} aria-labelledby="alert-title">
-          <div className="row" style={{ gap: 12 }}>
+          <div className="alert-hero__top">
             <span className="alert-hero__icon">
-              {alert.severity === 'info' ? <NamedGlyph name={kind.glyph} size={28} duo live /> : <AlertGlyph size={28} duo live={alert.active} />}
+              {alert.severity === 'info' ? <NamedGlyph name={kind.glyph} size={26} live /> : <AlertGlyph size={26} live={alert.active} />}
             </span>
-            <span className="stack" style={{ gap: 2 }}>
-              <span className="eyebrow" style={{ color: 'var(--tone-ink)' }}>
-                {sev.label} · {kind.label}
+            <span className="alert-hero__sev">{sev.label}</span>
+            <span className="grow" />
+            {alert.active ? (
+              <span className="alert-hero__live">
+                <span className="live-dot" />
+                Active
               </span>
-              <span className="meta" style={{ color: 'color-mix(in srgb, var(--tone-ink) 70%, var(--ink))' }}>
-                {alert.ago}
-              </span>
-            </span>
+            ) : null}
           </div>
-          <h2 id="alert-title" style={{ fontSize: '1.3125rem', lineHeight: 1.25 }}>
+          <span className="eyebrow alert-hero__eyebrow">
+            {kind.label} · {alert.ago}
+          </span>
+          <h2 id="alert-title" className="alert-hero__title">
             {alert.title}
           </h2>
-          <span className="row strong" style={{ gap: 6, fontSize: '0.875rem' }}>
+          <span className="alert-hero__window">
             <ClockGlyph size={16} />
             {alert.window}
           </span>
@@ -150,8 +153,8 @@ export default function AlertDetail() {
             <ul className="list" style={{ margin: 0, padding: 0, listStyle: 'none' }}>
               {alert.tips.map((tip) => (
                 <li key={tip} className="list-row">
-                  <span className="tile tone-mint" style={{ width: 32, height: 32, borderRadius: 10 }}>
-                    <CheckGlyph size={16} />
+                  <span className="alert-tip__check">
+                    <CheckGlyph size={15} />
                   </span>
                   <span className="body-sm grow">{tip}</span>
                 </li>

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertCard } from '../components/cards';
-import { PageHeader, SectionHead, Tile, ToggleRow } from '../components/ui';
+import { PageHeader, SectionHead, ToggleRow } from '../components/ui';
 import { EMERGENCY, FACILITIES } from '../data/city';
 import { useT } from '../i18n';
-import { NavigateGlyph, PhoneGlyph, PinGlyph, SosGlyph } from '../icons';
+import { NamedGlyph, NavigateGlyph, PhoneGlyph, PinGlyph, SosGlyph } from '../icons';
 import { km } from '../lib/format';
 import { visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
@@ -163,7 +163,13 @@ export default function Safety() {
     <>
       <PageHeader title={t('city.safety')} fallback="/city" />
       <main className="page page--with-header">
-        <SosButton onCalled={() => setCalled(true)} />
+        <section className="sos-card" aria-labelledby="sos-title">
+          <span className="eyebrow sos-card__eyebrow">Emergency · 112</span>
+          <h2 id="sos-title" className="sos-card__title">
+            Help is one press away.
+          </h2>
+          <SosButton onCalled={() => setCalled(true)} />
+        </section>
 
         {called ? (
           <div className="notice tone-red">
@@ -189,7 +195,9 @@ export default function Safety() {
           <div className="list">
             {EMERGENCY.map((e) => (
               <a key={e.id} href={`tel:${e.number}`} className="list-row glyph-host" aria-label={`Call ${e.name}, ${e.number}`}>
-                <Tile glyph={e.glyph} tone={e.tone} size="sm" />
+                <span className={`city-card__icon city-card__icon--sm tone-${e.tone}`}>
+                  <NamedGlyph name={e.glyph} size={20} />
+                </span>
                 <span className="list-row__body">
                   <span className="list-row__title">{e.name}</span>
                   <span className="list-row__meta">{e.description}</span>
@@ -266,7 +274,9 @@ export default function Safety() {
               .sort((a, b) => a.distanceKm - b.distanceKm)
               .map((f) => (
                 <div key={f.id} className="list-row">
-                  <Tile glyph={f.glyph} tone={f.kind === 'Police station' ? 'blue' : f.kind === 'Fire station' ? 'peach' : 'red'} size="sm" />
+                  <span className={`city-card__icon city-card__icon--sm tone-${f.kind === 'Police station' ? 'blue' : f.kind === 'Fire station' ? 'peach' : 'red'}`}>
+                    <NamedGlyph name={f.glyph} size={20} />
+                  </span>
                   <span className="list-row__body">
                     <span className="list-row__title">{f.name}</span>
                     <span className="list-row__meta">

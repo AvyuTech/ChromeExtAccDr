@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { PageHeader, SectionHead, Sheet, Tile } from '../components/ui';
+import { EmptyState, PageHeader, SectionHead, Sheet } from '../components/ui';
 import { SERVICES } from '../data/city';
 import type { CityService } from '../data/types';
 import { useT } from '../i18n';
-import { ChevronRightGlyph, ExternalGlyph, ShieldGlyph } from '../icons';
+import { ChevronRightGlyph, ExternalGlyph, NamedGlyph, SearchGlyph, ShieldGlyph } from '../icons';
 import { rupees } from '../lib/format';
 import { useToast } from '../state/toast';
 
@@ -18,6 +18,10 @@ export default function Services() {
   const t = useT();
   const toast = useToast();
   const [open, setOpen] = useState<CityService | null>(null);
+  const [query, setQuery] = useState('');
+  const q = query.trim().toLowerCase();
+  const matches = (s: CityService) => !q || `${s.name} ${s.provider} ${s.description}`.toLowerCase().includes(q);
+  const found = SERVICES.filter(matches);
   const due = SERVICES.filter((s) => s.due && s.amount);
   const total = due.reduce((sum, s) => sum + (s.amount ?? 0), 0);
   const action = open ? (GROUPS.find((g) => g.id === open.group)?.action ?? 'Open') : 'Open';
@@ -26,6 +30,21 @@ export default function Services() {
     <>
       <PageHeader title={t('city.services')} fallback="/city" />
       <main className="page page--with-header">
+        <form role="search" onSubmit={(e) => e.preventDefault()}>
+          <label htmlFor="svc-q" className="search-field">
+            <SearchGlyph size={22} />
+            <input
+              id="svc-q"
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Bills, certificates, bookings…"
+              autoComplete="off"
+              enterKeyHint="search"
+            />
+          </label>
+        </form>
+
         <div className="notice tone-mint">
           <ShieldGlyph size={20} />
           <span>
@@ -33,19 +52,24 @@ export default function Services() {
           </span>
         </div>
 
-        {due.length ? (
-          <section className="card card--accent stack" aria-labelledby="bills-due" style={{ gap: 10 }}>
-            <div className="row row--between">
-              <h2 id="bills-due" className="section__title">
-                {t('city.bills')}
-              </h2>
-              <span className="num" style={{ fontSize: '1.125rem' }}>
-                {rupees(total)}
+        {due.length && !q ? (
+          <section className="services-bills" aria-labelledby="bills-due">
+            <div className="row row--between" style={{ alignItems: 'flex-end' }}>
+              <span className="stack" style={{ gap: 2 }}>
+                <span className="eyebrow" style={{ color: 'var(--accent-strong)' }}>
+                  {due.length} due soon
+                </span>
+                <h2 id="bills-due" className="section__title">
+                  {t('city.bills')}
+                </h2>
               </span>
+              <span className="services-bills__total">{rupees(total)}</span>
             </div>
             {due.map((s) => (
               <button key={s.id} type="button" className="row services-due glyph-host" onClick={() => setOpen(s)}>
-                <Tile glyph={s.glyph} tone={s.tone} size="sm" />
+                <span className={`city-card__icon city-card__icon--sm tone-${s.tone}`}>
+                  <NamedGlyph name={s.glyph} size={20} />
+                </span>
                 <span className="stack grow" style={{ gap: 1, textAlign: 'left' }}>
                   <span className="strong" style={{ fontSize: '0.9375rem' }}>
                     {s.name}
@@ -61,13 +85,17 @@ export default function Services() {
           </section>
         ) : null}
 
-        {GROUPS.map((g) => (
+        {q && found.length === 0 ? <EmptyState glyph="services" title="No services match" body="Try a word like tax, water, birth or booking." /> : null}
+
+        {GROUPS.filter((g) => found.some((s) => s.group === g.id)).map((g) => (
           <section key={g.id} className="section" aria-labelledby={`svc-${g.id}`}>
             <SectionHead id={`svc-${g.id}`} title={t(g.key)} />
             <div className="list">
-              {SERVICES.filter((s) => s.group === g.id).map((s) => (
+              {found.filter((s) => s.group === g.id).map((s) => (
                 <button key={s.id} type="button" className="list-row glyph-host" onClick={() => setOpen(s)}>
-                  <Tile glyph={s.glyph} tone={s.tone} size="sm" />
+                  <span className={`city-card__icon city-card__icon--sm tone-${s.tone}`}>
+                    <NamedGlyph name={s.glyph} size={20} />
+                  </span>
                   <span className="list-row__body">
                     <span className="list-row__title">{s.name}</span>
                     <span className="list-row__meta">
@@ -89,7 +117,9 @@ export default function Services() {
         {open ? (
           <>
             <div className="row" style={{ gap: 12 }}>
-              <Tile glyph={open.glyph} tone={open.tone} size="lg" />
+              <span className={`city-card__icon tone-${open.tone}`}>
+                <NamedGlyph name={open.glyph} size={22} />
+              </span>
               <span className="stack" style={{ gap: 2 }}>
                 <span className="strong">{open.provider}</span>
                 <span className="meta">{open.description}</span>

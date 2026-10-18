@@ -1,12 +1,15 @@
-import { Link } from 'react-router-dom';
+import { useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { scenePhoto } from '../assets/photos';
 import { AlertCard } from '../components/cards';
 import { CONDITION_LABEL, CorridorRow, DepartureRow, ParkingRow, PowerRow, Sparkline, WaterRow } from '../components/city';
-import { SectionHead, Tile } from '../components/ui';
+import { CityMap, NEIGHBOURHOOD_POS, type MapPin } from '../components/CityMap';
+import { SectionHead } from '../components/ui';
 import { neighbourhoodName } from '../data/core';
-import { SERVICES } from '../data/city';
+import { ALERT_KIND_META, SERVICES } from '../data/city';
 import type { Tone } from '../data/types';
 import { useT } from '../i18n';
-import { AqiDial, aqiBand, ChevronRightGlyph, CityGlyph, WeatherGlyph, type GlyphName } from '../icons';
+import { AqiDial, aqiBand, ChevronRightGlyph, NamedGlyph, PinGlyph, SlidersGlyph, WeatherGlyph, type GlyphName } from '../icons';
 import { rupees } from '../lib/format';
 import { visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
@@ -21,8 +24,23 @@ const QUICK: Array<{ to: string; label: string; glyph: GlyphName; tone: Tone }> 
   { to: '/city/transit', label: 'Parking', glyph: 'parking', tone: 'teal' },
 ];
 
+/** Pins sharing a neighbourhood fan out so they stay tappable. */
+const FAN: Array<[number, number]> = [
+  [0, 0],
+  [48, -4],
+  [-46, 10],
+  [8, 50],
+  [52, 44],
+];
+
+function todayLabel() {
+  const d = new Date();
+  return `${d.toLocaleDateString('en-GB', { weekday: 'long' })}, ${d.getDate()} ${d.toLocaleDateString('en-GB', { month: 'short' })}`;
+}
+
 export default function City() {
   const t = useT();
+  const navigate = useNavigate();
   const pulse = useLiveCity();
   const { settings } = useSettings();
   const { data } = useAppData();
@@ -34,43 +52,141 @@ export default function City() {
   const bills = SERVICES.filter((s) => s.due && s.amount);
   const billTotal = bills.reduce((sum, s) => sum + (s.amount ?? 0), 0);
   const civic = pulse.civic;
+  const homeId = settings.location.home;
+  const home = NEIGHBOURHOOD_POS[homeId] ?? NEIGHBOURHOOD_POS.bodakdev;
+
+  // City updates on the map: each sits on its first mapped area, fanned out when they share one
+  // (and kept off the "you are here" dot).
+  const pins: MapPin[] = useMemo(() => {
+    const used: Record<string, number> = { [homeId]: 0 };
+    return alerts.flatMap((a) => {
+      const area = a.areas.find((x) => NEIGHBOURHOOD_POS[x]);
+      if (!area) return [];
+      const n = (used[area] = (used[area] ?? -1) + 1);
+      const [dx, dy] = FAN[n % FAN.length];
+      const kind = ALERT_KIND_META[a.kind];
+      return [
+        {
+          id: a.id,
+          x: NEIGHBOURHOOD_POS[area][0] + dx,
+          y: NEIGHBOURHOOD_POS[area][1] + dy,
+          glyph: kind.glyph,
+          title: a.title,
+          meta: `${kind.label} · ${a.ago}`,
+          to: `/city/alerts/${a.id}`,
+        },
+      ];
+    });
+  }, [alerts, homeId]);
 
   return (
-    <main className="page">
-      <header className="city-hero">
-        <div className="stack grow" style={{ gap: 4 }}>
-          <span className="meta strong">
-            {neighbourhoodName(settings.location.home)}, {settings.location.city}
-          </span>
-          <h1 className="page-title">{t('city.title')}</h1>
-          {pulse.paused ? (
-            <Link to="/settings/data" className="row meta strong" style={{ gap: 6, textDecoration: 'none' }}>
-              <span className="live-dot live-dot--muted" />
-              {t('city.paused')}
-            </Link>
-          ) : (
-            <span className="row meta strong" style={{ gap: 6, color: 'var(--mint-ink)' }}>
-              <span className="live-dot" />
-              {t('city.live')} · updates every 20 s
-            </span>
-          )}
+    <main className="page city">
+      <header className="city-head">
+        <div className="stack" style={{ gap: 8, minWidth: 0 }}>
+          <span className="eyebrow muted">{t('city.eyebrow', { city: settings.location.city })}</span>
+          <h1 className="hero-title">{t('city.headline')}</h1>
         </div>
-        <span className="city-hero__glyph">
-          <CityGlyph size={52} live={!pulse.paused} title="Live city" />
-        </span>
+        <Link to="/settings/alerts" className="icon-btn icon-btn--square" aria-label="Alert settings">
+          <SlidersGlyph size={22} />
+        </Link>
       </header>
+      <div className="city-status">
+        <span className="row" style={{ gap: 6 }}>
+          <PinGlyph size={16} style={{ color: 'var(--accent)' }} />
+          {neighbourhoodName(homeId)}, {settings.location.city}
+        </span>
+        {pulse.paused ? (
+          <Link to="/settings/data" className="city-live city-live--paused">
+            <span className="live-dot live-dot--muted" />
+            {t('city.paused')}
+          </Link>
+        ) : (
+          <span className="city-live">
+            <span className="live-dot" />
+            {t('city.live')} · {t('city.every')}
+          </span>
+        )}
+      </div>
+
+      <section className="card city-today" aria-labelledby="city-weather">
+        <div className={`city-today__photo${w.condition === 'night' ? ' is-night' : ''}`}>
+          <img src={scenePhoto('promenade')} alt="" />
+          <span className="photo-pill" style={{ top: 14, left: 14 }}>
+            {todayLabel()}
+          </span>
+          <div className="city-today__over">
+            <span className="city-today__temp num">{w.temp}°</span>
+            <span className="stack grow" style={{ gap: 2, minWidth: 0 }}>
+              <h2 id="city-weather" className="city-today__cond">
+                {CONDITION_LABEL[w.condition]}
+              </h2>
+              <span className="city-today__sub">
+                Feels {w.feelsLike}° · H {w.high}° · L {w.low}°
+              </span>
+            </span>
+            <span className="city-today__glyph">
+              <WeatherGlyph condition={w.condition} size={40} title={CONDITION_LABEL[w.condition]} />
+            </span>
+          </div>
+        </div>
+        <div className="city-today__body">
+          <p className="body-sm" style={{ margin: 0 }}>
+            {w.summary}
+          </p>
+          <dl className="city-today__stats">
+            <div>
+              <dt>Humidity</dt>
+              <dd>{w.humidity}%</dd>
+            </div>
+            <div>
+              <dt>Wind</dt>
+              <dd>{w.windKmh} km/h</dd>
+            </div>
+            <div className={w.uv >= 6 ? 'is-warn' : ''}>
+              <dt>UV</dt>
+              <dd>
+                {w.uv}
+                {w.uv >= 6 ? ' · High' : ''}
+              </dd>
+            </div>
+            <div>
+              <dt>Sunset</dt>
+              <dd>{w.sunset}</dd>
+            </div>
+          </dl>
+          <div className="stack" style={{ gap: 8 }}>
+            <span className="eyebrow muted">{t('city.hourly')}</span>
+            <div className="hscroll city-hours">
+              {w.hourly.map((h, i) => (
+                <div key={h.hour} className={`city-hour${i === 0 ? ' is-now' : ''}`}>
+                  <span className="city-hour__time">{i === 0 ? 'Now' : h.hour}</span>
+                  <WeatherGlyph condition={h.condition} size={26} live={false} title={CONDITION_LABEL[h.condition]} />
+                  <span className="num">{h.temp}°</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <nav aria-label={t('city.quick')} className="city-quick">
         {QUICK.map((q) => (
-          <Link key={q.label} to={q.to} className="city-quick__item glyph-host">
-            <Tile glyph={q.glyph} tone={q.tone} size="lg" />
+          <Link key={q.label} to={q.to} className={`city-quick__item glyph-host tone-${q.tone}`}>
+            <span className="city-quick__icon">
+              <NamedGlyph name={q.glyph} size={24} />
+            </span>
             <span>{q.label}</span>
           </Link>
         ))}
       </nav>
 
+      <section className="section" aria-labelledby="city-map">
+        <SectionHead id="city-map" title={t('city.aroundYou')} to="/city/alerts" />
+        <CityMap pins={pins} home={home} radiusKm={settings.alerts.radiusKm} areaLabel={t('city.nearYou')} onArea={() => navigate('/settings/location')} />
+      </section>
+
       <section className="section" aria-labelledby="city-alerts">
-        <SectionHead id="city-alerts" title={`${t('city.alerts')} · ${alerts.length}`} to="/city/alerts" />
+        <SectionHead id="city-alerts" title={`${t('city.updatesTitle')} · ${alerts.length}`} to="/city/alerts" />
         {alerts.length === 0 ? (
           <p className="notice tone-mint">All quiet near you. No alerts match your settings right now.</p>
         ) : (
@@ -78,70 +194,33 @@ export default function City() {
         )}
       </section>
 
-      <section className="card stack" aria-labelledby="city-weather" style={{ gap: 14 }}>
-        <h2 id="city-weather" className="sr-only">
-          {t('city.weather')}
-        </h2>
-        <div className="row" style={{ gap: 14 }}>
-          <span className="city-wx">
-            <WeatherGlyph condition={w.condition} size={56} title={CONDITION_LABEL[w.condition]} />
+      <section className="card city-card" aria-labelledby="city-air">
+        <div className="city-card__head">
+          <span className="city-card__icon tone-teal">
+            <NamedGlyph name="air" size={22} />
           </span>
-          <div className="stack grow" style={{ gap: 2 }}>
-            <span className="row" style={{ gap: 8, alignItems: 'baseline' }}>
-              <span className="num" style={{ fontSize: '2.25rem', letterSpacing: '-0.04em' }}>
-                {w.temp}°
-              </span>
-              <span className="meta">feels {w.feelsLike}°</span>
-            </span>
-            <span className="strong">{CONDITION_LABEL[w.condition]}</span>
-            <span className="meta">{w.summary}</span>
-          </div>
-        </div>
-        <div className="chip-wrap" aria-label="Today">
-          <span className="badge">
-            H {w.high}° · L {w.low}°
+          <span className="stack grow" style={{ gap: 1, minWidth: 0 }}>
+            <h2 id="city-air" className="section__title">
+              {t('city.air')}
+            </h2>
+            <span className="meta truncate">{pulse.aqi.station}</span>
           </span>
-          <span className="badge">Humidity {w.humidity}%</span>
-          <span className="badge">Wind {w.windKmh} km/h</span>
-          <span className={`badge ${w.uv >= 6 ? 'tone-amber' : ''}`}>UV {w.uv}</span>
-          <span className="badge">Sunset {w.sunset}</span>
-        </div>
-        <div className="stack" style={{ gap: 8 }}>
-          <span className="eyebrow muted">{t('city.hourly')}</span>
-          <div className="hscroll" style={{ gap: 8 }}>
-            {w.hourly.map((h) => (
-              <div key={h.hour} className="city-hour">
-                <span className="meta">{h.hour}</span>
-                <WeatherGlyph condition={h.condition} size={26} live={false} title={CONDITION_LABEL[h.condition]} />
-                <span className="num" style={{ fontSize: '0.9375rem' }}>
-                  {h.temp}°
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="card stack" aria-labelledby="city-air" style={{ gap: 12 }}>
-        <div className="section__head">
-          <h2 id="city-air" className="section__title">
-            {t('city.air')}
-          </h2>
-          <span className="meta">{pulse.aqi.station}</span>
         </div>
         <div className="city-air">
           <AqiDial value={pulse.aqi.value} size={150} />
-          <div className="stack" style={{ gap: 6, minWidth: 0 }}>
+          <div className="stack" style={{ gap: 8, minWidth: 0 }}>
             <span className="badge" style={{ alignSelf: 'flex-start', background: 'color-mix(in srgb, ' + band.color + ' 22%, var(--surface))', color: 'var(--ink)' }}>
               {band.label} · {pulse.aqi.dominant}
             </span>
-            <p className="body-sm">{pulse.aqi.advice}</p>
+            <p className="body-sm" style={{ margin: 0 }}>
+              {pulse.aqi.advice}
+            </p>
           </div>
         </div>
-        <div className="row row--between" style={{ alignItems: 'flex-end' }}>
+        <div className="city-air__trend">
           <span className="stack" style={{ gap: 2 }}>
             <span className="eyebrow muted">Last 7 hours</span>
-            <span className="meta">
+            <span className="strong">
               {trend[0]} → {trend[trend.length - 1]}
             </span>
           </span>
@@ -179,51 +258,50 @@ export default function City() {
         </div>
       </section>
 
-      <section className="card stack" aria-labelledby="city-ward" style={{ gap: 14 }}>
+      <section className="city-ward" aria-labelledby="city-ward">
         <div className="row" style={{ gap: 12 }}>
-          <Tile glyph="report" tone="amber" size="lg" live />
+          <span className="city-ward__icon">
+            <NamedGlyph name="report" size={24} live />
+          </span>
           <div className="stack grow" style={{ gap: 2 }}>
-            <h2 id="city-ward" className="section__title">
-              {t('city.ward')}: {civic.ward}
+            <span className="eyebrow city-ward__eyebrow">{t('city.ward')}</span>
+            <h2 id="city-ward" className="city-ward__title">
+              {civic.ward}
             </h2>
-            <span className="meta">Civic issues reported by neighbours</span>
           </div>
         </div>
-        <div className="stack" style={{ gap: 6 }}>
-          <div className="row row--between">
-            <span className="strong">{civic.resolvedPct}% resolved</span>
-            <span className="meta">{civic.resolvedThisWeek} fixed this week</span>
+        <div className="stack" style={{ gap: 8 }}>
+          <div className="row row--between" style={{ alignItems: 'baseline' }}>
+            <span className="city-ward__big">{civic.resolvedPct}%</span>
+            <span className="city-ward__muted">{civic.resolvedThisWeek} fixed this week</span>
           </div>
-          <div className="progress" role="img" aria-label={`${civic.resolvedPct}% of reports resolved`}>
-            <span style={{ width: `${civic.resolvedPct}%`, background: 'var(--mint-strong)' }} />
+          <div className="city-ward__bar" role="img" aria-label={`${civic.resolvedPct}% of reports resolved`}>
+            <span style={{ width: `${civic.resolvedPct}%` }} />
+          </div>
+          <span className="city-ward__muted">of reports resolved by the ward team</span>
+        </div>
+        <div className="grid-2">
+          <div className="city-ward__stat">
+            <span className="num">{civic.avgDays} days</span>
+            <span>average fix time</span>
+          </div>
+          <div className="city-ward__stat">
+            <span className="num">{civic.open}</span>
+            <span>open reports</span>
           </div>
         </div>
         <div className="grid-2">
-          <div className="city-stat">
-            <span className="num" style={{ fontSize: '1.25rem' }}>
-              {civic.avgDays} days
-            </span>
-            <span className="meta">average fix time</span>
-          </div>
-          <div className="city-stat">
-            <span className="num" style={{ fontSize: '1.25rem' }}>
-              {civic.open}
-            </span>
-            <span className="meta">open reports</span>
-          </div>
-        </div>
-        <div className="grid-2">
-          <Link to="/city/report" className="btn btn--primary">
+          <Link to="/city/report" className="btn btn--lime">
             {t('city.report')}
           </Link>
-          <Link to="/city/reports" className="btn btn--secondary">
+          <Link to="/city/reports" className="btn city-ward__ghost">
             {t('city.trackReports')}
           </Link>
         </div>
       </section>
 
       <section className="section" aria-labelledby="city-parking">
-        <SectionHead id="city-parking" title={t('city.parking')} />
+        <SectionHead id="city-parking" title={t('city.parking')} to="/city/transit" />
         <div className="list">
           {pulse.parking.map((p) => (
             <ParkingRow key={p.id} p={p} />
@@ -232,15 +310,17 @@ export default function City() {
       </section>
 
       {bills.length ? (
-        <Link to="/city/services" className="card row glyph-host" style={{ gap: 12, textDecoration: 'none', color: 'inherit' }}>
-          <Tile glyph="bill" tone="violet" size="lg" />
-          <span className="stack grow" style={{ gap: 2 }}>
+        <Link to="/city/services" className="card city-bills glyph-host">
+          <span className="city-card__icon tone-violet">
+            <NamedGlyph name="bill" size={22} />
+          </span>
+          <span className="stack grow" style={{ gap: 2, minWidth: 0 }}>
             <span className="strong">
               {bills.length} {t('city.bills').toLowerCase()} · {rupees(billTotal)}
             </span>
             <span className="meta">{bills.map((b) => `${b.name} ${b.due?.toLowerCase()}`).join(' · ')}</span>
           </span>
-          <ChevronRightGlyph size={18} style={{ color: 'var(--muted)' }} />
+          <ChevronRightGlyph size={18} style={{ color: 'var(--accent)' }} />
         </Link>
       ) : null}
     </main>

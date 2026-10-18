@@ -3,12 +3,19 @@ import { Link } from 'react-router-dom';
 import { AlertCard } from '../components/cards';
 import { EmptyState, PageHeader } from '../components/ui';
 import { ALERT_KIND_META, ALERTS } from '../data/city';
-import type { AlertKind } from '../data/types';
+import type { AlertKind, CityAlert } from '../data/types';
 import { useT } from '../i18n';
 import { NamedGlyph, SlidersGlyph } from '../icons';
 import { visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
+
+const SEVERITIES: Array<{ id: CityAlert['severity']; one: string; many: string }> = [
+  { id: 'critical', one: 'critical', many: 'critical' },
+  { id: 'warning', one: 'warning', many: 'warnings' },
+  { id: 'advisory', one: 'advisory', many: 'advisories' },
+  { id: 'info', one: 'for info', many: 'for info' },
+];
 
 export default function Alerts() {
   const t = useT();
@@ -35,15 +42,29 @@ export default function Alerts() {
         }
       />
       <main className="page page--with-header">
+        {visible.length ? (
+          <div className="alerts-summary" aria-label="Alerts by severity">
+            {SEVERITIES.map((sv) => {
+              const n = visible.filter((a) => a.severity === sv.id).length;
+              return n ? (
+                <span key={sv.id} className={`alerts-summary__item is-${sv.id}`}>
+                  <span className="alerts-summary__dot" aria-hidden="true" />
+                  <b>{n}</b> {n === 1 ? sv.one : sv.many}
+                </span>
+              ) : null;
+            })}
+          </div>
+        ) : null}
+
         <div className="chip-row" role="group" aria-label="Filter alerts by type">
-          <button type="button" className="chip" aria-pressed={kind === 'all'} onClick={() => setKind('all')}>
+          <button type="button" className="chip city-chip" aria-pressed={kind === 'all'} onClick={() => setKind('all')}>
             {t('city.all')} {visible.length}
           </button>
           {kinds.map((k) => {
             const n = visible.filter((a) => a.kind === k).length;
             return (
-              <button key={k} type="button" className="chip" aria-pressed={kind === k} onClick={() => setKind(k)}>
-                <NamedGlyph name={ALERT_KIND_META[k].glyph} size={16} />
+              <button key={k} type="button" className="chip city-chip" aria-pressed={kind === k} onClick={() => setKind(k)}>
+                <NamedGlyph name={ALERT_KIND_META[k].glyph} size={17} />
                 {ALERT_KIND_META[k].label}
                 {n ? <span className="meta" style={{ color: 'inherit', opacity: 0.75 }}>{n}</span> : null}
               </button>

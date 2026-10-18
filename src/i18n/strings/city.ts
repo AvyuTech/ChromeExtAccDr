@@ -2,6 +2,12 @@ import type { Dict } from '../types';
 
 export const city: Dict = {
   'city.title': { en: 'City pulse', gu: 'શહેરની નાડી', hi: 'शहर की नब्ज़' },
+  'city.eyebrow': { en: 'City pulse · {city}', gu: 'શહેરની નાડી · {city}', hi: 'शहर की नब्ज़ · {city}' },
+  'city.headline': { en: 'Your city, right now.', gu: 'તમારું શહેર, અત્યારે.', hi: 'आपका शहर, अभी।' },
+  'city.every': { en: 'updates every 20 s', gu: 'દર 20 સેકન્ડે અપડેટ', hi: 'हर 20 सेकंड में अपडेट' },
+  'city.aroundYou': { en: 'Around you right now', gu: 'અત્યારે તમારી આસપાસ', hi: 'अभी आपके आस-पास' },
+  'city.nearYou': { en: 'Near you', gu: 'તમારી નજીક', hi: 'आपके पास' },
+  'city.updatesTitle': { en: 'City updates', gu: 'શહેર અપડેટ્સ', hi: 'शहर अपडेट' },
   'city.live': { en: 'Live', gu: 'લાઇવ', hi: 'लाइव' },
   'city.paused': { en: 'Paused · Data saver', gu: 'થોભાવ્યું · ડેટા સેવર', hi: 'रुका हुआ · डेटा सेवर' },
   'city.weather': { en: 'Weather', gu: 'હવામાન', hi: 'मौसम' },
