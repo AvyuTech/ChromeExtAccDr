@@ -1,15 +1,15 @@
 import { Link, useParams } from 'react-router-dom';
 import { eventPhoto } from '../assets/photos';
 import { EventTile, SourceChips } from '../components/cards';
-import { DetailHero, downloadEventIcs, useShare } from '../components/discover';
-import { AvatarStack, WantButton } from '../components/friends';
+import { downloadEventIcs, IconAction, ProfileHead, useShare } from '../components/discover';
+import { AvatarStack } from '../components/friends';
 import { person } from '../data/core';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { EVENTS, eventById } from '../data/events';
 import { useT } from '../i18n';
-import { AlertGlyph, FriendsGlyph, CalendarGlyph, CheckGlyph, EyeGlyph, LockGlyph, PinGlyph, RupeeGlyph, ShareGlyph, StarGlyph, TrustRing, UsersGlyph } from '../icons';
+import { AlertGlyph, FriendsGlyph, CalendarGlyph, CheckGlyph, EyeGlyph, LockGlyph, NavigateGlyph, ShareGlyph, StarGlyph, TrustRing, UsersGlyph, WantGlyph } from '../icons';
 import { compact, price } from '../lib/format';
-import { allCheckIns, profileInfo } from '../lib/friends';
+import { allCheckIns, isWanted, profileInfo } from '../lib/friends';
 import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
@@ -34,7 +34,7 @@ export default function EventDetail() {
   const toast = useToast();
   const share = useShare();
   const { settings } = useSettings();
-  const { data, has, toggle } = useAppData();
+  const { data, has, toggle, toggleWant } = useAppData();
   const event = eventById(id);
 
   if (!event) {
@@ -73,6 +73,9 @@ export default function EventDetail() {
       profileInfo(fid).wantToTry.some((w) => w.refId === event.id && !w.done) ||
       allCheckIns(data).some((c) => c.authorId === fid && c.eventId === event.id),
   );
+  const wantItem = { id: `w-event-${event.id}`, kind: 'event' as const, refId: event.id, title: event.title, sub: `${event.day}, ${event.time}` };
+  const wanted = isWanted(data, wantItem);
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.venue}, ${event.area}, Ahmedabad`)}`;
   const firstNames = friendIds.map((fid) => person(fid).name.split(' ')[0]);
   const friendsText =
     firstNames.length === 0
@@ -83,141 +86,128 @@ export default function EventDetail() {
     <>
       <PageHeader title={event.title} fallback="/explore/events" />
       <main className="page page--with-header">
-        <DetailHero
-          tone={event.tone}
-          glyph={event.glyph}
-          src={eventPhoto(event.id)}
-          height={268}
-          badge={eventPhoto(event.id) ? undefined : `${event.day.toUpperCase()} · ${startTime.toUpperCase()}`}
-        >
-          {eventPhoto(event.id) ? (
+        <ProfileHead
+          cover={eventPhoto(event.id)}
+          coverBadge={
+            event.day === 'Today' ? (
+              <span className="hero-chip hero-chip--lime" style={{ position: 'absolute', top: 12, left: 'var(--gutter)', zIndex: 1 }}>
+                Tonight · {startTime}
+              </span>
+            ) : undefined
+          }
+          tone={event.tone === 'night' ? 'violet' : event.tone}
+          icon={
+            <span className="profile-head__date" aria-hidden="true">
+              <b>{event.day === 'Sat–Sun' ? 'Sat' : event.day}</b>
+              <span>{startTime}</span>
+            </span>
+          }
+          stats={[
+            { value: compact(goingCount), label: t('discover.stat.going'), tone: 'mint' as const },
+            { value: compact(interestedCount), label: t('discover.stat.interested') },
+            { value: price(event.price), label: t('discover.stat.entry') },
+          ]}
+          title={event.title}
+          sub={
             <>
-              <span className={`hero-chip ${event.day === 'Today' ? 'hero-chip--lime' : ''}`} style={{ position: 'absolute', top: 14, left: 14, zIndex: 1 }}>
-                {event.day === 'Today' ? 'Tonight' : event.day} · {startTime}
-              </span>
-              <span className="hero-chips">
-                <span className="hero-chip hero-chip--ink">
-                  <UsersGlyph size={14} />
-                  {compact(goingCount)} going
-                </span>
-                <span className="hero-chip">{price(event.price)}</span>
-              </span>
+              {CATEGORY_LABEL[event.category] ?? event.category} · {when}
             </>
-          ) : null}
-        </DetailHero>
+          }
+        >
+          <p className="profile-head__sub" style={{ fontWeight: 500 }}>
+            {event.venue}, {event.area} · {event.distanceKm} km away
+            {soldOutSoon ? <b style={{ color: 'var(--peach-ink)' }}> · {event.seatsLeft} seats left</b> : null}
+          </p>
+          <p className="origin-line" style={{ cursor: 'default' }}>
+            <UsersGlyph size={14} />
+            <span className="grow">{t('discover.event.organisedBy', { name: event.organiser })}</span>
+          </p>
+        </ProfileHead>
 
-        <div className="stack detail-head" style={{ gap: 10 }}>
-          <span className="eyebrow muted">
-            {CATEGORY_LABEL[event.category] ?? event.category} · {event.area}
-          </span>
-          <h1 className="detail-title">{event.title}</h1>
-          <ul className="fact-list">
-            <li>
-              <span className="tile tone-violet">
-                <CalendarGlyph size={14} />
-              </span>
-              <span>
-                <b>{when}</b>
-              </span>
-            </li>
-            <li>
-              <span className="tile tone-violet">
-                <PinGlyph size={14} />
-              </span>
-              <span>
-                {event.venue}, {event.area} · {event.distanceKm} km away
-              </span>
-            </li>
-            <li>
-              <span className="tile tone-violet">
-                <RupeeGlyph size={14} />
-              </span>
-              <span>
-                {price(event.price)}
-                {soldOutSoon ? ` · ${event.seatsLeft} seats left` : ''}
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        {event.confirmed ? (
-          <div className="grid-2">
-            <button
-              type="button"
-              className={`btn btn--lg ${going ? 'btn--mint' : 'btn--primary'}`}
-              aria-pressed={going}
+        <nav className="icon-row" aria-label={t('discover.event.actions')}>
+          {event.confirmed ? (
+            <IconAction
+              primary
+              pressed={going}
               onClick={() => {
                 const on = toggle('going', event.id);
                 toast(on ? `You're going to ${event.title}` : 'Marked as not going');
               }}
-            >
-              {going ? <CheckGlyph size={18} /> : <UsersGlyph size={18} />}
-              {t('discover.event.going')}
-            </button>
-            <button type="button" className="btn btn--lg btn--secondary" aria-pressed={interested} onClick={() => toggle('interested', event.id)}>
-              <StarGlyph size={16} style={{ color: interested ? 'var(--accent)' : 'var(--faint)' }} />
-              {t('discover.event.interested')}
-            </button>
-          </div>
-        ) : (
-          <button type="button" className="btn btn--lg btn--secondary btn--block" aria-pressed={interested} onClick={() => toggle('interested', event.id)}>
-            <StarGlyph size={16} style={{ color: interested ? 'var(--accent)' : 'var(--faint)' }} />
-            {interested ? 'We’ll tell you when it’s confirmed' : 'Notify me when confirmed'}
-          </button>
-        )}
+              icon={going ? <CheckGlyph size={18} /> : <UsersGlyph size={18} />}
+              label={t('discover.action.going')}
+              ariaLabel={t('discover.event.going')}
+            />
+          ) : null}
+          <IconAction
+            pressed={interested}
+            onClick={() => toggle('interested', event.id)}
+            icon={<StarGlyph size={18} />}
+            label={event.confirmed ? t('discover.action.interested') : interested ? 'Notifying' : 'Notify me'}
+            ariaLabel={event.confirmed ? t('discover.event.interested') : interested ? 'We’ll tell you when it’s confirmed' : 'Notify me when confirmed'}
+          />
+          <IconAction
+            pressed={wanted}
+            onClick={() => {
+              const added = toggleWant(wantItem);
+              toast(added ? `Added "${event.title}" to Want to try` : 'Removed from Want to try');
+            }}
+            icon={<WantGlyph size={18} active={wanted} />}
+            label={t('discover.action.want')}
+            ariaLabel={wanted ? 'On your Want to try list' : 'Add to Want to try'}
+          />
+          <IconAction
+            onClick={() => toast(downloadEventIcs(event) ? 'Calendar file downloaded' : 'Could not create a calendar file')}
+            icon={<CalendarGlyph size={18} />}
+            label={t('discover.action.calendar')}
+            ariaLabel={t('discover.event.calendar')}
+          />
+          <IconAction href={mapsUrl} icon={<NavigateGlyph size={18} />} label={t('discover.action.directions')} />
+          <IconAction onClick={() => share(event.title, `/event/${event.id}`)} icon={<ShareGlyph size={17} />} label={t('common.share')} />
+        </nav>
 
-        <div className="stack" style={{ gap: 6 }}>
-          <span className="meta" style={{ fontSize: '0.875rem' }}>
-            <b style={{ color: 'var(--mint-ink)' }}>{compact(goingCount)} going</b> · {compact(interestedCount)} interested
+        <Link to="/settings/privacy" className="row meta" style={{ gap: 6, textDecoration: 'none', marginTop: -2 }}>
+          {settings.privacy.showGoing ? <EyeGlyph size={13} /> : <LockGlyph size={13} />}
+          <span>
+            {settings.privacy.showGoing ? 'Neighbours can see your RSVP.' : 'Your RSVP is private.'}{' '}
+            <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Change</span>
           </span>
-          <Link to="/settings/privacy" className="row meta" style={{ gap: 6, textDecoration: 'none' }}>
-            {settings.privacy.showGoing ? <EyeGlyph size={14} /> : <LockGlyph size={14} />}
-            <span>
-              {settings.privacy.showGoing ? 'Neighbours can see your RSVP.' : 'Your RSVP is private.'}{' '}
-              <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Change</span>
-            </span>
-          </Link>
-        </div>
+        </Link>
 
-        <section className="card card--tight friends-going" aria-label={t('community.friendsInterested')}>
+        <section className="friends-going" aria-label={t('community.friendsInterested')}>
           {friendIds.length ? (
-            <AvatarStack ids={friendIds} size={30} />
+            <AvatarStack ids={friendIds} size={26} />
           ) : (
-            <span className="tile tone-violet">
-              <FriendsGlyph size={20} duo />
+            <span className="tile tone-violet" style={{ width: 30, height: 30, borderRadius: 15 }}>
+              <FriendsGlyph size={16} duo />
             </span>
           )}
           <span className="grow body-sm" style={{ minWidth: 0 }}>
             {friendsText}
           </span>
-          <WantButton item={{ id: `w-event-${event.id}`, kind: 'event', refId: event.id, title: event.title, sub: `${event.day}, ${event.time}` }} />
         </section>
 
-        <div className="grid-2">
-          <button
-            type="button"
-            className="btn btn--outline"
-            onClick={() => toast(downloadEventIcs(event) ? 'Calendar file downloaded' : 'Could not create a calendar file')}
-          >
-            <CalendarGlyph size={18} />
-            {t('discover.event.calendar')}
-          </button>
-          <button type="button" className="btn btn--outline" onClick={() => share(event.title, `/event/${event.id}`)}>
-            <ShareGlyph size={18} />
-            {t('common.share')}
-          </button>
-        </div>
+        <section className="dsec" aria-labelledby="about-title" style={{ borderTop: 'none', paddingTop: 0 }}>
+          <h2 className="section__title" id="about-title">
+            {t('discover.event.about')}
+          </h2>
+          <p className="body">{event.description}</p>
+          <div className="chip-wrap" style={{ gap: 6 }}>
+            {event.tags.map((tag) => (
+              <Link key={tag} to={`/ask?q=${encodeURIComponent(`${tag} events this weekend`)}`} className="chip" style={{ height: 28, padding: '0 11px', fontSize: '0.75rem' }}>
+                {tag}
+              </Link>
+            ))}
+          </div>
+        </section>
 
-        <section className="card stack" aria-labelledby="trust-title" style={event.confirmed ? undefined : { borderStyle: 'dashed', borderColor: 'var(--amber-line)' }}>
-          <div className="row" style={{ gap: 12 }}>
-            <TrustRing agree={agree} size={44} />
-            <div className="stack grow" style={{ gap: 2 }}>
-              <h2 className="section__title" id="trust-title" style={{ fontSize: '1rem' }}>
+        <section className="dsec" aria-labelledby="trust-title">
+          <div className="row" style={{ gap: 10 }}>
+            <TrustRing agree={agree} size={36} />
+            <div className="stack grow" style={{ gap: 0 }}>
+              <h2 className="section__title" id="trust-title" style={{ fontSize: '0.9375rem' }}>
                 {t('discover.event.trust')}
               </h2>
-              <span className="meta">
-                {event.confirmed ? t('answer.sourcesAgree', { n: sources.length }) : 'Seen in only one place so far'}
-              </span>
+              <span className="meta">{event.confirmed ? t('answer.sourcesAgree', { n: sources.length }) : 'Seen in only one place so far'}</span>
             </div>
           </div>
           {!event.confirmed ? (
@@ -229,23 +219,8 @@ export default function EventDetail() {
           <SourceChips sources={sources} label="Seen on" />
         </section>
 
-        <section className="card stack" aria-labelledby="about-title">
-          <h2 className="section__title" id="about-title">
-            {t('discover.event.about')}
-          </h2>
-          <p className="body">{event.description}</p>
-          <span className="meta">Organiser: {event.organiser}</span>
-          <div className="chip-wrap">
-            {event.tags.map((tag) => (
-              <Link key={tag} to={`/ask?q=${encodeURIComponent(`${tag} events this weekend`)}`} className="chip" style={{ height: 32, fontSize: '0.8125rem' }}>
-                {tag}
-              </Link>
-            ))}
-          </div>
-        </section>
-
         {similar.length ? (
-          <section className="section" aria-labelledby="similar-title">
+          <section className="dsec" aria-labelledby="similar-title">
             <SectionHead id="similar-title" title={t('discover.event.similar')} to="/explore/events" />
             <div className="hscroll">
               {similar.map((e) => (

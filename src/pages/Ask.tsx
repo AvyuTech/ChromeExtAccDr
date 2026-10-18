@@ -163,7 +163,7 @@ export default function Ask() {
           <BackGlyph size={20} />
         </button>
         <label className="ask-bar" htmlFor="ask-q">
-          <SparkGlyph size={20} thinking={thinking} />
+          <SparkGlyph size={18} thinking={thinking} />
           <input
             id="ask-q"
             type="text"
@@ -180,7 +180,7 @@ export default function Ask() {
             </button>
           ) : null}
           <button type="submit" className="ask-bar__go" aria-label={t('common.search')}>
-            <ArrowRightGlyph size={18} />
+            <ArrowRightGlyph size={17} />
           </button>
         </label>
       </form>
@@ -191,7 +191,7 @@ export default function Ask() {
             <span className="eyebrow muted">{t('discover.ask.eyebrow', { city: settings.location.city })}</span>
             <h1 className="hero-title">
               {t('discover.ask.headline')}
-              <SparkleMark size={24} className="hero-title__spark" />
+              <SparkleMark size={20} className="hero-title__spark" />
             </h1>
             <p className="body-sm muted" style={{ margin: 0 }}>
               {t('discover.ask.intro')}
@@ -210,8 +210,8 @@ export default function Ask() {
               <div className="list">
                 {data.recentSearches.map((s) => (
                   <button key={s} type="button" className="list-row" onClick={() => go(s)}>
-                    <span className="tile tone-violet" style={{ width: 32, height: 32, borderRadius: 10 }}>
-                      <ClockGlyph size={17} />
+                    <span className="tile tone-violet" style={{ width: 30, height: 30, borderRadius: 10 }}>
+                      <ClockGlyph size={15} />
                     </span>
                     <span className="list-row__body">
                       <span className="list-row__title" style={{ fontWeight: 500 }}>
@@ -233,10 +233,10 @@ export default function Ask() {
                 return (
                   <button key={s} type="button" className="ask-prompt glyph-host" onClick={() => go(s)}>
                     <span className={`tile tone-${look.tone}`}>
-                      <NamedGlyph name={look.glyph} size={20} duo />
+                      <NamedGlyph name={look.glyph} size={17} duo />
                     </span>
                     <span className="ask-prompt__text">{s}</span>
-                    <ArrowRightGlyph size={16} />
+                    <ArrowRightGlyph size={15} />
                   </button>
                 );
               })}
@@ -262,8 +262,8 @@ export default function Ask() {
           {thinking ? (
             <section className="answer-card ask-thinking" aria-busy="true" aria-label={t('discover.ask.thinking')}>
               <div className="row" style={{ gap: 8 }}>
-                <span className="tile tone-solid" style={{ width: 34, height: 34, borderRadius: 11 }}>
-                  <SparkGlyph size={18} thinking />
+                <span className="tile tone-solid" style={{ width: 30, height: 30, borderRadius: 10 }}>
+                  <SparkGlyph size={16} thinking />
                 </span>
                 <span className="display strong" style={{ fontSize: '0.9375rem' }}>
                   {t('answer.label')}

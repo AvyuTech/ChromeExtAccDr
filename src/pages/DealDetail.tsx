@@ -56,7 +56,7 @@ export default function DealDetail() {
       <PageHeader title={deal.merchant} fallback="/deals" actions={<ShareButton title={`${deal.title} at ${deal.merchant}`} path={`/deals/${deal.id}`} />} />
       <main className="page page--with-header">
         {photoSrc ? (
-          <DetailHero tone={deal.tone} glyph={deal.glyph} src={photoSrc} height={236}>
+          <DetailHero tone={deal.tone} glyph={deal.glyph} src={photoSrc} height={260}>
             <span className="deal-burst" aria-hidden="true">
               {deal.discount}
             </span>
@@ -70,32 +70,33 @@ export default function DealDetail() {
           </section>
         )}
 
-        <div className="stack detail-head" style={{ gap: 8 }}>
+        <div className="detail-head">
           <span className="eyebrow" style={{ color: 'var(--accent)' }}>
             {t('home.deal')} · {deal.ends}
           </span>
           <h1 className="detail-title">{deal.title}</h1>
-          <span className="meta" style={{ fontSize: '0.875rem' }}>
+          <p className="detail-facts">
             {place ? (
-              <Link to={`/place/${place.id}`} style={{ fontWeight: 700, color: 'var(--accent)', textDecoration: 'none' }}>
+              <Link to={`/place/${place.id}`} className="detail-facts__accent">
                 {deal.merchant}
               </Link>
             ) : (
-              deal.merchant
+              <span>{deal.merchant}</span>
             )}
-            {deal.merchant.includes(deal.area) ? '' : ` · ${deal.area}`} · {km(deal.distanceKm)}
-          </span>
-          <span className="row row--wrap" style={{ gap: 6, marginTop: 2 }}>
-            <span className="badge" style={{ gap: 5 }}>
+            {deal.merchant.includes(deal.area) ? null : <span>{deal.area}</span>}
+            <span>{km(deal.distanceKm)}</span>
+          </p>
+          <p className="detail-facts" style={{ marginTop: 0 }}>
+            <span className="row" style={{ gap: 4 }}>
               <ClockGlyph size={13} />
               {deal.ends}
             </span>
-            <span className="badge tone-mint" style={{ gap: 5 }}>
+            <span className="row" style={{ gap: 4, color: 'var(--mint-ink)' }}>
               <UsersGlyph size={13} />
               {compact(deal.claimedBy + (claimed ? 1 : 0))} claimed
             </span>
-            {deal.code ? <span className="badge">Code at checkout</span> : <span className="badge">No code needed</span>}
-          </span>
+            <span>{deal.code ? 'Code at checkout' : 'No code needed'}</span>
+          </p>
         </div>
 
         {claimed ? (
@@ -126,7 +127,7 @@ export default function DealDetail() {
         ) : (
           <button
             type="button"
-            className="btn btn--primary btn--lg btn--block"
+            className="btn btn--primary btn--block"
             onClick={() => {
               add('claimedDeals', deal.id);
               toast('Deal claimed');
@@ -136,7 +137,7 @@ export default function DealDetail() {
           </button>
         )}
 
-        <section className="card stack" aria-labelledby="terms-title">
+        <section className="dsec" aria-labelledby="terms-title">
           <h2 className="section__title" id="terms-title">
             {t('discover.deals.terms')}
           </h2>
@@ -153,7 +154,7 @@ export default function DealDetail() {
         </section>
 
         {place ? (
-          <section className="section" aria-labelledby="where-title">
+          <section className="dsec" aria-labelledby="where-title">
             <SectionHead id="where-title" title="Where" />
             <div className="list">
               <PlaceRow place={place} last />

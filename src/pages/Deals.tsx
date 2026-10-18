@@ -7,7 +7,7 @@ import { neighbourhoodName } from '../data/core';
 import { DEALS } from '../data/social';
 import type { Deal } from '../data/types';
 import { useT } from '../i18n';
-import { CheckGlyph, ClockGlyph, PinGlyph, SparkleMark, UsersGlyph } from '../icons';
+import { CheckGlyph, ClockGlyph, SparkleMark, UsersGlyph } from '../icons';
 import { compact, km } from '../lib/format';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
@@ -39,52 +39,51 @@ export function DealTile({ deal }: { deal: Deal }) {
   const { has, add } = useAppData();
   const claimed = has('claimedDeals', deal.id);
   return (
-    <article className="card deal-tile">
-      <Link to={`/deals/${deal.id}`} className="deal-tile__top glyph-host">
-        <Cover src={dealPhoto(deal)} glyph={deal.glyph} tone={deal.tone} className="deal-tile__thumb">
+    <article className="deal-row">
+      <Link to={`/deals/${deal.id}`} className="deal-row__main glyph-host">
+        <Cover src={dealPhoto(deal)} glyph={deal.glyph} tone={deal.tone} className="deal-row__thumb">
           <span className="deal-ribbon">{deal.discount}</span>
         </Cover>
-        <span className="stack grow" style={{ gap: 5, minWidth: 0 }}>
-          <span className="eyebrow" style={{ color: 'var(--accent)' }}>
+        <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
+          <span className="eyebrow" style={{ color: 'var(--accent)', fontSize: '0.625rem' }}>
             {CATEGORY_LABEL[deal.category]}
           </span>
-          <span className="deal-tile__title">{deal.title}</span>
-          <span className="meta row" style={{ gap: 4 }}>
-            <PinGlyph size={12} />
-            <span className="truncate">{deal.merchant.includes(deal.area) ? deal.merchant : `${deal.merchant} · ${deal.area}`}</span>
-            <span style={{ flexShrink: 0 }}>· {km(deal.distanceKm)}</span>
+          <span className="deal-row__title">{deal.title}</span>
+          <span className="deal-row__meta">
+            <span className="truncate" style={{ display: 'block', maxWidth: '100%' }}>
+              {deal.merchant.includes(deal.area) ? deal.merchant : `${deal.merchant} · ${deal.area}`} · {km(deal.distanceKm)}
+            </span>
+          </span>
+          <span className="deal-row__meta">
+            <span>
+              <ClockGlyph size={12} />
+              {deal.ends}
+            </span>
+            <span>
+              <UsersGlyph size={12} />
+              {compact(deal.claimedBy + (claimed ? 1 : 0))}
+            </span>
           </span>
         </span>
       </Link>
-      <div className="row deal-tile__foot" style={{ gap: 8 }}>
-        <span className="meta row grow" style={{ gap: 10 }}>
-          <span className="row" style={{ gap: 4 }}>
-            <ClockGlyph size={13} />
-            {deal.ends}
-          </span>
-          <span className="row" style={{ gap: 4 }}>
-            <UsersGlyph size={13} />
-            {compact(deal.claimedBy + (claimed ? 1 : 0))}
-          </span>
-        </span>
-        {claimed ? (
-          <Link to={`/deals/${deal.id}`} className="btn btn--sm btn--secondary">
-            <CheckGlyph size={15} />
-            {t('discover.deals.claimed')}
-          </Link>
-        ) : (
-          <button
-            type="button"
-            className="btn btn--sm btn--primary"
-            onClick={() => {
-              add('claimedDeals', deal.id);
-              toast(deal.code ? 'Deal claimed. Your code is ready' : 'Deal claimed', { label: 'View', onClick: () => navigate(`/deals/${deal.id}`) });
-            }}
-          >
-            {t('discover.deals.claim')}
-          </button>
-        )}
-      </div>
+      {claimed ? (
+        <Link to={`/deals/${deal.id}`} className="btn btn--sm btn--secondary" aria-label={`${t('discover.deals.claimed')}: ${deal.title}`}>
+          <CheckGlyph size={14} />
+          {t('discover.deals.claimed')}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          className="btn btn--sm btn--primary"
+          aria-label={`${t('discover.deals.claim')}: ${deal.title}`}
+          onClick={() => {
+            add('claimedDeals', deal.id);
+            toast(deal.code ? 'Deal claimed. Your code is ready' : 'Deal claimed', { label: 'View', onClick: () => navigate(`/deals/${deal.id}`) });
+          }}
+        >
+          {t('discover.deals.claim')}
+        </button>
+      )}
     </article>
   );
 }
@@ -102,9 +101,9 @@ export default function Deals() {
       <main className="page page--with-header">
         <div className="page-intro">
           <span className="eyebrow muted">{t('discover.deals.eyebrow', { n: DEALS.length, area: neighbourhoodName(settings.location.home) })}</span>
-          <h2 className="hero-title" style={{ fontSize: '1.75rem' }}>
+          <h2 className="hero-title" style={{ fontSize: '1.5rem' }}>
             {t('discover.deals.headline')}
-            <SparkleMark size={22} className="hero-title__spark" />
+            <SparkleMark size={19} className="hero-title__spark" />
           </h2>
         </div>
         <div className="chip-row" role="group" aria-label="Filter deals">
@@ -115,7 +114,7 @@ export default function Deals() {
           ))}
         </div>
         {list.length ? (
-          <div className="stack">
+          <div className="deal-list">
             {list.map((d) => (
               <DealTile key={d.id} deal={d} />
             ))}

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { groupPhoto } from '../assets/photos';
 import { EMERGENCY, FACILITIES, ISSUE_TYPES, REPORT_STEPS, reportById, SERVICES } from '../data/city';
@@ -6,18 +7,21 @@ import { eventById } from '../data/events';
 import { placeById } from '../data/places';
 import { dealById, groupById, postById } from '../data/social';
 import { alertById } from '../data/city';
-import type { CityEvent, CityPulse, Corridor, Group, Tone, TransitArrival } from '../data/types';
-import { ChevronRightGlyph, CountdownRing, NamedGlyph, PhoneGlyph, TrafficGlyph } from '../icons';
+import type { CityEvent, CityPulse, Corridor, Group, Place, Tone, TransitArrival } from '../data/types';
+import { CheckGlyph, ChevronRightGlyph, CountdownRing, NamedGlyph, PhoneGlyph, ShieldGlyph, TrafficGlyph, UsersGlyph } from '../icons';
 import { TRAFFIC_LABEL } from '../icons/live';
 import type { ResultRef } from '../lib/askEngine';
 import { compact, km, rupees } from '../lib/format';
-import { AlertCard, Cover, DealCard, EventRow, GroupRow, PlaceRow, PostCard } from './cards';
+import { placeOrigin } from '../lib/places';
+import { person } from '../data/core';
+import { collectionById } from '../data/friends';
+import { AlertCard, Avatar, Cover, DealCard, EventRow, GroupRow, PlaceRow, PostCard } from './cards';
 import { CheckInCard } from './friends';
 import { checkInById } from '../data/friends';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
 import { useT } from '../i18n';
-import { LinkRow, Tile } from './ui';
+import { LinkRow, Sheet, Tile } from './ui';
 
 /* ---------- Rows for live city results ---------- */
 
@@ -181,7 +185,7 @@ function renderCard(ref: ResultRef): ReactNode {
   }
 }
 
-/** Renders a mixed list of results: list-style rows are grouped into one rounded list per run. */
+/** Renders a mixed list of results: list-style rows are grouped into one flat list per run. */
 export function ResultList({ refs, pulse }: { refs: ResultRef[]; pulse: CityPulse }) {
   const blocks: ReactNode[] = [];
   let i = 0;
@@ -200,7 +204,7 @@ export function ResultList({ refs, pulse }: { refs: ResultRef[]; pulse: CityPuls
       i++;
     }
   }
-  return <div className="stack">{blocks}</div>;
+  return <div className="results">{blocks}</div>;
 }
 
 /* ---------- Groups ---------- */
@@ -232,11 +236,13 @@ export function GroupCard({ group, compact: small }: { group: Group; compact?: b
   );
   if (small) {
     return (
-      <div className="card group-row">
+      <div className="group-row">
         <Link to={`/groups/${group.id}`} className="group-row__link">
           <Cover src={src} glyph={group.glyph} tone={group.tone} className="group-row__thumb" />
           <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
-            <span className="group-card__name">{group.name}</span>
+            <span className="group-card__name" style={{ fontSize: '0.9063rem' }}>
+              {group.name}
+            </span>
             {meta}
           </span>
         </Link>
@@ -245,23 +251,22 @@ export function GroupCard({ group, compact: small }: { group: Group; compact?: b
     );
   }
   return (
-    <article className="card group-card">
+    <article className="group-card">
       <Link to={`/groups/${group.id}`} className="group-card__link">
         <Cover src={src} glyph={group.glyph} tone={group.tone} className="group-card__media">
           <span className="group-card__mark">
             <NamedGlyph name={group.glyph} size={20} />
           </span>
         </Cover>
-        <span className="group-card__body">
-          <span className="group-card__name">{group.name}</span>
-          {meta}
-          <span className="body-sm group-card__desc">{group.description}</span>
-        </span>
       </Link>
       <div className="group-card__foot">
-        <span className="meta grow">{group.area}</span>
+        <Link to={`/groups/${group.id}`} className="group-card__body grow" style={{ color: 'inherit', textDecoration: 'none', minWidth: 0 }}>
+          <span className="group-card__name">{group.name}</span>
+          {meta}
+        </Link>
         {join}
       </div>
+      <span className="body-sm group-card__desc">{group.description}</span>
     </article>
   );
 }
@@ -336,8 +341,8 @@ export function downloadEventIcs(e: CityEvent): boolean {
 }
 
 /**
- * Top-of-page hero for places, events, deals and groups. With a photo it is a
- * rounded photo card with a soft scrim; without one, a tinted panel with the glyph.
+ * Top-of-page hero for places, events, deals and groups. With a photo it runs
+ * edge to edge with a soft scrim; without one, a tinted panel with the glyph.
  */
 export function DetailHero({
   tone,
@@ -359,7 +364,7 @@ export function DetailHero({
       <div className="detail-hero detail-hero--photo" style={height ? { height } : undefined}>
         <img src={src} alt="" />
         {badge ? (
-          <span className="photo-pill" style={{ top: 14, left: 14 }}>
+          <span className="photo-pill" style={{ top: 12, left: 'var(--gutter)' }}>
             {badge}
           </span>
         ) : null}
@@ -392,4 +397,262 @@ export function useShare() {
       if ((err as DOMException)?.name !== 'AbortError') toast('Could not share right now');
     }
   };
+}
+
+/* ---------- Profile-style head: cover, round icon, stats ---------- */
+
+export interface HeadStat {
+  value: ReactNode;
+  label: string;
+  tone?: 'mint';
+}
+
+/**
+ * The top of a place, event or group page: the cover runs edge to edge, a round
+ * icon overlaps its lower edge with a few numbers beside it, then the name.
+ */
+export function ProfileHead({
+  cover,
+  coverBadge,
+  icon,
+  tone,
+  stats,
+  eyebrow,
+  title,
+  sub,
+  children,
+}: {
+  cover?: string;
+  coverBadge?: ReactNode;
+  icon: ReactNode;
+  tone: Tone;
+  stats?: HeadStat[];
+  eyebrow?: ReactNode;
+  title: string;
+  sub?: ReactNode;
+  children?: ReactNode;
+}) {
+  return (
+    <>
+      {cover ? (
+        <div className="detail-hero detail-hero--photo profile-cover">
+          <img src={cover} alt="" />
+          {coverBadge}
+        </div>
+      ) : (
+        <div className={`profile-cover profile-cover--plain tone-${tone}`} aria-hidden="true" />
+      )}
+      <section className="profile-head" aria-label={title}>
+        <div className="profile-head__top">
+          <span className={`profile-head__icon tone-${tone}`}>{icon}</span>
+          {stats?.length ? (
+            <dl className="profile-head__stats">
+              {stats.map((st) => (
+                <div key={st.label} className={st.tone ? `is-${st.tone}` : undefined}>
+                  <dt>{st.label}</dt>
+                  <dd>{st.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+        </div>
+        {eyebrow ? <span className="eyebrow muted">{eyebrow}</span> : null}
+        <h1 className="profile-head__title">{title}</h1>
+        {sub ? <p className="profile-head__sub">{sub}</p> : null}
+        {children}
+      </section>
+    </>
+  );
+}
+
+/** One round outline icon with a tiny label. `primary` fills it violet. */
+export function IconAction({
+  icon,
+  label,
+  onClick,
+  to,
+  href,
+  pressed,
+  primary,
+  ariaLabel,
+}: {
+  icon: ReactNode;
+  label: string;
+  onClick?: () => void;
+  to?: string;
+  href?: string;
+  pressed?: boolean;
+  primary?: boolean;
+  ariaLabel?: string;
+}) {
+  const cls = `icon-action${primary ? ' icon-action--primary' : ''}`;
+  const inner = (
+    <>
+      <span className="icon-action__icon">{icon}</span>
+      <span className="icon-action__label">{label}</span>
+    </>
+  );
+  if (to)
+    return (
+      <Link to={to} className={cls} aria-label={ariaLabel}>
+        {inner}
+      </Link>
+    );
+  if (href)
+    return (
+      <a href={href} className={cls} target="_blank" rel="noopener noreferrer" aria-label={ariaLabel}>
+        {inner}
+      </a>
+    );
+  return (
+    <button type="button" className={cls} aria-pressed={pressed} aria-label={ariaLabel} onClick={onClick}>
+      {inner}
+    </button>
+  );
+}
+
+/* ---------- Where a place came from, and claiming it ---------- */
+
+const ORIGIN_RULES = [
+  'People add places when they check in. Nothing is imported or bought.',
+  'A place is listed after 3 verified visits, or once a neighbourhood guide checks it.',
+  'Owners can claim a page to fix hours, menu and photos, and to reply to people.',
+  'Owners can’t post verdicts, pay for placement or hide reviews.',
+  'Parks, lakes, markets and streets belong to everyone and can’t be claimed.',
+  'AI only merges duplicates and flags fakes. It never adds places or reviews.',
+];
+
+/** "Added by Riya S. · Jan 2024 · Confirmed by 39 locals": opens the full story. */
+export function PlaceOriginLine({ place }: { place: Place }) {
+  const t = useT();
+  const [open, setOpen] = useState(false);
+  const o = place.origin;
+  const origin = placeOrigin(place);
+  const adder = person(o.addedBy);
+  const guide = o.guide ? person(o.guide) : undefined;
+  return (
+    <>
+      <button type="button" className="origin-line" onClick={() => setOpen(true)} aria-haspopup="dialog">
+        <Avatar who={{ ...adder, verified: false }} size={18} />
+        <span className="grow">
+          {t('discover.origin.addedBy', { name: adder.name })} · {o.addedWhen} · {t('discover.origin.confirmedShort', { n: o.confirmedBy })}
+        </span>
+        <ChevronRightGlyph size={14} />
+      </button>
+      <Sheet open={open} onClose={() => setOpen(false)} title={t('discover.origin.title', { name: place.name })}>
+        <ul className="origin-facts">
+          <li>
+            <Avatar who={{ ...adder, verified: false }} size={32} />
+            <span>
+              <b>{origin.added}</b>
+              <small>{t('discover.origin.addedNote')}</small>
+            </span>
+          </li>
+          <li>
+            <span className="origin-facts__icon tone-mint">
+              <UsersGlyph size={16} />
+            </span>
+            <span>
+              <b>{origin.confirmed}</b>
+              <small>{t('discover.origin.confirmedNote')}</small>
+            </span>
+          </li>
+          {guide ? (
+            <li>
+              <Avatar who={{ ...guide, verified: false }} size={32} />
+              <span>
+                <b>{origin.guide}</b>
+                <small>{t('discover.origin.guideNote')}</small>
+              </span>
+            </li>
+          ) : null}
+          <li>
+            <span className="origin-facts__icon tone-violet">
+              <ShieldGlyph size={16} />
+            </span>
+            <span>
+              <b>{origin.claim}</b>
+              <small>{o.publicPlace ? t('discover.origin.publicNote') : o.claimed ? t('discover.origin.claimedNote') : t('discover.origin.unclaimedNote')}</small>
+            </span>
+          </li>
+        </ul>
+        <span className="field__label">{t('discover.origin.how')}</span>
+        <ol className="rules">
+          {ORIGIN_RULES.map((r) => (
+            <li key={r}>{r}</li>
+          ))}
+        </ol>
+      </Sheet>
+    </>
+  );
+}
+
+/** Claimed chip, "Public place", or a quiet link to claim the page. */
+export function PlaceClaim({ place }: { place: Place }) {
+  const t = useT();
+  const toast = useToast();
+  const [open, setOpen] = useState(false);
+  const o = place.origin;
+  if (o.publicPlace) {
+    return (
+      <span className="claim-chip claim-chip--public">
+        <UsersGlyph size={13} />
+        {t('discover.claim.public')}
+      </span>
+    );
+  }
+  if (o.claimed) {
+    return (
+      <span className="claim-chip" title={`Since ${o.claimed.since}`}>
+        <CheckGlyph size={13} />
+        {t('discover.claim.claimed', { name: o.claimed.name, role: o.claimed.role.toLowerCase() })}
+      </span>
+    );
+  }
+  return (
+    <>
+      <button type="button" className="claim-link" onClick={() => setOpen(true)} aria-haspopup="dialog">
+        {t('discover.claim.ask')}
+      </button>
+      <Sheet open={open} onClose={() => setOpen(false)} title={t('discover.claim.title', { name: place.name })}>
+        <p className="body-sm muted">{t('discover.claim.intro')}</p>
+        <ol className="rules">
+          <li>Show you run it: a trade licence, FSSAI or GST certificate in the venue’s name.</li>
+          <li>We send a code to the venue’s landline that locals listed. Read it back to us.</li>
+          <li>Then you can update hours, menu and photos, and reply to check-ins.</li>
+        </ol>
+        <p className="notice tone-mint" style={{ margin: 0 }}>
+          <ShieldGlyph size={16} />
+          <span>{t('discover.claim.note')}</span>
+        </p>
+        <button
+          type="button"
+          className="btn btn--primary btn--block"
+          onClick={() => {
+            setOpen(false);
+            toast(t('discover.claim.started'));
+          }}
+        >
+          {t('discover.claim.start')}
+        </button>
+      </Sheet>
+    </>
+  );
+}
+
+/** For places outside the city: how it reached you, not "near you". */
+export function AwayLine({ place }: { place: Place }) {
+  const t = useT();
+  const list = place.origin.viaList ? collectionById(place.origin.viaList) : undefined;
+  return (
+    <p className="away-line">
+      <span className="away-line__tag">{t('discover.origin.outside')}</span>
+      {list ? (
+        <span>
+          {t('discover.origin.fromList', { name: person(list.ownerId).name.split(' ')[0] })}{' '}
+          <Link to={`/lists/${list.id}`}>‘{list.title}’</Link>
+        </span>
+      ) : null}
+    </p>
+  );
 }

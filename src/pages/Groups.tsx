@@ -30,7 +30,7 @@ export default function Groups() {
       <main className="page page--with-header">
         <div className="page-intro">
           <span className="eyebrow muted">{t('discover.groups.eyebrow')}</span>
-          <h2 className="hero-title" style={{ fontSize: '1.75rem' }}>
+          <h2 className="hero-title" style={{ fontSize: '1.5rem' }}>
             {t('discover.groups.headline')}
           </h2>
         </div>
@@ -44,21 +44,25 @@ export default function Groups() {
         </div>
 
         <label htmlFor="group-q" className="search-field">
-          <SearchGlyph size={22} />
+          <SearchGlyph size={19} />
           <input id="group-q" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('discover.groups.search')} autoComplete="off" />
         </label>
 
         {list.length ? (
-          <div className="stack" role="tabpanel">
-            {list.map((g) => (
-              <GroupCard key={g.id} group={g} compact={tab === 'yours'} />
-            ))}
+          <div className="stack" role="tabpanel" style={{ gap: 14 }}>
+            <div className={`group-list${tab === 'yours' ? '' : ' group-list--cards'}`}>
+              {list.map((g) => (
+                <GroupCard key={g.id} group={g} compact={tab === 'yours'} />
+              ))}
+            </div>
             {tab === 'yours' && !q && suggested.length ? (
-              <section className="section" aria-labelledby="suggested-title" style={{ marginTop: 8 }}>
+              <section className="dsec" aria-labelledby="suggested-title">
                 <SectionHead id="suggested-title" title="Suggested for you" />
-                {suggested.map((g) => (
-                  <GroupCard key={g.id} group={g} />
-                ))}
+                <div className="group-list group-list--cards">
+                  {suggested.map((g) => (
+                    <GroupCard key={g.id} group={g} />
+                  ))}
+                </div>
               </section>
             ) : null}
           </div>

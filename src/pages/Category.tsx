@@ -11,6 +11,7 @@ import { useT } from '../i18n';
 import { ClockGlyph, MoviesGlyph, NamedGlyph, type GlyphName } from '../icons';
 import { km } from '../lib/format';
 import { placeCommunity } from '../lib/friends';
+import { placeOrigin } from '../lib/places';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
@@ -142,7 +143,7 @@ export default function Category() {
         <section className={`cat-banner glyph-host${banner ? ' cat-banner--photo' : ` tone-${config.tone}`}`} aria-label={t(config.titleKey)}>
           {banner ? <img src={banner} alt="" /> : null}
           <span className="cat-banner__icon">
-            <NamedGlyph name={config.glyph} size={24} duo={!banner} live />
+            <NamedGlyph name={config.glyph} size={19} duo={!banner} live />
           </span>
           <span className="cat-banner__text">
             <span className="cat-banner__count">
@@ -177,7 +178,7 @@ export default function Category() {
 
         {category === 'events' ? (
           events.length ? (
-            <div className="stack">
+            <div className="results">
               {events.map((e) => (
                 <EventRow key={e.id} event={e} />
               ))}
@@ -192,9 +193,9 @@ export default function Category() {
             <section className="section" aria-labelledby="movies-title">
               <SectionHead id="movies-title" title={t('discover.movies.showing')} />
               {MOVIES.map((m) => (
-                <article key={m.id} className="card card--tight row" style={{ alignItems: 'flex-start', gap: 12 }}>
+                <article key={m.id} className="movie-row">
                   <span className={`movie-poster tone-${m.tone}`}>
-                    <MoviesGlyph size={30} duo live />
+                    <MoviesGlyph size={26} duo live />
                   </span>
                   <div className="stack grow" style={{ gap: 8 }}>
                     <div className="stack" style={{ gap: 2 }}>
@@ -215,13 +216,13 @@ export default function Category() {
                             type="button"
                             className="chip chip--accent"
                             aria-pressed={on}
-                            style={{ height: 34, padding: '0 12px' }}
+                            style={{ height: 30, padding: '0 10px', fontSize: '0.75rem' }}
                             onClick={() => {
                               setReminders((r) => (on ? r.filter((x) => x !== id) : [...r, id]));
                               toast(on ? `Reminder removed for ${s}` : `We'll remind you 45 min before ${s}`);
                             }}
                           >
-                            <ClockGlyph size={14} />
+                            <ClockGlyph size={13} />
                             {s}
                           </button>
                         );
@@ -232,11 +233,13 @@ export default function Category() {
               ))}
               <p className="meta">Tap a showtime for a reminder. Tickets are booked with the cinema.</p>
             </section>
-            <section className="section" aria-labelledby="matinee-title">
+            <section className="dsec" aria-labelledby="matinee-title">
               <SectionHead id="matinee-title" title={t('discover.movies.matinee')} to="/deals" />
-              {DEALS.filter((d) => d.category === 'movies').map((d) => (
-                <DealCard key={d.id} deal={d} />
-              ))}
+              <div className="results">
+                {DEALS.filter((d) => d.category === 'movies').map((d) => (
+                  <DealCard key={d.id} deal={d} />
+                ))}
+              </div>
             </section>
           </>
         ) : null}
@@ -244,11 +247,11 @@ export default function Category() {
         {category === 'food' || category === 'places' || category === 'getaways' ? (
           places.length ? (
             category === 'getaways' ? (
-              <div className="stack">
+              <div className="getaways">
                 {places.map((p) => (
-                  <Link key={p.id} to={`/place/${p.id}`} className="card getaway-card glyph-host">
+                  <Link key={p.id} to={`/place/${p.id}`} className="getaway-card glyph-host">
                     <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="getaway-card__media">
-                      <span className="photo-pill" style={{ top: 12, left: 12 }}>
+                      <span className="photo-pill" style={{ top: 12, left: 'var(--gutter)' }}>
                         {driveTime(p.distanceKm)}
                       </span>
                     </Cover>
@@ -259,8 +262,13 @@ export default function Category() {
                           {km(p.distanceKm)}
                         </span>
                       </span>
-                      <span className="meta">{p.kind}</span>
-                      <span className="body-sm" style={{ color: 'var(--ink-3)' }}>
+                      <span className="meta">
+                        {p.kind} · {t('discover.origin.outside')}
+                      </span>
+                      <span className="meta" style={{ color: 'var(--accent)', fontWeight: 600 }}>
+                        {placeOrigin(p).added}
+                      </span>
+                      <span className="body-sm" style={{ color: 'var(--ink-3)', marginTop: 2 }}>
                         {p.summary}
                       </span>
                     </span>
