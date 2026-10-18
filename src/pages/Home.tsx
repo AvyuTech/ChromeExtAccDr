@@ -34,6 +34,7 @@ import { useLiveCity } from '../state/live';
 import { enabledSources, useSettings } from '../state/settings';
 import { HeroRow, useBoardContext } from '../components/helpful';
 import { leaderboard } from '../lib/helpful';
+import { HelpfulInfo } from '../components/helpGuide';
 
 type Topic = 'all' | 'food' | 'events' | 'clubs' | 'alerts';
 type Show = 'latest' | 'trending' | 'questions';
@@ -404,7 +405,16 @@ function HelpfulThisMonth() {
   if (!rows.length) return null;
   return (
     <section className="section" aria-labelledby="heroes-title">
-      <SectionHead id="heroes-title" title="Most helpful this month" to="/heroes" linkLabel="City heroes" />
+      <SectionHead
+        id="heroes-title"
+        title={
+          <>
+            Most helpful this month <HelpfulInfo size={14} />
+          </>
+        }
+        to="/heroes"
+        linkLabel="City heroes"
+      />
       <div className="list">
         {rows.map((r) => (
           <HeroRow key={r.personId} row={r} sortBy="points" />

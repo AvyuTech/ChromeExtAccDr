@@ -20,6 +20,7 @@ import { isFullyVerified } from '../data/identity';
 import { compact } from '../lib/format';
 import { rankOf, topStrengths } from '../lib/helpful';
 import { pagesRunBy } from '../lib/places';
+import { HelpfulInfo } from './helpGuide';
 
 /* Pieces shared by the Friends hub, profiles, lists and Me. */
 
@@ -157,6 +158,7 @@ export function ProfileHero({
   followsMe,
   actions,
   followers,
+  helpful,
   minor,
   online,
   level,
@@ -170,6 +172,8 @@ export function ProfileHero({
   /** An ActionBar: one main action, then small icons. */
   actions: ReactNode;
   followers: HeroStat;
+  /** Helpful points: the second headline number, how much they've helped. */
+  helpful: HeroStat;
   /** Following and check-ins, small, under the follower count. */
   minor: HeroStat[];
   online?: boolean;
@@ -190,10 +194,20 @@ export function ProfileHero({
           {online ? <span className="profile-hero__online" aria-hidden="true" /> : null}
         </span>
         <div className="profile-hero__reach">
-          <StatTarget stat={followers} className="profile-hero__followers">
-            <b className="num">{followers.value}</b>
-            <span>{followers.label}</span>
-          </StatTarget>
+          {/* Two headline numbers: how many follow you, and how much you've helped. */}
+          <span className="profile-hero__big">
+            <StatTarget stat={followers} className="profile-hero__followers">
+              <b className="num">{followers.value}</b>
+              <span>{followers.label}</span>
+            </StatTarget>
+            <span className="profile-hero__helpful">
+              <StatTarget stat={helpful} className="profile-hero__followers">
+                <b className="num">{helpful.value}</b>
+                <span>{helpful.label}</span>
+              </StatTarget>
+              <HelpfulInfo size={14} />
+            </span>
+          </span>
           <span className="profile-hero__minor">
             {minor.map((st, i) => (
               <span key={st.label}>

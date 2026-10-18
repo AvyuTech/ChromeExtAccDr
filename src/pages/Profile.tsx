@@ -12,6 +12,7 @@ import { compact } from '../lib/format';
 import { allCheckIns, canSee, collectionsFor, isFollowing, profileInfo, sharedWants } from '../lib/friends';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
+import { helpfulOf } from '../data/helpful';
 
 type Tab = 'checkins' | 'want' | 'lists';
 const TABS: Tab[] = ['checkins', 'want', 'lists'];
@@ -84,6 +85,7 @@ export default function Profile() {
           followsMe={info.followsMe}
           bio={info.bio}
           followers={{ label: t('people.followers').toLowerCase(), value: compact(info.followers + (following ? 1 : 0)), onClick: () => setAbout(true) }}
+          helpful={{ label: 'helpful', value: compact(helpfulOf(id).lifetime), onClick: () => setAbout(true) }}
           minor={[
             { label: t('people.following').toLowerCase(), value: compact(info.following) },
             { label: t('people.checkins').toLowerCase(), value: compact(info.checkIns) },

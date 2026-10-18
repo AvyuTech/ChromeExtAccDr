@@ -9,7 +9,7 @@ import { ShareSheet } from '../components/share';
 import { EmptyState, Sheet } from '../components/ui';
 import { REPORTS } from '../data/city';
 import { PEOPLE, neighbourhoodName } from '../data/core';
-import { HELPFUL } from '../data/helpful';
+import { HELPFUL, helpfulOf } from '../data/helpful';
 import { PLACES } from '../data/places';
 import { pagesRunBy } from '../lib/places';
 import type { WantItem } from '../data/types';
@@ -174,6 +174,7 @@ export default function Me() {
           online
           bio={profile.bio || undefined}
           followers={{ label: t('people.followers').toLowerCase(), value: compact(info.followers), to: '/friends' }}
+          helpful={{ label: 'helpful', value: compact(helpfulOf('me').lifetime), to: '/me/impact' }}
           minor={[
             { label: t('people.following').toLowerCase(), value: compact(data.following.length), to: '/friends?tab=following' },
             { label: checkIns === 1 ? 'check-in' : t('people.checkins').toLowerCase(), value: checkIns },

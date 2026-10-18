@@ -26,6 +26,7 @@ export const ROUTES = [
   '/claim/pickle-play',
   '/claim/seoul-bowl',
   '/heroes',
+  '/settings/helpful',
   '/me/impact',
   '/post/giveaway-books',
   '/event/sufi-night',

@@ -160,7 +160,11 @@ Points are tagged by topic (Food, Cafés, Traffic & roads, Parenting, Pets, Fitn
 
 **Rankings, many ways:** the City heroes board ranks verified residents by scope (my neighbourhood, the city, my clubs, friends), period (this month or all time) and measure (helpful points, helpful answers, pages added, issues fixed, meetups hosted, rising this month), filtered by topic. Seasons reset on the 1st; levels never reset. People can hide themselves from boards in Settings ▸ Privacy.
 
-**Where it shows:** a quiet level tag next to names (only from Local expert up, so feeds stay calm), replies ordered by *Most helpful*, profiles (level, points, known for, rank in their area), Me ▸ *Your impact* (progress to the next level, what's missing, points history, how to earn), and *Most helpful in this club* on every club.
+**Where it shows:** helpful points are the second headline number on every profile, next to followers (so fame and contribution sit side by side); the level is a pill beside the name; a quiet level tag sits next to names on posts and replies (only from Local expert up, so feeds stay calm); replies order by *Most helpful*; *Most helpful here* on every club and *Most helpful this month* on Home; the City heroes board; and Me ▸ *Your impact* (progress, what's missing, points history).
+
+**Explained in the app:** an ⓘ beside every helpful number (profiles, City heroes, Your impact, Home and clubs) opens the six-step loop in a sheet, and **Settings ▸ Helpful points & levels** has the whole plan: the loop, how you earn, levels, rankings, where it shows and fair play.
+
+**The loop, end to end:** you help → neighbours say it helped → you earn points (only from verified people, capped) → your level rises (with identity checks) → you stand out (points beside followers, level on your answers, rank on City heroes) → *help comes back*: your own questions, reports and plans reach more local experts and neighbours. The last step is marked *Coming next* in the app; it isn't built yet.
 
 ## Filling the city before people do
 

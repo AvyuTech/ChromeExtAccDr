@@ -16,6 +16,7 @@ import { clubMemberIds, leaderboard } from '../lib/helpful';
 import { ageMinutes, hotScore, netScore } from '../lib/thread';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
+import { HelpfulInfo } from '../components/helpGuide';
 
 export default function GroupDetail() {
   const { id = '' } = useParams();
@@ -180,7 +181,7 @@ export default function GroupDetail() {
           <section className="dsec" aria-labelledby="club-helpers">
             <div className="dsec__head">
               <h2 className="section__title" id="club-helpers">
-                Most helpful here
+                Most helpful here <HelpfulInfo size={14} />
               </h2>
               <Link to="/heroes?scope=clubs" className="section__link">
                 City heroes

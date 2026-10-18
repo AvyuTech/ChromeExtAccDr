@@ -4,6 +4,7 @@ import { Avatar } from '../../components/cards';
 import { LevelBadge } from '../../components/helpful';
 import { EmptyState, PageHeader, Sheet } from '../../components/ui';
 import { ALERT_KIND_META } from '../../data/city';
+import { helpfulOf } from '../../data/helpful';
 import { PEOPLE, TOGGLEABLE_SOURCES, neighbourhoodName } from '../../data/core';
 import { LANGUAGES, useT } from '../../i18n';
 import { BellGlyph, CheckGlyph, ChevronRightGlyph, DataGlyph, LogoutGlyph, MoonGlyph, RefreshGlyph, SearchGlyph } from '../../icons';
@@ -17,6 +18,8 @@ function trailFor(id: SectionId, s: Settings, t: (k: string, v?: Record<string, 
   switch (id) {
     case 'account':
       return s.profile.verifiedResident ? t('common.verified') : '';
+    case 'helpful':
+      return `${helpfulOf('me').lifetime.toLocaleString('en-IN')} helpful`;
     case 'location':
       return neighbourhoodName(s.location.home);
     case 'notifications':

@@ -906,3 +906,16 @@ a.want-row__title:hover {
   flex-direction: column;
   gap: 14px;
 }
+
+/* Two headline numbers: followers, then helpful with its ⓘ */
+.profile-hero__big {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+}
+.profile-hero__helpful {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}

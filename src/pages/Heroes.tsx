@@ -6,6 +6,7 @@ import { EmptyState, PageHeader } from '../components/ui';
 import { HELP_TOPICS, type HelpTopic } from '../data/helpful';
 import { leaderboard, SORT_LABEL, type BoardPeriod, type BoardScope, type BoardSort } from '../lib/helpful';
 import { useSettings } from '../state/settings';
+import { HelpfulInfo } from '../components/helpGuide';
 
 const SCOPES: BoardScope[] = ['city', 'area', 'clubs', 'friends'];
 const SORTS: BoardSort[] = ['points', 'answers', 'pages', 'fixes', 'meetups', 'rising'];
@@ -36,7 +37,7 @@ export default function Heroes() {
 
   return (
     <>
-      <PageHeader title="City heroes" sub={`${settings.location.city} · ${MONTH} season`} fallback="/me" />
+      <PageHeader title="City heroes" sub={`${settings.location.city} · ${MONTH} season`} fallback="/me" actions={<HelpfulInfo size={18} />} />
       <main className="page page--with-header heroes">
         <p className="heroes__intro">
           The people whose answers, tips and fixes helped the most. Points only come from neighbours who were helped.{' '}

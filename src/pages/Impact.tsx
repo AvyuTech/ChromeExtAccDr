@@ -4,9 +4,10 @@ import { Avatar } from '../components/cards';
 import { KnownFor, LevelProgress, useBoardContext, useLevel } from '../components/helpful';
 import { PageHeader } from '../components/ui';
 import { person } from '../data/core';
-import { EARN_RULES, FAIR_PLAY, HELPFUL, LEVELS, MY_LEDGER, PENALTIES, REQUIREMENT_LABEL, type LedgerEntry } from '../data/helpful';
-import { CheckGlyph, ChevronRightGlyph, ClockGlyph, ListsGlyph, PinGlyph, ReportGlyph, SparkGlyph, StarGlyph, UpvoteGlyph } from '../icons';
+import { HELPFUL, LEVELS, MY_LEDGER, type LedgerEntry } from '../data/helpful';
+import { ChevronRightGlyph, ClockGlyph, ListsGlyph, PinGlyph, ReportGlyph, SparkGlyph, UpvoteGlyph } from '../icons';
 import { rankOf } from '../lib/helpful';
+import { EarnTable, FairPlayList, HelpfulInfo, LevelLadder } from '../components/helpGuide';
 
 const KIND_ICON: Record<NonNullable<LedgerEntry['kind']>, ReactNode> = {
   upvotes: <UpvoteGlyph size={15} />,
@@ -71,7 +72,7 @@ export default function Impact() {
 
   return (
     <>
-      <PageHeader title="Your impact" sub="Helpful points and levels" fallback="/me" />
+      <PageHeader title="Your impact" sub="Helpful points and levels" fallback="/me" actions={<HelpfulInfo size={18} />} />
       <main className="page page--with-header impact">
         <section className="impact-head" aria-labelledby="impact-level">
           <div className="impact-head__top">
@@ -156,26 +157,7 @@ export default function Impact() {
             How points work
           </h2>
           <p className="body-sm muted">You earn when someone else says you helped. Posting, replying and checking in earn nothing by themselves.</p>
-          <div className="rule-table">
-            {EARN_RULES.map((r) => (
-              <div key={r.id} className="rule-row">
-                <span className="rule-row__what">
-                  {r.what}
-                  {r.note ? <span className="meta">{r.note}</span> : null}
-                </span>
-                <span className="rule-row__pts num">+{r.points}</span>
-              </div>
-            ))}
-            {PENALTIES.map((r) => (
-              <div key={r.id} className="rule-row">
-                <span className="rule-row__what">
-                  {r.what}
-                  {r.note ? <span className="meta">{r.note}</span> : null}
-                </span>
-                <span className="rule-row__pts num is-neg">{r.points}</span>
-              </div>
-            ))}
-          </div>
+          <EarnTable />
         </section>
 
         <section className="dsec" aria-labelledby="impact-levels">
@@ -183,33 +165,7 @@ export default function Impact() {
             Levels
           </h2>
           <p className="body-sm muted">Each level needs points and a few checks, so the people with the highest levels are real, local and recently helpful.</p>
-          <ol className="ladder">
-            {LEVELS.map((l, i) => {
-              const state = i < info.index ? 'is-past' : i === info.index ? 'is-now' : '';
-              return (
-                <li key={l.id} className={`ladder__step ${state}`}>
-                  <span className="ladder__mark" aria-hidden="true">
-                    {i < info.index ? <CheckGlyph size={11} /> : i === info.index ? <span className="ladder__dot" /> : l.id === 'hero' ? <StarGlyph size={11} /> : null}
-                  </span>
-                  <div className="ladder__body">
-                    <div className="ladder__head">
-                      <span className="ladder__name">
-                        {l.name}
-                        {i === info.index ? <span className="badge badge--sm">You</span> : null}
-                      </span>
-                      <span className="meta num">{l.min ? `${l.min.toLocaleString('en-IN')} pts` : 'Start'}</span>
-                    </div>
-                    {l.needs.length ? <span className="meta">Needs: {l.needs.map((r) => REQUIREMENT_LABEL[r]).join(', ')}</span> : null}
-                    <ul className="ladder__unlocks">
-                      {l.unlocks.map((u) => (
-                        <li key={u}>{u}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+          <LevelLadder />
           <p className="meta">Levels never pay out money and never buy visibility. Businesses can’t earn points.</p>
         </section>
 
@@ -217,11 +173,7 @@ export default function Impact() {
           <h2 className="section__title" id="impact-fair">
             Fair play
           </h2>
-          <ul className="fair-list">
-            {FAIR_PLAY.map((f) => (
-              <li key={f}>{f}</li>
-            ))}
-          </ul>
+          <FairPlayList />
         </section>
 
         <Link to="/heroes" className="impact-cta">

@@ -425,4 +425,5 @@ export const settings: Dict = {
   'interest.shopping': { en: 'Shopping', gu: 'ખરીદી', hi: 'ख़रीदारी' },
   'interest.groups': { en: 'Meeting new people', gu: 'નવા લોકોને મળવું', hi: 'नए लोगों से मिलना' },
   'settings.identity': { en: 'Identity & work', gu: 'ઓળખ અને કામ', hi: 'पहचान और काम' },
+  'settings.helpful': { en: 'Helpful points & levels', gu: 'મદદના પોઇન્ટ અને લેવલ', hi: 'मदद के पॉइंट और लेवल' },
 };

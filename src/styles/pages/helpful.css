@@ -579,3 +579,99 @@
 .impact .dsec[id] {
   scroll-margin-top: 64px;
 }
+
+/* ---------- ⓘ: how helpful points work ---------- */
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  vertical-align: middle;
+  cursor: pointer;
+}
+.info-btn:hover,
+.info-btn:focus-visible {
+  color: var(--ink);
+}
+.section__title .info-btn {
+  margin-left: 2px;
+}
+
+/* The loop, step by step */
+.help-loop {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.help-loop li {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 0 0 14px;
+}
+.help-loop li:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  bottom: 2px;
+  left: 11px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--divider);
+}
+.help-loop__n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--ground);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.help-loop li.is-next .help-loop__n {
+  background: var(--surface-3);
+  color: var(--ink);
+  outline: 1px dashed var(--border-strong);
+}
+.help-loop__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding-top: 2px;
+}
+.help-loop__body b {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+}
+.help-loop__body > span {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+/* Settings › Helpful points & levels */
+.help-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.help-guide section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
