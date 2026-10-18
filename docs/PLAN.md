@@ -30,7 +30,7 @@ Pages and clubs work in similar ways (both have people who run them, both can po
 
 | | Profile | Business page | Public place | Club |
 | --- | --- | --- | --- | --- |
-| Shape | Round | Square | Square | A stack of squares |
+| Shape | Round | Square | Square | Square with a double ring |
 | Mark | none | Shop front | Tree | People |
 | Label | name | *Business page* | *Public place* | *Club* |
 | Main action | Follow | Check in | Check in | Join |
@@ -183,7 +183,7 @@ Explore is for finding pages, and everything on it is something people made: pag
 
 - **Roam the city:** drag to move (with a little glide), pinch, scroll or double-tap to zoom, + and − buttons, and a button to come back to where you live. The city goes well past your neighbourhood, from Gota to Maninagar and Bopal to the old city.
 - **Choose what to see:** *Businesses*, *Public places* and *Clubs* at the top, on or off, with counts. The category filters narrow businesses and public places.
-- **Shape says what it is, colour says how good it is:** squares are business pages, circles public places, stacked squares clubs; dashed squares are new places still being confirmed. Green is loved (70%+ must try), violet liked (50–69%), amber mixed, grey new; clubs are blue when they have meetups coming up. A friend's face on a pin means they've been. *Colours* explains it on the map.
+- **Shape says what it is, colour says how good it is:** squares are business pages, circles public places, double-ringed squares clubs; dashed squares are new places still being confirmed. Green is loved (70%+ must try), violet liked (50–69%), amber mixed, grey new; clubs are blue when they have meetups coming up. A friend's face on a pin means they've been. *Colours* explains it on the map.
 - **Zoom in for more:** zoomed out, pins are small dots; zoom in and they show their score (59%, 2.4k members); further in, their names.
 - **Tap a pin** for a small card: photo, what it is, the score and locals, open now, friends who've been (for a club: members and the next meetup; for a spotted place: *I've been*). **Tap the card** to open the page.
 - **Swipe the card** left for the next nearest spot and right to go back ("2 of 23 nearby"); the map follows each one. Arrows and the keyboard do the same. It walks outward from the first spot you tapped, across everything that's switched on: businesses, public places and clubs.

@@ -74,6 +74,7 @@ npm run build        # type-checks, then builds to dist/
 npm run preview      # serves dist/ on http://localhost:4173
 npm test             # unit tests (answer engine, storage)
 npm run e2e          # smoke test every screen in light + dark (needs `npm run preview` running)
+node scripts/audit-layout.mjs [url]   # flag text overlapping text and badges covering photos, on every screen
 npm run build:single # one self-contained HTML file in dist-single/ for sharing
 ```
 

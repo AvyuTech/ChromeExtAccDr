@@ -30,7 +30,7 @@ import { person } from '../data/core';
 /*
   The Explore map: a whole city to roam. Drag to move, pinch, scroll or double-tap
   to zoom. Shape says what something is (square pages, round public places,
-  stacked clubs), colour says how good it is. Tap a pin for a small card; tap the
+  double-ringed clubs), colour says how good it is. Tap a pin for a small card; tap the
   card to open the page.
 */
 
@@ -812,7 +812,7 @@ export function ExploreMap({ category, height, full }: { category?: (p: { catego
                 {INSIGHT_LABEL[i]}
               </span>
             ))}
-            <span className="xmap__legend-row">Square: business page · round: public place · stacked: club</span>
+            <span className="xmap__legend-row">Square: business page · round: public place · double ring: club</span>
           </div>
         ) : null}
 

@@ -179,9 +179,9 @@
 }
 .xmap-pin--club .xmap-pin__shape {
   border-radius: 11px;
+  /* Clubs wear a double ring: colour, white, colour. */
   box-shadow:
-    4px -4px 0 -1px #fff,
-    4px -4px 0 1px var(--pin),
+    0 0 0 2px var(--pin),
     0 3px 8px rgba(17, 20, 28, 0.28);
 }
 .xmap-pin.is-spotted .xmap-pin__shape {
@@ -195,9 +195,8 @@
 }
 .xmap-pin--club.is-on .xmap-pin__shape {
   box-shadow:
-    4px -4px 0 -1px #fff,
-    4px -4px 0 1px var(--pin),
-    0 0 0 4px color-mix(in srgb, var(--pin) 35%, transparent);
+    0 0 0 2px var(--pin),
+    0 0 0 6px color-mix(in srgb, var(--pin) 35%, transparent);
 }
 /* Zoomed out: small shapes without icons */
 .xmap-pin.is-dot .xmap-pin__shape {
@@ -213,9 +212,7 @@
 }
 .xmap-pin--club.is-dot .xmap-pin__shape {
   border-radius: 5px;
-  box-shadow:
-    3px -3px 0 -1px #fff,
-    3px -3px 0 0.5px var(--pin);
+  box-shadow: 0 0 0 1.5px var(--pin);
 }
 .xmap-pin.is-dot {
   transform: translate(-50%, -50%);

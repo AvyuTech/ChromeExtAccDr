@@ -948,7 +948,8 @@
 .profile-head__icon--club {
   border-radius: 26px;
   overflow: visible;
-  box-shadow: 6px -6px 0 -3px var(--ground), 6px -6px 0 -1px var(--border-strong);
+  /* A double ring, hugging the shape: a club is people around something. */
+  box-shadow: 0 0 0 2px var(--border-strong);
 }
 .profile-head__icon--page > img,
 .profile-head__icon--public > img,

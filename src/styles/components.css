@@ -1558,9 +1558,9 @@ button.list-row:active {
   position: absolute;
   right: -2px;
   bottom: -2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 8px;
+  width: var(--tick, 16px);
+  height: var(--tick, 16px);
+  border-radius: 50%;
   background: var(--mint-strong);
   border: 2px solid var(--surface);
   color: #ffffff;
@@ -1662,6 +1662,8 @@ a.feed-post__name:hover {
   font-weight: 700;
   color: var(--accent);
   text-decoration: none;
+  /* Keep a club's name whole: wrap it to the next line rather than split it. */
+  white-space: nowrap;
 }
 .feed-post__club .entity-mark {
   margin-right: 3px;
@@ -2027,10 +2029,19 @@ a.feed-post__name:hover {
 }
 /* Clubs: a stack of squares, like a group */
 .entity-pic--club .entity-pic__img {
+  position: relative;
   border-radius: 30%;
+}
+/* A double ring drawn over the photo, on the shape's own edge, never outside its box. */
+.entity-pic--club .entity-pic__img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   box-shadow:
-    4px -4px 0 -1px var(--ground),
-    4px -4px 0 0 var(--border-strong);
+    inset 0 0 0 1.5px var(--border-strong),
+    inset 0 0 0 3.5px var(--ground);
+  pointer-events: none;
 }
 .entity-pic__badge {
   position: absolute;

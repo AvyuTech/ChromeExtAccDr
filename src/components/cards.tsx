@@ -46,9 +46,10 @@ export function Avatar({ who, size = 40, ring }: { who: Person; size?: number; r
       aria-hidden="true"
     >
       {src ? <img src={src} alt="" loading="lazy" decoding="async" /> : who.initials}
-      {who.verified ? (
-        <span className="avatar__tick">
-          <CheckGlyph size={Math.max(8, Math.round(size * 0.22))} />
+      {/* The verified tick scales with the photo, and small photos (reply previews, face stacks) skip it so it never covers a face. */}
+      {who.verified && size >= 28 ? (
+        <span className="avatar__tick" style={{ ['--tick' as string]: `${Math.min(18, Math.max(12, Math.round(size * 0.34)))}px` }}>
+          <CheckGlyph size={Math.min(11, Math.max(8, Math.round(size * 0.2)))} />
         </span>
       ) : null}
     </span>

@@ -6,7 +6,7 @@ import { GroupsGlyph, StoreGlyph, TreeGlyph, UserGlyph, type GlyphProps } from '
 /**
  * Nearhood has three kinds of thing, and each always looks like itself:
  * people are round, pages are square with a shop-front mark (a tree for public
- * places like lakes and parks), and clubs are a stack of squares with a people mark.
+ * places like lakes and parks), and clubs are squares with a double ring and a people mark.
  */
 export type EntityKind = 'person' | 'page' | 'public' | 'club';
 
