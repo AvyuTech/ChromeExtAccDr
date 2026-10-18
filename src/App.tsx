@@ -7,6 +7,7 @@ import Alerts from './pages/Alerts';
 import Ask from './pages/Ask';
 import Category from './pages/Category';
 import CheckIn from './pages/CheckIn';
+import Claim from './pages/Claim';
 import CheckInDetail from './pages/CheckInDetail';
 import Chat from './pages/Chat';
 import City from './pages/City';
@@ -18,12 +19,15 @@ import ClubNew from './pages/ClubNew';
 import GroupDetail from './pages/GroupDetail';
 import Glyphs from './pages/Glyphs';
 import Groups from './pages/Groups';
+import Heroes from './pages/Heroes';
 import Home from './pages/Home';
+import Impact from './pages/Impact';
 import ListDetail from './pages/ListDetail';
 import Me from './pages/Me';
 import Messages from './pages/Messages';
 import NotFound from './pages/NotFound';
 import Onboarding from './pages/Onboarding';
+import PageNew from './pages/PageNew';
 import PlaceDetail from './pages/PlaceDetail';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
@@ -41,7 +45,7 @@ import { SettingsProvider, useSettings } from './state/settings';
 import { ToastProvider } from './state/toast';
 
 /** Full-screen flows hide the tab bar. */
-const NO_NAV = [/^\/onboarding/, /^\/compose/, /^\/messages\/.+/, /^\/city\/report$/, /^\/checkin$/, /^\/clubs\/new$/];
+const NO_NAV = [/^\/onboarding/, /^\/compose/, /^\/messages\/.+/, /^\/city\/report$/, /^\/checkin$/, /^\/clubs\/new$/, /^\/post\/.+/, /^\/pages\/new$/, /^\/claim\/.+/];
 
 /** Old /groups/:id links open the club. */
 function GroupRedirect() {
@@ -79,6 +83,8 @@ function Shell() {
                   <Route path="/explore/:category" element={<Category />} />
                   <Route path="/deals/*" element={<Navigate to="/explore" replace />} />
                   <Route path="/place/:id" element={<PlaceDetail />} />
+                  <Route path="/pages/new" element={<PageNew />} />
+                  <Route path="/claim/:id" element={<Claim />} />
                   <Route path="/event/:id" element={<EventDetail />} />
                   <Route path="/clubs" element={<Groups />} />
                   <Route path="/clubs/new" element={<ClubNew />} />
@@ -107,6 +113,8 @@ function Shell() {
                   <Route path="/city/safety" element={<Safety />} />
                   <Route path="/me" element={<Me />} />
                   <Route path="/me/saved" element={<Saved />} />
+                  <Route path="/me/impact" element={<Impact />} />
+                  <Route path="/heroes" element={<Heroes />} />
                   <Route path="/settings" element={<SettingsHome />} />
                   <Route path="/settings/:section" element={<SettingsSection />} />
                   <Route path="/about/glyphs" element={<Glyphs />} />
