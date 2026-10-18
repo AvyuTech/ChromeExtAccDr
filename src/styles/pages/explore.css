@@ -1,6 +1,6 @@
 /* ---------- Explore ---------- */
 .explore {
-  gap: 18px;
+  gap: 14px;
 }
 .explore-head {
   display: flex;
@@ -9,27 +9,27 @@
   justify-content: space-between;
 }
 .explore-head .hero-title {
-  font-size: 1.875rem;
+  font-size: 1.5rem;
 }
 .explore-head__squiggle {
   margin-left: 4px;
   vertical-align: 0.05em;
 }
 .explore-head .icon-btn {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
 }
 .explore-area {
   margin-top: -10px;
   color: var(--ink);
-  font-size: 0.9375rem;
+  font-size: 0.8438rem;
 }
 
 .chip--icon {
-  height: 44px;
-  padding: 0 16px 0 13px;
-  border-radius: 16px;
+  height: 34px;
+  padding: 0 13px 0 10px;
+  border-radius: 12px;
 }
 .chip--icon .glyph {
   color: var(--accent);
@@ -44,9 +44,16 @@
   overflow: hidden;
   border-radius: var(--radius-xl);
 }
+/* On Explore the map runs edge to edge */
+.explore .city-map {
+  margin: 0 calc(var(--gutter) * -1);
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+}
 .city-map__viewport {
   position: relative;
-  height: 236px;
+  height: 220px;
   overflow: hidden;
   background: var(--map-land);
   cursor: grab;
@@ -287,40 +294,39 @@
   }
 }
 
-/* ---------- "Worth stepping out for" ---------- */
+/* ---------- "Worth stepping out for": photo edge to edge, text under it ---------- */
 .feature-card {
   position: relative;
-  padding: 0;
-  overflow: hidden;
 }
 .feature-card__link {
   display: flex;
   flex-direction: column;
+  gap: 10px;
   color: inherit;
   text-decoration: none;
 }
 .feature-card__media {
-  height: 200px;
+  height: 230px;
+  margin: 0 calc(var(--gutter) * -1);
   border-radius: 0;
 }
 .feature-card__body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 16px 16px 14px;
+  gap: 3px;
 }
 .feature-card__title {
   font-family: var(--font-display);
-  font-size: 1.375rem;
+  font-size: 1.1875rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 .feature-card__rating {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 800;
   color: var(--ink);
 }
@@ -332,45 +338,46 @@
   opacity: 1;
 }
 .feature-card__friends {
-  gap: 10px;
-  margin-top: 6px;
+  gap: 8px;
+  margin-top: 4px;
   color: var(--muted);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 
-/* ---------- Tonight ---------- */
+/* ---------- Tonight: flat rows ---------- */
 .tonight-card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 0 14px 0 0;
-  overflow: hidden;
-  min-height: 112px;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--divider);
   color: inherit;
   text-decoration: none;
 }
+.tonight-card:last-child {
+  border-bottom: none;
+}
 .tonight-card__media {
-  align-self: stretch;
-  width: 124px;
-  border-radius: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
 }
 .tonight-card__body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 3px;
   flex-grow: 1;
   min-width: 0;
-  padding: 14px 0;
 }
 .tonight-card__body .badge--lime {
-  padding: 5px 10px;
-  font-size: 0.6875rem;
+  padding: 2px 7px;
+  font-size: 0.5938rem;
 }
 .tonight-card__title {
   font-family: var(--font-display);
-  font-size: 1.0625rem;
+  font-size: 0.9375rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.25;
@@ -387,11 +394,11 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 18px;
-  min-height: 112px;
-  padding: 14px;
+  gap: 12px;
+  min-height: 92px;
+  padding: 10px;
   overflow: hidden;
-  border-radius: var(--radius-lg);
+  border-radius: 14px;
   background: var(--tone-bg);
   color: var(--tone-ink);
   text-decoration: none;
@@ -421,9 +428,9 @@
   background: linear-gradient(180deg, rgba(14, 16, 24, 0.05) 20%, rgba(14, 16, 24, 0.7) 100%);
 }
 .explore-tile__icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 13px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -441,12 +448,12 @@
 }
 .explore-tile__name {
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 .explore-tile__count {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   opacity: 0.85;
 }

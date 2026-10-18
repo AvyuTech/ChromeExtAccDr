@@ -185,7 +185,7 @@ export default function Explore() {
         {featured ? (
           <section className="section" aria-labelledby="worth-title">
             <SectionHead id="worth-title" title={t('discover.explore.worth')} to={mood === 'coffee' || mood === 'food' ? '/explore/food' : '/explore/places'} />
-            <article className="card feature-card">
+            <article className="feature-card">
               <Link to={`/place/${featured.id}`} className="feature-card__link">
                 <span className="feature-card__media photo-frame">
                   {placePhoto(featured.id) ? (
@@ -196,12 +196,12 @@ export default function Explore() {
                     </span>
                   )}
                   {friendIds.length ? (
-                    <span className="photo-pill" style={{ top: 14, left: 14 }}>
-                      <HeartGlyph size={15} style={{ color: '#6c52ee' }} />
+                    <span className="photo-pill" style={{ top: 14, left: 16 }}>
+                      <HeartGlyph size={13} style={{ color: '#6c52ee' }} />
                       {t('discover.explore.friendsLove')}
                     </span>
                   ) : featured.isNew ? (
-                    <span className="photo-pill" style={{ top: 14, left: 14 }}>
+                    <span className="photo-pill" style={{ top: 14, left: 16 }}>
                       New this week
                     </span>
                   ) : null}
@@ -238,22 +238,22 @@ export default function Explore() {
               </Link>
               <button
                 type="button"
-                className="photo-action"
-                style={{ top: 14, right: 14 }}
+                className="photo-action photo-action--sm"
+                style={{ top: 12, right: 0 }}
                 aria-pressed={saved}
                 aria-label={saved ? 'Remove from saved' : 'Save place'}
                 onClick={() => toggle('savedPlaces', featured.id)}
               >
-                <SaveGlyph size={20} active={saved} />
+                <SaveGlyph size={17} active={saved} />
               </button>
             </article>
           </section>
         ) : null}
 
         {tonight.length && (mood === 'for-you' || mood === 'culture') ? (
-          <div className="stack" style={{ gap: 12 }}>
+          <div className="stack" style={{ gap: 0 }}>
             {tonight.map((e) => (
-              <Link key={e.id} to={`/event/${e.id}`} className="card tonight-card">
+              <Link key={e.id} to={`/event/${e.id}`} className="tonight-card">
                 <span className="tonight-card__media photo-frame">
                   {eventPhoto(e.id) ? (
                     <img src={eventPhoto(e.id)} alt="" loading="lazy" />
@@ -284,8 +284,8 @@ export default function Explore() {
               {more.map((p) => {
                 const c = placeCommunity(p.id, data, settings);
                 return (
-                  <Link key={p.id} to={`/place/${p.id}`} className="card photo-card" style={{ width: 208 }}>
-                    <span className="photo-frame photo-card__media" style={{ height: 132 }}>
+                  <Link key={p.id} to={`/place/${p.id}`} className="photo-card" style={{ width: 164 }}>
+                    <span className="photo-frame photo-card__media" style={{ height: 120 }}>
                       {placePhoto(p.id) ? (
                         <img src={placePhoto(p.id)} alt="" loading="lazy" />
                       ) : (
