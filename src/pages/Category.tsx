@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { categoryPhoto } from '../assets/photos';
-import { PlaceRow } from '../components/cards';
-import { EventLinkRow, eventFriends } from '../components/discover';
+import { categoryPhoto, eventPhoto } from '../assets/photos';
+import { Cover, PlaceRow } from '../components/cards';
+import { eventFriends } from '../components/discover';
 import { EmptyState, PageHeader, Segmented } from '../components/ui';
 import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
 import type { CityEvent, Place, Tone } from '../data/types';
 import { useT } from '../i18n';
 import { ChevronRightGlyph, NamedGlyph, PlusGlyph, type GlyphName } from '../icons';
+import { price } from '../lib/format';
 import { placeCommunity } from '../lib/friends';
+import { eventHost } from '../lib/hosts';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 
@@ -28,7 +30,7 @@ const CONFIG: Record<string, Config> = {
     titleKey: 'discover.cat.events',
     glyph: 'events',
     tone: 'violet',
-    blurb: 'Found on organisers’ pages, ticketing sites, reels and news. Nearhood doesn’t sell tickets: every event links out.',
+    blurb: 'Posted by locals, pages and clubs. Nearhood only lists events someone here shared, and never sells tickets: every event links out.',
   },
   getaways: { titleKey: 'discover.cat.getaways', glyph: 'getaways', tone: 'teal', blurb: 'Day trips and weekends your friends added to their lists.' },
   places: { titleKey: 'discover.cat.places', glyph: 'pin', tone: 'green', blurb: 'Lakes, markets, heritage and things to do around you.' },
@@ -58,6 +60,9 @@ const PLACE_CHIPS: Record<string, Array<{ id: string; label: string; test: (p: P
     { id: 'full', label: 'Full day or more', test: (p) => p.distanceKm > 80 },
   ],
 };
+
+/** Today first, then the weekend, for "Soonest". */
+const DAY_ORDER: CityEvent['day'][] = ['Today', 'Tomorrow', 'Fri', 'Sat', 'Sat–Sun', 'Sun'];
 
 const EVENT_CHIPS: Array<{ id: string; label: string; test: (e: CityEvent) => boolean }> = [
   { id: 'all', label: 'All', test: () => true },
@@ -100,16 +105,17 @@ export default function Category() {
   const events = useMemo(() => {
     if (category !== 'events') return [];
     const test = EVENT_CHIPS.find((c) => c.id === chip)?.test ?? (() => true);
-    const list = EVENTS.filter((e) => (e.confirmed || settings.sources.showUnconfirmed) && e.sources.some(allowed)).filter(test);
-    // "Popular" means popular with your friends first, then how many places it was seen on.
+    // Only events a person, page or club posted; nothing gathered from elsewhere.
+    const list = EVENTS.filter((e) => eventHost(e) && (e.confirmed || settings.sources.showUnconfirmed)).filter(test);
+    // "Popular" means popular with your friends first; "Soonest" means today, then the weekend.
     const keen = (e: CityEvent) => {
       const f = eventFriends(e.id, data);
       return f.want.length + f.went.length;
     };
     return [...list].sort((a, b) =>
-      sort === 'nearest' ? a.distanceKm - b.distanceKm : sort === 'top' ? b.sources.length - a.sources.length : keen(b) - keen(a) || b.sources.length - a.sources.length,
+      sort === 'nearest' ? a.distanceKm - b.distanceKm : sort === 'top' ? DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day) : keen(b) - keen(a) || a.distanceKm - b.distanceKm,
     );
-  }, [category, chip, sort, allowed, settings.sources.showUnconfirmed, data]);
+  }, [category, chip, sort, settings.sources.showUnconfirmed, data]);
 
   if (!config) {
     return (
@@ -168,7 +174,7 @@ export default function Category() {
           options={[
             { value: 'popular', label: category === 'events' ? t('discover.sort.friends') : t('discover.sort.popular') },
             { value: 'nearest', label: t('discover.sort.nearest') },
-            { value: 'top', label: category === 'events' ? t('common.verified') : t('community.mostMust') },
+            { value: 'top', label: category === 'events' ? 'Soonest' : t('community.mostMust') },
           ]}
         />
 
@@ -176,11 +182,11 @@ export default function Category() {
           events.length ? (
             <div className="list">
               {events.map((e) => (
-                <EventLinkRow key={e.id} event={e} />
+                <PostedEventRow key={e.id} event={e} />
               ))}
             </div>
           ) : (
-            <EmptyState glyph="events" title="No events match" body="Try another filter." />
+            <EmptyState glyph="events" title="No events match" body="Try another filter. Events show up here when a person, page or club posts one." />
           )
         ) : null}
 
@@ -205,5 +211,24 @@ export default function Category() {
         ) : null}
       </main>
     </>
+  );
+}
+
+/** An event as one row, labelled with who posted it: a person, a page or a club. */
+function PostedEventRow({ event }: { event: CityEvent }) {
+  const host = eventHost(event)!;
+  const by = host.kind === 'page' ? `Posted by the page ${host.name}` : host.kind === 'club' ? `Posted in ${host.name}` : `Shared by ${host.name}`;
+  return (
+    <Link to={`/event/${event.id}`} className={`list-row glyph-host${event.confirmed ? '' : ' event-link-row--unconfirmed'}`}>
+      <Cover src={eventPhoto(event.id)} glyph={event.glyph} tone={event.tone} className="place-thumb" />
+      <span className="list-row__body">
+        <span className="list-row__title">{event.title}</span>
+        <span className="list-row__meta">
+          {event.day}, {event.time} · {event.area} · {event.price === 0 ? 'Free' : price(event.price)}
+        </span>
+        <span className="list-row__meta posted-by">{event.confirmed ? by : `${by} · not confirmed yet`}</span>
+      </span>
+      <ChevronRightGlyph size={16} />
+    </Link>
   );
 }
