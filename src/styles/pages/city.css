@@ -46,7 +46,7 @@
   position: relative;
   height: 210px;
   margin: 0 calc(var(--gutter) * -1);
-  background: #24324a;
+  background: #262628;
   color: #ffffff;
   overflow: hidden;
 }

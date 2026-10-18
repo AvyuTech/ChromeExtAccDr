@@ -251,9 +251,9 @@
 }
 .chip[aria-pressed='true'],
 .chip--on {
-  background: var(--accent-fill);
-  border-color: var(--accent-fill);
-  color: var(--on-accent);
+  background: var(--selected-bg);
+  border-color: var(--selected-bg);
+  color: var(--selected-ink);
   font-weight: 700;
 }
 .chip--accent[aria-pressed='true'] {
@@ -1318,9 +1318,9 @@ button.list-row:active {
     height: min(868px, calc(100dvh - 48px));
     padding: 12px;
     border-radius: 58px;
-    background: linear-gradient(145deg, #2a2f3b, #12151c);
+    background: linear-gradient(145deg, #2c2c2f, #111113);
     box-shadow:
-      0 0 0 2px #3a4050,
+      0 0 0 2px #3c3c40,
       0 40px 90px rgba(29, 35, 48, 0.35),
       inset 0 0 0 2px rgba(255, 255, 255, 0.06);
   }
@@ -1394,7 +1394,7 @@ button.list-row:active {
     height: 32px;
     border-radius: 16px;
     transform: translateX(-50%);
-    background: #0b0d12;
+    background: #0b0b0c;
   }
   .device__home {
     display: block;

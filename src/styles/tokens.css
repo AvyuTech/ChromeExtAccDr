@@ -99,6 +99,9 @@
   --gutter: 16px;
   --column: 480px;
   --status-h: 0px;
+  /* Selected chips and toggles: violet in light, white on black in dark */
+  --selected-bg: #6c52ee;
+  --selected-ink: #ffffff;
   /* Illustrative map */
   --map-land: #eef0e6;
   --map-street: #fbfbf7;
@@ -115,27 +118,27 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --ground: #12151c;
-    --backdrop: #0a0c11;
-    --surface: #1a1e28;
-    --surface-2: #1f2430;
-    --surface-3: #262c3a;
-    --border: #2a3040;
-    --border-strong: #353c4f;
-    --divider: #242a38;
-    --ink: #f3f3ee;
-    --ink-2: #dfe1e6;
-    --ink-3: #c9ccd5;
-    --muted: #a3a8b6;
-    --faint: #586074;
+    --ground: #0f0f10;
+    --backdrop: #09090a;
+    --surface: #18181a;
+    --surface-2: #1e1e20;
+    --surface-3: #27272a;
+    --border: #2a2a2d;
+    --border-strong: #38383c;
+    --divider: #232325;
+    --ink: #f4f4f2;
+    --ink-2: #e3e3e0;
+    --ink-3: #cacac7;
+    --muted: #a2a2a6;
+    --faint: #5e5e63;
     --accent: #ab9cff;
     --accent-fill: #6c52ee;
     --accent-deep: #5a40db;
-    --accent-strong: #cdc4ff;
-    --accent-tint: #272148;
-    --accent-tint-2: #201c3b;
-    --accent-line: #3f3677;
-    --accent-soft-ink: #ddd5fb;
+    --accent-strong: #e6e2fb;
+    --accent-tint: #262628;
+    --accent-tint-2: #1f1f21;
+    --accent-line: #3a3a3e;
+    --accent-soft-ink: #e6e2fb;
     --on-accent: #ffffff;
     --accent-shadow: rgba(0, 0, 0, 0.5);
     --accent-glow: rgba(108, 82, 238, 0.2);
@@ -160,7 +163,7 @@
     --teal-ink: #84d8d2;
     --teal-tint: #12302e;
     --blue-ink: #aebcff;
-    --blue-tint: #1d2645;
+    --blue-tint: #1f2022;
     --green-ink: #7fdc9b;
     --green-tint: #15301f;
     --yellow-ink: #f5d76c;
@@ -171,46 +174,48 @@
     --red-ink: #ffa3ac;
     --red-tint: #3d1a20;
     --red-line: #5c262f;
-    --night: #0c0e13;
+    --night: #0b0b0c;
+    --selected-bg: #f4f4f2;
+    --selected-ink: #0f0f10;
     --night-ink: #dfff8a;
     --shadow-card: none;
     --shadow-float: 0 16px 40px rgba(0, 0, 0, 0.55);
     --shadow-photo: 0 10px 30px rgba(0, 0, 0, 0.4);
-    --map-land: #1b1f28;
-    --map-street: #222733;
-    --map-block: #20242e;
-    --map-park: #1d2e26;
-    --map-water: #1a2a44;
-    --map-road: #303646;
-    --map-road-edge: #14171e;
-    --map-road-major: #3d4252;
-    --map-label: #7d8396;
+    --map-land: #1a1a1c;
+    --map-street: #222224;
+    --map-block: #1f1f21;
+    --map-park: #1b241e;
+    --map-water: #1d232a;
+    --map-road: #333336;
+    --map-road-edge: #111112;
+    --map-road-major: #3f3f43;
+    --map-label: #86868c;
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --ground: #12151c;
-  --backdrop: #0a0c11;
-  --surface: #1a1e28;
-  --surface-2: #1f2430;
-  --surface-3: #262c3a;
-  --border: #2a3040;
-  --border-strong: #353c4f;
-  --divider: #242a38;
-  --ink: #f3f3ee;
-  --ink-2: #dfe1e6;
-  --ink-3: #c9ccd5;
-  --muted: #a3a8b6;
-  --faint: #586074;
+  --ground: #0f0f10;
+  --backdrop: #09090a;
+  --surface: #18181a;
+  --surface-2: #1e1e20;
+  --surface-3: #27272a;
+  --border: #2a2a2d;
+  --border-strong: #38383c;
+  --divider: #232325;
+  --ink: #f4f4f2;
+  --ink-2: #e3e3e0;
+  --ink-3: #cacac7;
+  --muted: #a2a2a6;
+  --faint: #5e5e63;
   --accent: #ab9cff;
   --accent-fill: #6c52ee;
   --accent-deep: #5a40db;
-  --accent-strong: #cdc4ff;
-  --accent-tint: #272148;
-  --accent-tint-2: #201c3b;
-  --accent-line: #3f3677;
-  --accent-soft-ink: #ddd5fb;
+  --accent-strong: #e6e2fb;
+  --accent-tint: #262628;
+  --accent-tint-2: #1f1f21;
+  --accent-line: #3a3a3e;
+  --accent-soft-ink: #e6e2fb;
   --on-accent: #ffffff;
   --accent-shadow: rgba(0, 0, 0, 0.5);
   --accent-glow: rgba(108, 82, 238, 0.2);
@@ -235,7 +240,7 @@
   --teal-ink: #84d8d2;
   --teal-tint: #12302e;
   --blue-ink: #aebcff;
-  --blue-tint: #1d2645;
+  --blue-tint: #1f2022;
   --green-ink: #7fdc9b;
   --green-tint: #15301f;
   --yellow-ink: #f5d76c;
@@ -246,20 +251,22 @@
   --red-ink: #ffa3ac;
   --red-tint: #3d1a20;
   --red-line: #5c262f;
-  --night: #0c0e13;
+  --night: #0b0b0c;
+  --selected-bg: #f4f4f2;
+  --selected-ink: #0f0f10;
   --night-ink: #dfff8a;
   --shadow-card: none;
   --shadow-float: 0 16px 40px rgba(0, 0, 0, 0.55);
   --shadow-photo: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --map-land: #1b1f28;
-  --map-street: #222733;
-  --map-block: #20242e;
-  --map-park: #1d2e26;
-  --map-water: #1a2a44;
-  --map-road: #303646;
-  --map-road-edge: #14171e;
-  --map-road-major: #3d4252;
-  --map-label: #7d8396;
+  --map-land: #1a1a1c;
+  --map-street: #222224;
+  --map-block: #1f1f21;
+  --map-park: #1b241e;
+  --map-water: #1d232a;
+  --map-road: #333336;
+  --map-road-edge: #111112;
+  --map-road-major: #3f3f43;
+  --map-label: #86868c;
 }
 
 /* Settings › Accessibility › High contrast */
@@ -274,21 +281,21 @@
 }
 @media (prefers-color-scheme: dark) {
   :root[data-contrast='high']:not([data-theme='light']) {
-    --muted: #d6d9e2;
-    --faint: #8e94a6;
-    --border: #4a5268;
-    --border-strong: #5b6480;
-    --divider: #3a4154;
+    --muted: #dcdcdf;
+    --faint: #909096;
+    --border: #4a4a4f;
+    --border-strong: #5c5c62;
+    --divider: #3a3a3e;
     --accent: #c8bdff;
     --accent-strong: #e4deff;
   }
 }
 :root[data-theme='dark'][data-contrast='high'] {
-  --muted: #d6d9e2;
-  --faint: #8e94a6;
-  --border: #4a5268;
-  --border-strong: #5b6480;
-  --divider: #3a4154;
+  --muted: #dcdcdf;
+  --faint: #909096;
+  --border: #4a4a4f;
+  --border-strong: #5c5c62;
+  --divider: #3a3a3e;
   --accent: #c8bdff;
   --accent-strong: #e4deff;
 }

@@ -204,16 +204,16 @@ button.list-row:disabled {
   color: var(--muted);
 }
 .quick-tile[aria-pressed='true'] {
-  border-color: var(--accent-fill);
-  background: var(--accent-fill);
-  color: var(--on-accent);
+  border-color: var(--selected-bg);
+  background: var(--selected-bg);
+  color: var(--selected-ink);
 }
 .quick-tile[aria-pressed='true'] .quick-tile__icon {
   background: var(--lime);
   color: #1d2330;
 }
 .quick-tile[aria-pressed='true'] .quick-tile__state {
-  color: color-mix(in srgb, var(--on-accent) 75%, transparent);
+  color: color-mix(in srgb, var(--selected-ink) 70%, transparent);
 }
 
 /* Outline glyph tiles in settings rows */
@@ -302,11 +302,11 @@ button.list-row:disabled {
   background: var(--m-bg);
 }
 .theme-mock--dark {
-  --m-bg: #12151c;
-  --m-card: #1f2430;
-  --m-ink: #f3f3ee;
-  --m-line: #353c4f;
-  --m-tint: #272148;
+  --m-bg: #0f0f10;
+  --m-card: #1e1e20;
+  --m-ink: #f4f4f2;
+  --m-line: #38383c;
+  --m-tint: #262628;
 }
 .theme-mock__title {
   height: 7px;
