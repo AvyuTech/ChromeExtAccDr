@@ -1,36 +1,19 @@
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
-import { CheckInCard, CheckInGrid, CollectionCard, FollowButton, TasteMatchPill, useFollow } from '../components/friends';
-import { chatLink, ClubRows, clubsOf, DoneRing, PlanCard, ProfileAction, ProfileHero, shareOrCopy, TabStrip, ViewToggle, WantRow } from '../components/people';
-import { KnownFor } from '../components/helpful';
+import { CheckInCard, CheckInGrid, CollectionCard, FollowButton, useFollow } from '../components/friends';
+import { chatLink, clubsOf, DoneRing, PlanCard, ProfileAbout, ProfileAction, ProfileHero, TabStrip, ViewToggle, WantRow } from '../components/people';
+import { ShareSheet } from '../components/share';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { PEOPLE } from '../data/core';
 import { useT } from '../i18n';
-import { ChatGlyph, CheckGlyph, CopyGlyph, FlagGlyph, LockGlyph, MoreGlyph, PlusGlyph, ShareGlyph, UserGlyph } from '../icons';
+import { ChatGlyph, CheckGlyph, FlagGlyph, InfoGlyph, LockGlyph, MoreGlyph, PlusGlyph, ShareGlyph, SkipGlyph, UserGlyph } from '../icons';
 import { compact } from '../lib/format';
 import { allCheckIns, canSee, collectionsFor, isFollowing, profileInfo, sharedWants } from '../lib/friends';
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
 
-type Tab = 'checkins' | 'want' | 'clubs' | 'lists';
-const TABS: Tab[] = ['checkins', 'want', 'clubs', 'lists'];
-
-const TASTE_LABEL: Record<string, string> = {
-  cafes: 'Cafés',
-  brunch: 'Brunch',
-  korean: 'Korean',
-  gujarati: 'Gujarati food',
-  'street food': 'Street food',
-  heritage: 'Heritage',
-  sports: 'Sports',
-  getaways: 'Getaways',
-  workshops: 'Workshops',
-  kids: 'Kids & family',
-  nature: 'Parks & lakes',
-  wellness: 'Wellness',
-  shopping: 'Shopping',
-  family: 'Family outings',
-};
+type Tab = 'checkins' | 'want' | 'lists';
+const TABS: Tab[] = ['checkins', 'want', 'lists'];
 
 /** Follow as a round icon: a person with a plus, or a tick once you follow. */
 function FollowAction({ personId }: { personId: string }) {
@@ -53,6 +36,8 @@ export default function Profile() {
   const toast = useToast();
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [more, setMore] = useState(false);
+  const [about, setAbout] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   if (id === 'me') return <Navigate to="/me" replace />;
   const p = PEOPLE[id];
@@ -92,16 +77,8 @@ export default function Profile() {
   const lists = collectionsFor(data, id);
   const clubs = clubsOf(id);
 
-  const profileUrl = `${window.location.origin}${window.location.pathname}#/people/${id}`;
-  const share = async () => {
-    const res = await shareOrCopy(`${p.name} on Nearhood`, profileUrl);
-    if (res === 'copied') toast('Profile link copied');
-    else if (res === 'failed') toast('Could not share right now');
-  };
-
   const stats = [
     { label: t('people.checkins'), value: info.checkIns },
-    { label: t('people.places'), value: info.places },
     { label: t('people.followers'), value: info.followers + (following ? 1 : 0) },
     { label: t('people.following'), value: info.following },
   ];
@@ -114,23 +91,14 @@ export default function Profile() {
           who={p}
           label={p.name}
           name={p.name}
-          sub={`@${info.handle} · ${t('people.since', { year: info.since })}`}
-          place={p.area}
-          badges={
-            <>
-              {info.followsMe ? <span className="badge">{t('people.followsYou')}</span> : null}
-              <TasteMatchPill personId={id} />
-            </>
-          }
+          sub={`@${info.handle} · ${p.area}${info.followsMe ? ` · ${t('people.followsYou')}` : ''}`}
           bio={info.bio}
+          onAbout={() => setAbout(true)}
           actions={
             <>
               <FollowAction personId={id} />
               <ProfileAction to={chatLink(id)} label={t('people.message')}>
                 <ChatGlyph size={18} />
-              </ProfileAction>
-              <ProfileAction label={t('common.share')} onClick={share}>
-                <ShareGlyph size={18} />
               </ProfileAction>
               <ProfileAction label="More" ariaLabel={`More about ${first}`} onClick={() => setMore(true)}>
                 <MoreGlyph size={18} />
@@ -139,27 +107,6 @@ export default function Profile() {
           }
           stats={stats.map((st) => ({ label: st.label, value: compact(st.value) }))}
         />
-
-        <KnownFor personId={id} />
-
-        {info.tasteTags.length ? (
-          <section className="taste-row" aria-label={`${first} is into`}>
-            <span className="eyebrow muted">{t('people.taste')}</span>
-            <div className="chip-row">
-              {info.tasteTags.map((tag) => (
-                <span key={tag} className="chip chip--static">
-                  {TASTE_LABEL[tag] ?? tag}
-                </span>
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        {shared.length ? (
-          <section className="section" aria-label={t('people.bothWant')}>
-            <PlanCard personId={id} items={shared} />
-          </section>
-        ) : null}
 
         <TabStrip
           idPrefix="profile"
@@ -176,14 +123,6 @@ export default function Profile() {
                 </>
               ),
             },
-            {
-              id: 'clubs',
-              label: (
-                <>
-                  {t('people.tab.clubs')} <span className="muted">{clubs.length}</span>
-                </>
-              ),
-            },
             { id: 'lists', label: t('people.tab.lists') },
           ]}
         />
@@ -193,9 +132,7 @@ export default function Profile() {
             <>
               {visible.length ? (
                 <div className="row row--between checkin-count">
-                  <span className="meta strong">
-                    {visible.length} {visible.length === 1 ? 'check-in' : 'check-ins'}
-                  </span>
+                  <span className="meta strong">Recent check-ins</span>
                   <ViewToggle value={view} onChange={setView} />
                 </div>
               ) : null}
@@ -235,6 +172,7 @@ export default function Profile() {
           {tab === 'want' ? (
             list.length ? (
               <>
+                {shared.length ? <PlanCard personId={id} items={shared} /> : null}
                 <div className="row">
                   <DoneRing done={done.length} total={list.length} size={40} />
                   <div className="stack grow" style={{ gap: 2 }}>
@@ -253,14 +191,6 @@ export default function Profile() {
             )
           ) : null}
 
-          {tab === 'clubs' ? (
-            clubs.length ? (
-              <ClubRows clubs={clubs.map((c) => c.club)} adminIds={clubs.filter((c) => c.admin).map((c) => c.club.id)} />
-            ) : (
-              <EmptyState glyph="groups" title={t('people.emptyClubs')} body={`${first} isn’t in any clubs yet.`} />
-            )
-          ) : null}
-
           {tab === 'lists' ? (
             lists.length ? (
               <div className="grid-2 people-list-grid">
@@ -276,36 +206,39 @@ export default function Profile() {
       </main>
 
       <Sheet open={more} onClose={() => setMore(false)} title={p.name}>
-        <div className="list">
+        <div className="list list--grouped">
           <button
             type="button"
             className="list-row"
-            onClick={async () => {
+            onClick={() => {
               setMore(false);
-              try {
-                await navigator.clipboard.writeText(profileUrl);
-                toast('Profile link copied');
-              } catch {
-                toast('Could not copy right now');
-              }
+              setSharing(true);
             }}
           >
-            <span className="tile">
-              <CopyGlyph size={18} />
+            <span className="set-tile">
+              <ShareGlyph size={17} />
             </span>
             <span className="list-row__body">
-              <span className="list-row__title">Copy profile link</span>
+              <span className="list-row__title">Share profile</span>
             </span>
           </button>
-          <Link to="/settings/privacy" className="list-row" onClick={() => setMore(false)}>
-            <span className="tile">
-              <LockGlyph size={18} />
+          <button
+            type="button"
+            className="list-row"
+            onClick={() => {
+              setMore(false);
+              setAbout(true);
+            }}
+          >
+            <span className="set-tile">
+              <InfoGlyph size={17} />
             </span>
             <span className="list-row__body">
-              <span className="list-row__title">Who can see your check-ins</span>
-              <span className="list-row__meta">Privacy settings</span>
+              <span className="list-row__title">About {first}</span>
             </span>
-          </Link>
+          </button>
+        </div>
+        <div className="list list--grouped">
           <button
             type="button"
             className="list-row"
@@ -314,17 +247,46 @@ export default function Profile() {
               toast(`Thanks. A moderator will look at ${first}’s profile.`);
             }}
           >
-            <span className="tile" style={{ background: 'var(--red-tint)', color: 'var(--red)' }}>
-              <FlagGlyph size={18} />
+            <span className="set-tile">
+              <FlagGlyph size={17} />
+            </span>
+            <span className="list-row__body">
+              <span className="list-row__title">Report profile</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="list-row"
+            onClick={() => {
+              setMore(false);
+              toast(`${first} is blocked. They can’t see your check-ins or message you.`);
+            }}
+          >
+            <span className="set-tile">
+              <SkipGlyph size={17} />
             </span>
             <span className="list-row__body">
               <span className="list-row__title" style={{ color: 'var(--red-ink)' }}>
-                Report profile
+                Block {first}
               </span>
             </span>
           </button>
         </div>
       </Sheet>
+
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} title={p.name} path={`/people/${id}`} message={`Have a look at ${p.name} on Nearhood`} />
+      <ProfileAbout
+        open={about}
+        onClose={() => setAbout(false)}
+        personId={id}
+        name={p.name}
+        area={p.area}
+        since={info.since}
+        followsMe={info.followsMe}
+        tasteTags={info.tasteTags}
+        clubs={clubs.map((c) => c.club)}
+        adminIds={clubs.filter((c) => c.admin).map((c) => c.club.id)}
+      />
     </>
   );
 }

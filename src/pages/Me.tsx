@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { itemPhoto, placePhoto } from '../assets/photos';
+import { placePhoto } from '../assets/photos';
 import { Cover } from '../components/cards';
-import { AvatarStack, CheckInCard, CheckInGrid, CollectionCard } from '../components/friends';
-import { ClubRows, DoneRing, myClubs, ProfileAction, ProfileHero, shareOrCopy, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
-import { LevelProgress } from '../components/helpful';
+import { CheckInCard, CheckInGrid, CollectionCard } from '../components/friends';
+import { DoneRing, myClubs, ProfileAbout, ProfileHero, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
+import { ShareSheet } from '../components/share';
 import { EmptyState, Sheet } from '../components/ui';
 import { REPORTS } from '../data/city';
 import { PEOPLE, neighbourhoodName } from '../data/core';
@@ -18,7 +18,6 @@ import {
   ChatGlyph,
   CheckGlyph,
   ChevronRightGlyph,
-  EditGlyph,
   FriendsGlyph,
   GroupsGlyph,
   HelpGlyph,
@@ -29,25 +28,20 @@ import {
   PlusGlyph,
   ReportGlyph,
   SaveGlyph,
-  ShareGlyph,
+  ShieldGlyph,
   SlidersGlyph,
   StarGlyph,
-  StepRing,
   UpvoteGlyph,
 } from '../icons';
-import { collectionFor, collectionsFor, isFriend, isWanted, profileInfo } from '../lib/friends';
+import { collectionFor, collectionsFor, isWanted, profileInfo } from '../lib/friends';
 import { unreadMessageCount, unreadNotificationCount } from '../lib/selectors';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 import { GlyphTile, SettingLink } from './settings/parts';
 
-/* A peek at what a first check-in looks like. */
-const FIRST_PHOTOS = [itemPhoto('Cold brew'), itemPhoto('Dosa'), itemPhoto('Sunrise yoga')].filter((x): x is string => !!x);
-
-
-type Tab = 'checkins' | 'want' | 'clubs' | 'lists' | 'impact';
-const TABS: Tab[] = ['checkins', 'want', 'clubs', 'lists', 'impact'];
+type Tab = 'checkins' | 'want' | 'lists';
+const TABS: Tab[] = ['checkins', 'want', 'lists'];
 
 export default function Me() {
   const t = useT();
@@ -60,6 +54,8 @@ export default function Me() {
   const { apply } = useListEdits();
   const [confirm, setConfirm] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [about, setAbout] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const myPages = pagesRunBy('me');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [newList, setNewList] = useState(false);
@@ -79,13 +75,11 @@ export default function Me() {
   const profile = settings.profile;
   const info = profileInfo('me');
   const me = { ...PEOPLE.me, name: profile.name, initials: (profile.name.trim()[0] ?? 'N').toUpperCase(), verified: profile.verifiedResident };
+  const area = neighbourhoodName(settings.location.home);
   const myReports = [...data.myReports, ...REPORTS.filter((r) => r.mine)];
-  const fixed = myReports.filter((r) => r.status === 4).length;
-  const open = myReports.length - fixed;
   const savedCount = data.savedPlaces.length + data.savedEvents.length + data.savedPosts.length;
   const unread = unreadNotificationCount(settings, data);
   const unreadChats = unreadMessageCount(data);
-  const friends = data.following.filter((id) => isFriend(data, id)).length;
 
   const want = data.wantToTry;
   const wantOpen = want.filter((w) => !w.done);
@@ -95,11 +89,11 @@ export default function Me() {
   const myLists = collectionsFor(data, 'me').map(apply);
   const followedLists = data.followedCollections.map((id) => collectionFor(data, id)).filter((c): c is NonNullable<typeof c> => !!c);
 
+  // Your check-ins are the ones on this device, so the stat, the grid and the empty state agree.
   const stats = [
     { label: t('people.checkins'), value: data.myCheckIns.length, to: undefined as string | undefined },
-    { label: t('people.followers'), value: info.followers, to: '/friends?tab=find' },
+    { label: t('people.followers'), value: info.followers, to: '/friends' },
     { label: t('people.following'), value: data.following.length, to: '/friends?tab=following' },
-    { label: t('me.helpful'), value: HELPFUL.me.lifetime, to: '/me/impact' },
   ];
 
   const addItem = (e: FormEvent) => {
@@ -124,12 +118,6 @@ export default function Me() {
         onClick: () => navigate(w.refId ? `/checkin?place=${encodeURIComponent(w.refId)}` : '/checkin'),
       });
     }
-  };
-
-  const shareProfile = async () => {
-    const res = await shareOrCopy(`${profile.name} on Nearhood`, `${window.location.origin}${window.location.pathname}#/people/me`);
-    if (res === 'copied') toast('Profile link copied');
-    else if (res === 'failed') toast('Could not share right now');
   };
 
   const createList = (e: FormEvent) => {
@@ -179,28 +167,19 @@ export default function Me() {
           who={me}
           label={profile.name}
           name={profile.name}
-          sub={`@${profile.handle}`}
-          place={`${neighbourhoodName(settings.location.home)}, ${settings.location.city}`}
+          sub={`@${profile.handle} · ${area}`}
           online
           mine
+          buttons
           bio={profile.bio || undefined}
           actions={
             <>
-              <ProfileAction to="/checkin" label="Check in" primary>
-                <PlusGlyph size={19} />
-              </ProfileAction>
-              <ProfileAction to="/settings/account" label={t('me.editProfile')}>
-                <EditGlyph size={18} />
-              </ProfileAction>
-              <ProfileAction label={t('common.share')} onClick={shareProfile}>
-                <ShareGlyph size={18} />
-              </ProfileAction>
-              <ProfileAction to="/me/saved" label={t('me.saved')}>
-                <SaveGlyph size={18} />
-              </ProfileAction>
-              <ProfileAction to="/settings" label={t('common.settings')}>
-                <SlidersGlyph size={18} />
-              </ProfileAction>
+              <Link to="/settings/account" className="btn btn--soft btn--sm profile-btn">
+                {t('me.editProfile')}
+              </Link>
+              <button type="button" className="btn btn--soft btn--sm profile-btn" onClick={() => setSharing(true)}>
+                Share profile
+              </button>
             </>
           }
           stats={stats.map((st) => ({
@@ -213,15 +192,6 @@ export default function Me() {
               st.value
             ),
           }))}
-          footer={
-            <Link to="/friends?tab=following" className="me-friends-row">
-              <AvatarStack ids={data.following.filter((id) => isFriend(data, id)).slice(0, 4)} size={22} max={4} />
-              <span className="grow">
-                <b>{friends}</b> {friends === 1 ? 'friend' : 'friends'} · following {data.following.length}
-              </span>
-              <span className="section__link">{t('people.friends')}</span>
-            </Link>
-          }
         />
 
         <TabStrip
@@ -239,16 +209,7 @@ export default function Me() {
                 </>
               ),
             },
-            {
-              id: 'clubs',
-              label: (
-                <>
-                  {t('people.tab.clubs')} <span className="muted">{clubs.length}</span>
-                </>
-              ),
-            },
             { id: 'lists', label: t('people.tab.lists') },
-            { id: 'impact', label: t('people.tab.impact') },
           ]}
         />
 
@@ -273,23 +234,17 @@ export default function Me() {
                 )}
               </>
             ) : (
-              <section className="first-checkin" aria-labelledby="first-ci">
-                <span className="first-checkin__photos" aria-hidden="true">
-                  {FIRST_PHOTOS.map((src) => (
-                    <img key={src} src={src} alt="" loading="lazy" decoding="async" />
-                  ))}
-                </span>
-                <div className="first-checkin__body">
-                  <h2 className="first-checkin__title" id="first-ci">
-                    {t('people.firstCheckin')}
-                  </h2>
-                  <p className="body-sm muted">{t('people.firstCheckinBody')}</p>
-                  <Link to="/checkin" className="btn btn--primary btn--sm" style={{ alignSelf: 'flex-start', marginTop: 4 }}>
+              <EmptyState
+                glyph="checkin"
+                title={t('people.firstCheckin')}
+                body={t('people.firstCheckinBody')}
+                action={
+                  <Link to="/checkin" className="btn btn--primary btn--sm">
                     <PlusGlyph size={13} />
                     Check in
                   </Link>
-                </div>
-              </section>
+                }
+              />
             )
           ) : null}
 
@@ -347,33 +302,6 @@ export default function Me() {
             </>
           ) : null}
 
-          {tab === 'clubs' ? (
-            <>
-              <div className="row row--between checkin-count">
-                <span className="meta strong">
-                  {clubs.length} {clubs.length === 1 ? 'club' : 'clubs'}
-                </span>
-                <Link to="/clubs/new" className="section__link">
-                  {t('people.startClub')}
-                </Link>
-              </div>
-              {clubs.length ? (
-                <ClubRows clubs={clubs} adminIds={clubs.filter((g) => g.admins.includes('me')).map((g) => g.id)} />
-              ) : (
-                <EmptyState
-                  glyph="groups"
-                  title={t('people.emptyClubs')}
-                  body="Join a club near you, or start one: neighbours, founders, cricket lovers, parents."
-                  action={
-                    <Link to="/clubs" className="btn btn--primary btn--sm">
-                      {t('people.findClubs')}
-                    </Link>
-                  }
-                />
-              )}
-            </>
-          ) : null}
-
           {tab === 'lists' ? (
             <>
               <section className="section" aria-labelledby="my-lists">
@@ -413,40 +341,6 @@ export default function Me() {
             </>
           ) : null}
 
-          {tab === 'impact' ? (
-            <section className="stack me-impact-flat" aria-labelledby="impact-title">
-              <div className="row row--between">
-                <h2 className="section__title" id="impact-title">
-                  {t('me.impact')}
-                </h2>
-                <Link to="/me/impact" className="section__link">
-                  Points history
-                </Link>
-              </div>
-              <div className="grid-3 me-impact">
-                <Link to="/city/reports" className="me-impact__cell">
-                  <StepRing step={4} steps={5} size={48}>
-                    <span className="num">{fixed}</span>
-                  </StepRing>
-                  <span className="meta">{t('me.streetsFixed')}</span>
-                </Link>
-                <Link to="/city/reports" className="me-impact__cell">
-                  <StepRing step={2} steps={5} size={48}>
-                    <span className="num">{open}</span>
-                  </StepRing>
-                  <span className="meta">{t('me.inProgress')}</span>
-                </Link>
-                <Link to="/me/impact" className="me-impact__cell">
-                  <span className="me-impact__big num">{HELPFUL.me.thisMonth}</span>
-                  <span className="meta">Helpful this month</span>
-                </Link>
-              </div>
-              <LevelProgress personId="me" />
-              <Link to="/heroes" className="section__link" style={{ alignSelf: 'flex-start' }}>
-                See City heroes
-              </Link>
-            </section>
-          ) : null}
         </div>
 
       </main>
@@ -526,6 +420,21 @@ export default function Me() {
             {t('me.shortcuts')}
           </h2>
           <div className="list list--grouped">
+            <button
+              type="button"
+              className="list-row"
+              onClick={() => {
+                setMenu(false);
+                setAbout(true);
+              }}
+            >
+              <GlyphTile G={ShieldGlyph} />
+              <span className="list-row__body">
+                <span className="list-row__title">About you</span>
+                <span className="list-row__meta">How others see you: checks, topics, clubs</span>
+              </span>
+              <ChevronRightGlyph size={16} style={{ color: 'var(--muted)', flexShrink: 0 }} />
+            </button>
             <SettingLink to="/me/impact" G={UpvoteGlyph} title="Your impact" trail={<span className="set-trail">{HELPFUL.me.lifetime}</span>} />
             <SettingLink to="/heroes" G={StarGlyph} title="City heroes" />
             <SettingLink to="/me/saved" G={SaveGlyph} tone="violet" title={t('me.saved')} trail={<span className="set-trail">{savedCount}</span>} />
@@ -576,6 +485,19 @@ export default function Me() {
         </section>
         </div>
       </Sheet>
+
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} title="your profile" path="/people/me" message={`Find me on Nearhood: ${profile.name}`} />
+      <ProfileAbout
+        open={about}
+        onClose={() => setAbout(false)}
+        personId="me"
+        name={profile.name}
+        area={area}
+        since={info.since}
+        tasteTags={info.tasteTags}
+        clubs={clubs}
+        adminIds={clubs.filter((g) => g.admins.includes('me')).map((g) => g.id)}
+      />
 
       <Sheet open={confirm} onClose={() => setConfirm(false)} title={t('settings.signOutTitle')}>
         <p className="body-sm">{t('settings.signOutBody')}</p>

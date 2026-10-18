@@ -1,4 +1,4 @@
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { eventPhoto, groupPhoto, photo, placePhoto, scenePhoto } from '../assets/photos';
 import { person } from '../data/core';
@@ -8,12 +8,16 @@ import { GROUPS } from '../data/social';
 import type { AppData } from '../state/appData';
 import type { Collection, Group, Person, Tone, WantItem } from '../data/types';
 import { useT } from '../i18n';
-import { CheckGlyph, PinGlyph, TrashGlyph, type GlyphName } from '../icons';
+import { CheckGlyph, ChevronRightGlyph, PinGlyph, ShieldGlyph, StarGlyph, TrashGlyph, type GlyphName } from '../icons';
 import { useAppData } from '../state/appData';
 import { Avatar, Cover } from './cards';
-import { AvatarStack, WantButton } from './friends';
-import { HelpfulLine } from './helpful';
-import { AskMeAbout, IdentitySheet, TrustLine, useIdentity, WorkLine } from './identity';
+import { AvatarStack, TasteMatchPill, WantButton } from './friends';
+import { HelpfulLine, levelTitle, useBoardContext, useLevel } from './helpful';
+import { IdentityRows, useIdentity, WorkLine } from './identity';
+import { Sheet } from './ui';
+import { isFullyVerified } from '../data/identity';
+import { compact } from '../lib/format';
+import { rankOf, topStrengths } from '../lib/helpful';
 import { pagesRunBy } from '../lib/places';
 
 /* Pieces shared by the Friends hub, profiles, lists and Me. */
@@ -64,51 +68,63 @@ const COVER: Record<string, string> = {
 
 export const coverPhoto = (personId: string) => photo(COVER[personId] ?? '') ?? scenePhoto('sunset-friends');
 
+/** Labels for the "Into" tags on profiles. */
+export const TASTE_LABEL: Record<string, string> = {
+  cafes: 'Cafés',
+  brunch: 'Brunch',
+  korean: 'Korean',
+  gujarati: 'Gujarati food',
+  'street food': 'Street food',
+  heritage: 'Heritage',
+  sports: 'Sports',
+  getaways: 'Getaways',
+  workshops: 'Workshops',
+  kids: 'Kids & family',
+  nature: 'Parks & lakes',
+  wellness: 'Wellness',
+  shopping: 'Shopping',
+  family: 'Family outings',
+};
+
 /**
  * Profile top, Instagram style: a full-bleed cover, the avatar overlapping it with
- * the stats beside it, then name, badges, bio and full-width actions. No card.
+ * three stats beside it, then only what tells you who someone is: name, work, the
+ * pages they run, where they stand, bio. Everything else lives in About.
  */
 export function ProfileHero({
   who,
   label,
   name,
   sub,
-  place,
-  badges,
   bio,
   actions,
+  buttons,
   stats,
   online,
-  footer,
   mine,
+  onAbout,
 }: {
   who: Person;
   label: string;
   name: string;
   sub: ReactNode;
-  place?: string;
-  badges?: ReactNode;
   bio?: string;
   actions: ReactNode;
+  /** Actions are side-by-side buttons (your own profile) rather than round icons. */
+  buttons?: boolean;
   stats: Array<{ label: string; value: ReactNode }>;
   online?: boolean;
-  footer?: ReactNode;
-  /** Your own profile: the identity sheet links to edit it. */
+  /** Your own profile: the standing line shows your progress and opens Your impact. */
   mine?: boolean;
+  /** Opens the About sheet from the standing line. */
+  onAbout?: () => void;
 }) {
   const identity = useIdentity(who.id);
-  const [idOpen, setIdOpen] = useState(false);
   const runs = pagesRunBy(who.id);
   return (
     <section className="profile-hero" aria-label={label}>
       <div className="profile-hero__cover">
         <img src={coverPhoto(who.id)} alt="" />
-        {place ? (
-          <span className="photo-pill profile-hero__place">
-            <PinGlyph size={12} />
-            {place}
-          </span>
-        ) : null}
       </div>
       <div className="profile-hero__top">
         <span className="profile-hero__avatar">
@@ -143,16 +159,160 @@ export function ProfileHero({
             </span>
           </span>
         ) : null}
-        <HelpfulLine personId={who.id} />
+        {mine ? <HelpfulLine personId={who.id} /> : <StandingLine personId={who.id} onOpen={onAbout} />}
         {bio ? <p className="profile-hero__bio">{bio}</p> : null}
-        <TrustLine identity={identity} area={who.area} onOpen={() => setIdOpen(true)} />
-        <AskMeAbout identity={identity} />
-        {badges ? <div className="profile-hero__badges">{badges}</div> : null}
       </div>
-      <IdentitySheet open={idOpen} onClose={() => setIdOpen(false)} name={name} identity={identity} area={who.area} mine={mine} />
-      <div className="profile-hero__actions">{actions}</div>
-      {footer}
+      <div className={`profile-hero__actions${buttons ? ' profile-hero__actions--buttons' : ''}`}>{actions}</div>
     </section>
+  );
+}
+
+/** "★ City hero · 4,820 helpful · Verified": where someone stands, in one line. Opens About. */
+export function StandingLine({ personId, onOpen }: { personId: string; onOpen?: () => void }) {
+  const identity = useIdentity(personId);
+  const info = useLevel(personId);
+  const full = isFullyVerified(identity);
+  return (
+    <button type="button" className="standing-line" onClick={onOpen} aria-haspopup="dialog">
+      <span className="standing-line__level">
+        {info.level.id === 'hero' ? <StarGlyph size={12} /> : null}
+        {levelTitle(personId, info)}
+      </span>
+      <span className="grow">
+        · {info.points.toLocaleString('en-IN')} helpful ·{' '}
+        <span className={`standing-line__check${full ? ' is-full' : ''}`}>
+          <ShieldGlyph size={12} />
+          {full ? 'Verified' : 'Partly verified'}
+        </span>
+      </span>
+      <ChevronRightGlyph size={14} />
+    </button>
+  );
+}
+
+/**
+ * About someone, in one sheet: where they stand, what they're known for and happy
+ * to be asked about, what they're into, the checks behind "Verified", their clubs.
+ */
+export function ProfileAbout({
+  open,
+  onClose,
+  personId,
+  name,
+  area,
+  since,
+  followsMe,
+  tasteTags,
+  clubs,
+  adminIds = [],
+}: {
+  open: boolean;
+  onClose: () => void;
+  personId: string;
+  name: string;
+  area: string;
+  since: string;
+  followsMe?: boolean;
+  tasteTags: string[];
+  clubs: Group[];
+  adminIds?: string[];
+}) {
+  const mine = personId === 'me';
+  const first = name.split(' ')[0];
+  const identity = useIdentity(personId);
+  const info = useLevel(personId);
+  const ctx = useBoardContext();
+  const rank = rankOf(personId, { scope: 'area', area, period: 'month', sortBy: 'points' }, ctx);
+  const strengths = topStrengths(personId, 3);
+  const ask = identity.askMeAbout ?? [];
+  return (
+    <Sheet open={open} onClose={onClose} title={mine ? 'About you' : `About ${first}`}>
+      <div className="about" onClick={(e) => (e.target as HTMLElement).closest('a') && onClose()}>
+        <section className="about-sec">
+          <h3 className="about-sec__title">Where {mine ? 'you stand' : `${first} stands`}</h3>
+          <Link to={mine ? '/me/impact' : '/heroes'} className="about-standing">
+            <span className="about-standing__level">
+              {info.level.id === 'hero' ? <StarGlyph size={13} /> : null}
+              {levelTitle(personId, info)}
+            </span>
+            <span className="meta">
+              {info.points.toLocaleString('en-IN')} helpful points
+              {rank ? ` · #${rank.rank} in ${area} this month` : ''}
+            </span>
+            <span className="section__link">{mine ? 'Your impact' : 'See City heroes'}</span>
+          </Link>
+        </section>
+
+        {strengths.length || ask.length ? (
+          <section className="about-sec">
+            {strengths.length ? (
+              <>
+                <h3 className="about-sec__title">Known for</h3>
+                <div className="about-chips">
+                  {strengths.map((st) => (
+                    <Link key={st.topic} to={`/ask?q=${encodeURIComponent(st.topic)}`} className="id-ask__chip">
+                      {st.topic} <span className="muted num">{compact(st.points)}</span>
+                    </Link>
+                  ))}
+                </div>
+              </>
+            ) : null}
+            {ask.length ? (
+              <>
+                <h3 className="about-sec__title">{mine ? 'Happy to be asked about' : `Ask ${first} about`}</h3>
+                <div className="about-chips">
+                  {ask.map((topic) => (
+                    <Link key={topic} to={`/ask?q=${encodeURIComponent(topic)}`} className="id-ask__chip">
+                      {topic}
+                    </Link>
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </section>
+        ) : null}
+
+        {tasteTags.length ? (
+          <section className="about-sec">
+            <h3 className="about-sec__title">Into</h3>
+            <div className="about-chips">
+              {tasteTags.map((tag) => (
+                <span key={tag} className="id-ask__chip">
+                  {TASTE_LABEL[tag] ?? tag}
+                </span>
+              ))}
+            </div>
+            {mine ? null : (
+              <span>
+                <TasteMatchPill personId={personId} />
+              </span>
+            )}
+          </section>
+        ) : null}
+
+        <section className="about-sec">
+          <h3 className="about-sec__title">Checks</h3>
+          <IdentityRows identity={identity} area={area} />
+          {mine ? (
+            <Link to="/settings/identity" className="section__link">
+              Edit identity and work
+            </Link>
+          ) : null}
+        </section>
+
+        {clubs.length ? (
+          <section className="about-sec">
+            <h3 className="about-sec__title">Clubs</h3>
+            <ClubRows clubs={clubs} adminIds={adminIds} />
+          </section>
+        ) : null}
+
+        <p className="meta about-foot">
+          On Nearhood since {since}
+          {followsMe ? ' · Follows you' : ''}
+        </p>
+      </div>
+    </Sheet>
   );
 }
 

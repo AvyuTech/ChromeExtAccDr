@@ -59,8 +59,8 @@ export function AskMeAbout({ identity }: { identity: Identity }) {
   );
 }
 
-/** What has been checked for this person, and how Nearhood checks people. */
-export function IdentitySheet({ open, onClose, name, identity, area, mine }: { open: boolean; onClose: () => void; name: string; identity: Identity; area: string; mine?: boolean }) {
+/** One row per check (phone, ID, home, work, vouches), with how Nearhood checks it. */
+export function IdentityRows({ identity, area }: { identity: Identity; area: string }) {
   const w = identity.work;
   const rows = [
     { G: PhoneGlyph, title: 'Phone number', done: identity.checks.phone, how: 'One-time code to an Indian mobile number.' },
@@ -75,21 +75,28 @@ export function IdentitySheet({ open, onClose, name, identity, area, mine }: { o
     { G: UsersGlyph, title: `${identity.vouches} neighbours vouched`, done: identity.vouches >= 3, how: 'People who know them in person said they’re real.' },
   ];
   return (
+    <div className="list">
+      {rows.map((r) => (
+        <div key={r.title} className="list-row id-row">
+          <span className="id-row__icon">
+            <r.G size={18} />
+          </span>
+          <span className="list-row__body">
+            <span className="list-row__title">{r.title}</span>
+            <span className="list-row__meta">{r.how}</span>
+          </span>
+          <span className={`id-row__state${r.done ? ' is-done' : ''}`}>{r.done ? <CheckGlyph size={14} /> : '—'}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** What has been checked for this person, and how Nearhood checks people. */
+export function IdentitySheet({ open, onClose, name, identity, area, mine }: { open: boolean; onClose: () => void; name: string; identity: Identity; area: string; mine?: boolean }) {
+  return (
     <Sheet open={open} onClose={onClose} title={mine ? 'Your identity' : `About ${name.split(' ')[0]}`}>
-      <div className="list">
-        {rows.map((r) => (
-          <div key={r.title} className="list-row id-row">
-            <span className="id-row__icon">
-              <r.G size={18} />
-            </span>
-            <span className="list-row__body">
-              <span className="list-row__title">{r.title}</span>
-              <span className="list-row__meta">{r.how}</span>
-            </span>
-            <span className={`id-row__state${r.done ? ' is-done' : ''}`}>{r.done ? <CheckGlyph size={14} /> : '—'}</span>
-          </div>
-        ))}
-      </div>
+      <IdentityRows identity={identity} area={area} />
       <p className="meta">Only verified residents can post, review and run clubs. Checks happen once and are never shown in full.</p>
       {mine ? (
         <Link to="/settings/identity" className="btn btn--soft btn--block" onClick={onClose}>

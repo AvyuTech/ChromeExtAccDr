@@ -631,12 +631,6 @@
   font-size: 0.75rem;
 }
 
-/* Me › City impact cells are links now */
-a.me-impact__cell {
-  color: var(--ink);
-  text-decoration: none;
-}
-
 /* Anchored sections clear the sticky header */
 .impact .dsec[id] {
   scroll-margin-top: 64px;

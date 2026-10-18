@@ -607,22 +607,6 @@ button.list-row:disabled {
   color: var(--lime-ink);
 }
 
-/* ---------- Me: city impact ---------- */
-.me-impact__cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  text-align: center;
-}
-.me-impact__big {
-  height: 48px;
-  display: flex;
-  align-items: center;
-  font-size: 1.5rem;
-  color: var(--mint-ink);
-}
-
 /* ---------- Onboarding ---------- */
 .onb {
   min-height: 100dvh;

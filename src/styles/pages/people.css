@@ -43,17 +43,6 @@
   height: 100%;
   object-fit: cover;
 }
-.profile-hero__place {
-  top: auto;
-  right: 10px;
-  bottom: 10px;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  font-weight: 700;
-}
-.profile-hero__place .glyph {
-  color: #6c52ee;
-}
 .profile-hero__top {
   position: relative;
   z-index: 1;
@@ -88,7 +77,7 @@
   flex-grow: 1;
   align-self: flex-start;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   /* Clear of the cover: the row starts 48px above the cover's edge */
   margin: 60px 0 0;
 }
@@ -137,25 +126,69 @@
   font-size: 0.875rem;
   line-height: 1.42;
 }
-.profile-hero__badges {
+/* "★ City hero · 4,820 helpful · Verified" — opens About */
+.standing-line {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 6px;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
 }
-.profile-hero__badges .badge {
-  padding: 3px 8px;
-  font-size: 0.6875rem;
+.standing-line .grow {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.profile-hero__badges .badge .glyph {
-  width: 12px;
-  height: 12px;
+.standing-line__level {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  color: var(--ink);
+  font-weight: 800;
+}
+.standing-line__level .glyph {
+  color: var(--amber-ink);
+}
+.standing-line__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  vertical-align: -2px;
+}
+.standing-line__check.is-full .glyph {
+  color: var(--mint-strong);
 }
 .profile-hero__actions {
   display: flex;
   align-items: flex-start;
   gap: 4px;
   margin: 2px -6px 0;
+}
+/* Your own profile: two plain buttons side by side, Instagram style */
+.profile-hero__actions--buttons {
+  gap: 8px;
+  margin: 4px 0 0;
+}
+.profile-btn {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--surface-3);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
 }
 /* Round outline icons with a small label, instead of wide pill buttons */
 .profile-action {
@@ -251,17 +284,6 @@
   color: var(--ink);
   text-decoration: none;
 }
-.me-friends-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--ink);
-  font-size: 0.8125rem;
-  text-decoration: none;
-}
-.me-friends-row .avatar-stack > .avatar {
-  border-color: var(--ground);
-}
 
 /* Tabs on people pages run edge to edge with one hairline under them */
 .people-tabs {
@@ -297,47 +319,67 @@
   margin: -4px 0 -6px;
 }
 
-/* First check-in prompt on Me: flat */
-.first-checkin {
+/* About sheet: small titled sections, hairlines between them */
+.about {
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
-.first-checkin__photos {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.about-sec {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--divider);
+}
+.about-sec:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+.about-sec__title {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.about-sec__title + .about-chips + .about-sec__title {
+  margin-top: 4px;
+}
+.about-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.about-standing {
+  display: flex;
+  flex-direction: column;
   gap: 2px;
-  height: 128px;
-  margin: 0 calc(var(--gutter) * -1);
+  color: var(--ink);
+  text-decoration: none;
 }
-.first-checkin__photos img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.first-checkin__body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.first-checkin__title {
+.about-standing__level {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-family: var(--font-display);
-  font-size: 1.0625rem;
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
-
-/* "Into" tags on a profile */
-.taste-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.about-standing__level .glyph {
+  color: var(--amber-ink);
 }
-.chip--static {
-  height: 28px;
-  padding: 0 11px;
+.about-standing .section__link {
+  margin-top: 2px;
   font-size: 0.75rem;
-  cursor: default;
+}
+.about-sec .list {
+  margin: 0 calc(var(--gutter) * -1);
+}
+.about-foot {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--divider);
 }
 
 /* Photo thumbs in pickers and list rows */
