@@ -45,6 +45,29 @@ export interface Person {
 
 export type PlaceCategory = 'food' | 'cafe' | 'sports' | 'shopping' | 'nature' | 'heritage' | 'culture';
 
+/**
+ * How a place got onto Nearhood. Places are never imported, bought or listed by
+ * businesses: a person adds one when they check in, locals with verified visits
+ * confirm it, and an owner can later claim the page to keep facts up to date.
+ */
+export interface PlaceOrigin {
+  /** Person who first added it. */
+  addedBy: string;
+  addedWhen: string;
+  /** Distinct locals with verified visits who confirmed the name, pin and details. */
+  confirmedBy: number;
+  /** Neighbourhood guide who reviewed the listing. */
+  guide?: string;
+  /** Owner or manager verified with a licence and a code sent to the venue's phone. */
+  claimed?: { name: string; role: string; since: string };
+  /** Parks, lakes, markets and streets belong to everyone and can't be claimed. */
+  publicPlace?: boolean;
+  /** Outside the city: reachable through friends and people's lists, not city browsing. */
+  outsideCity?: boolean;
+  /** The list it was first shared in, when it came in that way. */
+  viaList?: string;
+}
+
 export interface Place {
   id: string;
   name: string;
@@ -68,6 +91,26 @@ export interface Place {
   glyph: GlyphName;
   address: string;
   bestTime?: string;
+  origin: PlaceOrigin;
+}
+
+/** A new opening someone spotted. It joins Nearhood once enough locals confirm it. */
+export interface SpottedPlace {
+  id: string;
+  name: string;
+  kind: string;
+  category: PlaceCategory;
+  area: string;
+  spottedBy: string;
+  ago: string;
+  note: string;
+  /** People with verified visits who confirmed it is real and open. */
+  confirmedBy: string[];
+  /** Confirmations needed before it is listed (a neighbourhood guide counts for all). */
+  needed: number;
+  glyph: GlyphName;
+  tone: Tone;
+  photo?: string;
 }
 
 export type EventCategory = 'music' | 'market' | 'comedy' | 'heritage' | 'workshop' | 'food' | 'sports' | 'kids' | 'wellness';

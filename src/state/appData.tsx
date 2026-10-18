@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { DEFAULT_FOLLOWING, MY_WANT_TO_TRY } from '../data/friends';
-import type { ChatMessage, CheckIn, CivicReport, Collection, Post, Reply, WantItem } from '../data/types';
+import type { ChatMessage, CheckIn, CivicReport, Collection, Post, Reply, SpottedPlace, WantItem } from '../data/types';
 import { mergeDefaults, readJSON, removeKey, writeJSON } from './storage';
 
 /** What this person has done in the app. Sample content stays in src/data; this layers on top. */
@@ -38,6 +38,10 @@ export interface AppData {
   /** Follow requests handled while "Approve new followers" is on. */
   approvedFollowers: string[];
   declinedFollowers: string[];
+  /** New openings this person confirmed after visiting. */
+  confirmedSpots: string[];
+  /** Places this person added that are waiting for confirmations. */
+  mySpots: SpottedPlace[];
 }
 
 export const DEFAULT_APP_DATA: AppData = {
@@ -70,6 +74,8 @@ export const DEFAULT_APP_DATA: AppData = {
   collectionEdits: {},
   approvedFollowers: [],
   declinedFollowers: [],
+  confirmedSpots: [],
+  mySpots: [],
 };
 
 type ListKey = {
@@ -104,6 +110,7 @@ interface AppDataContextValue {
   removeWant: (id: string) => void;
   addCollection: (collection: Collection) => void;
   editCollection: (id: string, patch: Partial<Pick<Collection, 'title' | 'description' | 'placeIds'>>) => void;
+  addSpot: (spot: SpottedPlace) => void;
   reset: () => void;
 }
 
@@ -188,6 +195,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     (id, patch) => setData((d) => ({ ...d, collectionEdits: { ...d.collectionEdits, [id]: { ...(d.collectionEdits[id] ?? {}), ...patch } } })),
     [],
   );
+  const addSpot = useCallback((spot: SpottedPlace) => setData((d) => ({ ...d, mySpots: [spot, ...d.mySpots] })), []);
   const reset = useCallback(() => {
     removeKey(KEY);
     setData(DEFAULT_APP_DATA);
@@ -214,9 +222,10 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       removeWant,
       addCollection,
       editCollection,
+      addSpot,
       reset,
     }),
-    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, editCollection, reset],
+    [data, has, toggle, add, remove, addPost, addReport, addReply, sendMessage, rememberSearch, clearSearches, markAllRead, addCheckIn, addCheckInComment, toggleWant, setWantDone, removeWant, addCollection, editCollection, addSpot, reset],
   );
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

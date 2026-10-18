@@ -17,7 +17,8 @@ describe('detectIntent', () => {
     ["What's happening this weekend?", 'events'],
     ['quiet café with good wifi', 'cafe'],
     ['How is traffic on SG Highway?', 'traffic'],
-    ['next metro near me', 'transit'],
+    ['best way to Navrangpura now', 'traffic'],
+    ['next metro near me', 'traffic'],
     ['is the water supply normal', 'water'],
     ['what is the AQI', 'air'],
     ['power cut in satellite', 'power'],
@@ -32,6 +33,20 @@ describe('detectIntent', () => {
 });
 
 describe('ask', () => {
+  it('suggests a road for a trip and skips the jammed one', () => {
+    const r = ask('Best way to Navrangpura now', base);
+    expect(r.intent).toBe('traffic');
+    expect(r.heading).toBe('Getting to Navrangpura');
+    expect(r.answer).toMatch(/Best way to \*\*Navrangpura\*\*/);
+    expect(r.answer).toMatch(/skip \*\*SG Highway\*\*/);
+  });
+
+  it('answers bus and metro questions with roads', () => {
+    const r = ask('next metro near me', base);
+    expect(r.intent).toBe('traffic');
+    expect(r.answer).toMatch(/covers roads rather than buses/);
+  });
+
   it('answers the weekend question with merged sources', () => {
     const r = ask("What's happening this weekend?", base);
     expect(r.intent).toBe('events');

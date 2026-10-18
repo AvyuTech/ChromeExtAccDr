@@ -16,6 +16,7 @@ import { useT } from '../i18n';
 import { CheckGlyph, ChevronDownGlyph, HeartGlyph, ChevronRightGlyph, NamedGlyph, PinGlyph, SaveGlyph, SearchGlyph, SquiggleMark, StarGlyph, type GlyphName } from '../icons';
 import { km } from '../lib/format';
 import { friendsMustTries, placeCommunity } from '../lib/friends';
+import { spottedPlaces } from '../lib/places';
 import { visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
@@ -47,6 +48,7 @@ export default function Explore() {
   const navigate = useNavigate();
   const { settings, update } = useSettings();
   const { data, has, toggle } = useAppData();
+  const spotted = spottedPlaces(data);
   const [query, setQuery] = useState('');
   const [mood, setMood] = useState<Mood>('for-you');
   const [areaSheet, setAreaSheet] = useState(false);
@@ -64,7 +66,7 @@ export default function Explore() {
       return c.friendIds.length * 3 + c.mustPct / 20 + (p.distanceKm <= radius ? 2 : 0) + (p.openNow ? 1 : 0);
     };
     return PLACES.filter((p) => !cats || cats.includes(p.category))
-      .filter((p) => p.distanceKm < 40)
+      .filter((p) => !p.origin.outsideCity)
       .map((p) => ({ place: p, score: score(p) }))
       .sort((a, b) => b.score - a.score)
       .map((x) => x.place);
@@ -276,6 +278,66 @@ export default function Explore() {
             ))}
           </div>
         ) : null}
+
+        <section className="section" aria-labelledby="spotted-title">
+          <div className="section__head">
+            <h2 className="section__title" id="spotted-title">
+              {t('discover.spotted.title')}
+            </h2>
+            <Link to="/settings/about" className="section__link">
+              {t('discover.spotted.how')}
+            </Link>
+          </div>
+          <p className="meta" style={{ marginTop: -6 }}>
+            {t('discover.spotted.sub')}
+          </p>
+          <div>
+            {spotted.map((sp) => {
+              const pic = sp.photo ? photo(sp.photo) : undefined;
+              const done = sp.count >= sp.needed;
+              return (
+                <div key={sp.id} className="spotted-row">
+                  <span className="spotted-row__thumb photo-frame">
+                    {pic ? (
+                      <img src={pic} alt="" loading="lazy" />
+                    ) : (
+                      <span className={`photo-frame__glyph tone-${sp.tone}`}>
+                        <NamedGlyph name={sp.glyph} size={22} duo />
+                      </span>
+                    )}
+                  </span>
+                  <span className="spotted-row__body">
+                    <span className="spotted-row__name">{sp.name}</span>
+                    <span className="meta">
+                      {sp.kind} · {sp.area}
+                    </span>
+                    <span className="spotted-row__by">
+                      {sp.mine ? t('discover.spotted.byYou') : t('discover.spotted.by', { name: person(sp.spottedBy).name.split(' ')[0] })} · {sp.ago}
+                    </span>
+                    <span className="spotted-row__progress" aria-label={t('discover.spotted.progress', { n: sp.count, total: sp.needed })}>
+                      {Array.from({ length: sp.needed }, (_, i) => (
+                        <span key={i} className={i < sp.count ? 'is-on' : undefined} />
+                      ))}
+                      <small>{done ? t('discover.spotted.ready') : t('discover.spotted.progress', { n: sp.count, total: sp.needed })}</small>
+                    </span>
+                  </span>
+                  {sp.mine || sp.confirmedBy.includes('me') ? null : (
+                    <button
+                      type="button"
+                      className={`chip${sp.confirmedByMe ? ' chip--soft' : ''}`}
+                      style={{ height: 30, padding: '0 11px' }}
+                      aria-pressed={sp.confirmedByMe}
+                      onClick={() => toggle('confirmedSpots', sp.id)}
+                    >
+                      {sp.confirmedByMe ? <CheckGlyph size={14} /> : null}
+                      {sp.confirmedByMe ? t('discover.spotted.confirmed') : t('discover.spotted.been')}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
 
         {more.length ? (
           <section className="section" aria-labelledby="more-title">

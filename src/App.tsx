@@ -92,7 +92,8 @@ function Shell() {
                   <Route path="/city" element={<City />} />
                   <Route path="/city/alerts" element={<Alerts />} />
                   <Route path="/city/alerts/:id" element={<AlertDetail />} />
-                  <Route path="/city/transit" element={<Transit />} />
+                  <Route path="/city/traffic" element={<Transit />} />
+                  <Route path="/city/transit" element={<Navigate to="/city/traffic" replace />} />
                   <Route path="/city/report" element={<Report />} />
                   <Route path="/city/reports" element={<Reports />} />
                   <Route path="/city/reports/:id" element={<ReportDetail />} />

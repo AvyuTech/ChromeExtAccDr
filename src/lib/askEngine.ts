@@ -2,7 +2,7 @@ import { ALERTS, EMERGENCY, FACILITIES, REPORTS, SERVICES } from '../data/city';
 import { EVENTS } from '../data/events';
 import { PLACES } from '../data/places';
 import { CHECKINS } from '../data/friends';
-import { PEOPLE } from '../data/core';
+import { NEIGHBOURHOODS, PEOPLE } from '../data/core';
 import { DEALS, GROUPS, POSTS } from '../data/social';
 import type { CityEvent, CityPulse, Place, SourceId } from '../data/types';
 import { aqiBand, TRAFFIC_LABEL } from '../icons/live';
@@ -25,7 +25,6 @@ export type Intent =
   | 'traffic'
   | 'weather'
   | 'air'
-  | 'transit'
   | 'water'
   | 'power'
   | 'civic'
@@ -98,8 +97,8 @@ const has = (q: string, words: string[]) => words.some((w) => new RegExp(`\\b${w
 export function detectIntent(q: string): Intent {
   if (has(q, ['friend', 'friends', 'people i follow'])) return 'friends';
   if (has(q, ['emergenc', 'hospital', 'ambulance', 'police', 'sos', 'fire brigade', 'helpline', 'unsafe', 'safe'])) return 'safety';
-  if (has(q, ['traffic', 'commute', 'road', 'highway', 'jam', 'signal', 'drive'])) return 'traffic';
-  if (has(q, ['metro', 'brts', 'bus', 'train', 'transit', 'station'])) return 'transit';
+  // Nearhood covers roads, not public transport: trips and routes are answered with live road traffic.
+  if (has(q, ['traffic', 'commute', 'road', 'highway', 'jam', 'signal', 'drive', 'route', 'fastest way', 'best way', 'get to', 'reach', 'metro', 'brts', 'bus', 'transit'])) return 'traffic';
   if (has(q, ['aqi', 'air', 'pollution', 'smog', 'pm2'])) return 'air';
   if (has(q, ['weather', 'rain', 'hot', 'temperature', 'forecast', 'sunny', 'umbrella', 'heat'])) return 'weather';
   if (has(q, ['water', 'supply', 'tanker', 'pressure'])) return 'water';
@@ -288,44 +287,39 @@ export function ask(query: string, o: AskOptions): AskResult {
       const worst = roads[0];
       const clear = roads.filter((r) => r.level === 0).map((r) => `**${r.name}**`);
       const alerts = ALERTS.filter((a) => a.kind === 'traffic' && a.active);
-      const lead =
-        worst.level === 0
-          ? 'Roads are **moving freely** across the west of the city right now.'
-          : `**${worst.name}** is the slowest right now: **${worst.minutes} min** from ${worst.stretch.replace(' → ', ' to ')} (usually ${worst.usual}).`;
-      const cause = worst.cause ? `Cause: ${lowerFirst(worst.cause)}.` : '';
-      const ok = clear.length ? `${clear.join(' and ')} ${clear.length > 1 ? 'are' : 'is'} clear.` : '';
+      const dest = NEIGHBOURHOODS.find((n) => new RegExp(`\\b${n.name}`, 'i').test(q) && n.name !== o.homeArea);
+      const publicTransport = has(q, ['metro', 'brts', 'bus', 'transit']);
+      let lead: string;
+      if (dest) {
+        const best = [...o.pulse.corridors].filter((c) => c.id !== worst.id).sort((a, b) => a.level - b.level || a.minutes - a.usual - (b.minutes - b.usual))[0];
+        lead = `Best way to **${dest.name}** right now: take **${best.name}** (${best.minutes} min on its stretch, usually ${best.usual})${
+          worst.level > 0 ? ` and skip **${worst.name}**${worst.cause ? `, ${lowerFirst(worst.cause)}` : ''}` : ''
+        }.`;
+      } else {
+        lead =
+          worst.level === 0
+            ? 'Roads are **moving freely** across the west of the city right now.'
+            : `**${worst.name}** is the slowest right now: **${worst.minutes} min** from ${worst.stretch.replace(' → ', ' to ')} (usually ${worst.usual}).`;
+      }
+      const cause = !dest && worst.cause ? `Cause: ${lowerFirst(worst.cause)}.` : '';
+      const ok = !dest && clear.length ? `${clear.join(' and ')} ${clear.length > 1 ? 'are' : 'is'} clear.` : '';
       return {
         ...base,
-        heading: 'Roads right now',
-        answer: finish([[lead, cause].filter(Boolean).join(' '), ok, alerts.length ? `Planned: ${lowerFirst(alerts[0].title)}.` : ''].filter(Boolean), o.length),
+        heading: dest ? `Getting to ${dest.name}` : 'Roads right now',
+        answer: finish(
+          [
+            publicTransport ? 'Nearhood covers roads rather than buses and the metro, so here is how the roads look.' : '',
+            [lead, cause].filter(Boolean).join(' '),
+            ok,
+            alerts.length ? `Planned: ${lowerFirst(alerts[0].title)}.` : '',
+          ].filter(Boolean),
+          o.length,
+        ),
         sources: ['police', 'maps', 'neighbours'].filter((s) => o.sourceAllowed(s as SourceId)) as SourceId[],
         results: [...roads.map((r) => ({ type: 'corridor' as const, id: r.id })), ...alerts.map((a) => ({ type: 'alert' as const, id: a.id }))],
         followUps: [
-          { label: 'Metro instead?', query: 'Next metro from Doordarshan Kendra' },
+          dest ? { label: 'How is SG Highway?', query: 'How is traffic on SG Highway' } : { label: 'Best way to Navrangpura', query: 'Best way to Navrangpura now' },
           { label: 'Parking near CG Road', query: 'Where can I park near CG Road' },
-        ],
-        confidence: 'high',
-      };
-    }
-
-    case 'transit': {
-      const arrivals = [...o.pulse.arrivals].sort((a, b) => a.minutes - b.minutes);
-      const metro = arrivals.find((a) => a.mode === 'metro');
-      const brts = arrivals.find((a) => a.mode === 'brts');
-      const lead = metro
-        ? `Next **${metro.line}** train from **${metro.stop}** towards ${metro.towards} in **${metro.minutes} min** (${metro.walkMin} min walk).`
-        : 'No metro trains are due right now.';
-      const more = brts ? `${brts.line} from ${brts.stop} leaves in ${brts.minutes} min; it is ${brts.crowd.toLowerCase()} right now.` : '';
-      const alert = ALERTS.find((a) => a.kind === 'transit' && a.active);
-      return {
-        ...base,
-        heading: 'Leaving soon near you',
-        answer: finish([lead, more, alert ? `Note: ${lowerFirst(alert.title)}.` : ''].filter(Boolean), o.length),
-        sources: ['metro', 'neighbours'].filter((s) => o.sourceAllowed(s as SourceId)) as SourceId[],
-        results: [...arrivals.map((a) => ({ type: 'arrival' as const, id: a.id })), ...(alert ? [{ type: 'alert' as const, id: alert.id }] : [])],
-        followUps: [
-          { label: 'Traffic on SG Highway', query: 'How is traffic on SG Highway' },
-          { label: 'Metro pass deal', query: 'Metro pass deals' },
         ],
         confidence: 'high',
       };
@@ -566,7 +560,7 @@ export function ask(query: string, o: AskOptions): AskResult {
         return {
           ...base,
           heading: 'Try asking differently',
-          answer: `I couldn't find anything for "${q}" yet. Try asking about events, cafés, traffic, the metro, water timings or the air.`,
+          answer: `I couldn't find anything for "${q}" yet. Try asking about events, cafés, traffic, water timings or the air.`,
           sources: [],
           results: [],
           followUps: [
@@ -606,7 +600,7 @@ export const SUGGESTED_QUESTIONS = [
   "What's happening this weekend?",
   'Quiet café with good Wi-Fi',
   'How is traffic on SG Highway?',
-  'Next metro near me',
+  'Best way to Navrangpura now',
   'Is the water supply normal today?',
   'Free things to do with kids',
 ];

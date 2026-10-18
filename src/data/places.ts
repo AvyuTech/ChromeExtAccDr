@@ -1,4 +1,4 @@
-import type { Place } from './types';
+import type { Place, SpottedPlace } from './types';
 
 export const PLACES: Place[] = [
   {
@@ -22,6 +22,7 @@ export const PLACES: Place[] = [
     glyph: 'cafe',
     address: '[Street address], Prahlad Nagar',
     bestTime: 'Before 12 pm',
+    origin: { addedBy: 'riya', addedWhen: 'Jan 2024', confirmedBy: 39, guide: 'aditi', claimed: { name: 'Neha', role: 'Owner', since: 'Mar 2024' } },
   },
   {
     id: 'corner-table',
@@ -44,6 +45,7 @@ export const PLACES: Place[] = [
     glyph: 'cafe',
     address: '[Street address], Bodakdev',
     bestTime: '9 – 11 am',
+    origin: { addedBy: 'harsh', addedWhen: 'Nov 2023', confirmedBy: 64, claimed: { name: 'Corner Table team', role: 'Manager', since: 'Jan 2024' } },
   },
   {
     id: 'brew-lab',
@@ -65,6 +67,7 @@ export const PLACES: Place[] = [
     tone: 'clay',
     glyph: 'cafe',
     address: '[Street address], CG Road',
+    origin: { addedBy: 'meera', addedWhen: 'Aug 2023', confirmedBy: 118, guide: 'arjun' },
   },
   {
     id: 'seoul-bowl',
@@ -88,6 +91,7 @@ export const PLACES: Place[] = [
     glyph: 'food',
     address: '[Street address], Sindhu Bhavan Road',
     bestTime: 'Before 7:30 pm',
+    origin: { addedBy: 'aditi', addedWhen: '3 weeks ago', confirmedBy: 41, guide: 'zoya' },
   },
   {
     id: 'spice-courtyard',
@@ -109,6 +113,7 @@ export const PLACES: Place[] = [
     tone: 'amber',
     glyph: 'food',
     address: '[Street address], Bodakdev',
+    origin: { addedBy: 'harsh', addedWhen: 'Jun 2023', confirmedBy: 88, claimed: { name: 'Raghav', role: 'Owner', since: 'Sep 2023' } },
   },
   {
     id: 'pickle-play',
@@ -131,6 +136,7 @@ export const PLACES: Place[] = [
     tone: 'green',
     glyph: 'sports',
     address: '[Street address], Thaltej',
+    origin: { addedBy: 'karan', addedWhen: 'Jun 2024', confirmedBy: 22 },
   },
   {
     id: 'manek-chowk',
@@ -153,6 +159,7 @@ export const PLACES: Place[] = [
     glyph: 'market',
     address: 'Manek Chowk, Old city',
     bestTime: 'After 10 pm',
+    origin: { addedBy: 'dev', addedWhen: 'May 2023', confirmedBy: 210, guide: 'meera', publicPlace: true },
   },
   {
     id: 'vastrapur-lake',
@@ -174,6 +181,7 @@ export const PLACES: Place[] = [
     tone: 'teal',
     glyph: 'nature',
     address: 'Vastrapur Lake, Vastrapur',
+    origin: { addedBy: 'farah', addedWhen: 'May 2023', confirmedBy: 156, publicPlace: true },
   },
   {
     id: 'riverfront-park',
@@ -195,6 +203,7 @@ export const PLACES: Place[] = [
     tone: 'green',
     glyph: 'nature',
     address: 'Sabarmati Riverfront',
+    origin: { addedBy: 'dev', addedWhen: 'Jul 2023', confirmedBy: 97, publicPlace: true },
   },
   {
     id: 'clay-studio',
@@ -216,6 +225,7 @@ export const PLACES: Place[] = [
     tone: 'clay',
     glyph: 'pottery',
     address: '[Street address], Satellite',
+    origin: { addedBy: 'kavya', addedWhen: 'Feb 2024', confirmedBy: 31, claimed: { name: 'Ishita', role: 'Studio host', since: 'Apr 2024' } },
   },
   {
     id: 'law-garden',
@@ -237,6 +247,7 @@ export const PLACES: Place[] = [
     tone: 'peach',
     glyph: 'shopping',
     address: 'Law Garden, Navrangpura',
+    origin: { addedBy: 'meera', addedWhen: 'Jun 2023', confirmedBy: 74, publicPlace: true },
   },
   {
     id: 'adalaj',
@@ -258,6 +269,7 @@ export const PLACES: Place[] = [
     tone: 'amber',
     glyph: 'heritage',
     address: 'Adalaj, Gandhinagar district',
+    origin: { addedBy: 'nikhil', addedWhen: 'Dec 2023', confirmedBy: 58, publicPlace: true, outsideCity: true, viaList: 'day-trips' },
   },
   {
     id: 'polo-forest',
@@ -279,7 +291,59 @@ export const PLACES: Place[] = [
     tone: 'green',
     glyph: 'getaways',
     address: 'Polo Forest, Sabarkantha',
+    origin: { addedBy: 'nikhil', addedWhen: 'Jan 2024', confirmedBy: 33, publicPlace: true, outsideCity: true, viaList: 'day-trips' },
   },
 ];
 
 export const placeById = (id: string) => PLACES.find((p) => p.id === id);
+
+/** New openings locals have spotted, waiting for enough verified visits to be listed. */
+export const SPOTTED: SpottedPlace[] = [
+  {
+    id: 'kettle-crumb',
+    name: 'Kettle & Crumb',
+    kind: 'Bakery café',
+    category: 'cafe',
+    area: 'Prahlad Nagar',
+    spottedBy: 'priyank',
+    ago: '2 days ago',
+    note: 'Soft opening this week. Sourdough comes out at 5 pm and sells out fast.',
+    confirmedBy: ['priyank', 'riya'],
+    needed: 3,
+    glyph: 'cafe',
+    tone: 'peach',
+    photo: 'dish-avocado-toast',
+  },
+  {
+    id: 'taco-tiempo',
+    name: 'Taco Tiempo',
+    kind: 'Food truck',
+    category: 'food',
+    area: 'Sindhu Bhavan Rd',
+    spottedBy: 'karan',
+    ago: 'Yesterday',
+    note: 'Parks near the Sindhu Bhavan junction after 7 pm. Paneer tacos, ₹180 for two.',
+    confirmedBy: ['karan'],
+    needed: 3,
+    glyph: 'food',
+    tone: 'amber',
+    photo: 'event-food-trucks',
+  },
+  {
+    id: 'board-brew',
+    name: 'Board & Brew',
+    kind: 'Board game café',
+    category: 'cafe',
+    area: 'Navrangpura',
+    spottedBy: 'arjun',
+    ago: '5 days ago',
+    note: '200+ games, a quiet back room and a ₹150 table fee on weekends.',
+    confirmedBy: ['arjun', 'meera'],
+    needed: 3,
+    glyph: 'cafe',
+    tone: 'violet',
+    photo: 'scene-table',
+  },
+];
+
+export const spottedById = (id: string) => SPOTTED.find((p) => p.id === id);

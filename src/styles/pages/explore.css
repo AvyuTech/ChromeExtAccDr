@@ -457,3 +457,57 @@
   font-weight: 600;
   opacity: 0.85;
 }
+
+/* ---------- Spotted by locals: new openings waiting for confirmations ---------- */
+.spotted-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.spotted-row:last-child {
+  border-bottom: none;
+}
+.spotted-row__thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+}
+.spotted-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex-grow: 1;
+  min-width: 0;
+}
+.spotted-row__name {
+  font-size: 0.9063rem;
+  font-weight: 700;
+}
+.spotted-row__by {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.spotted-row__progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 3px;
+}
+.spotted-row__progress > span {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border-strong);
+}
+.spotted-row__progress > span.is-on {
+  background: var(--mint-strong);
+}
+.spotted-row__progress small {
+  margin-left: 5px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--muted);
+}

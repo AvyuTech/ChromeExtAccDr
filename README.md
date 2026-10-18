@@ -10,13 +10,26 @@ It started from the Nearhood design canvas and now follows the **Porcelain** des
 | --- | --- |
 | **Home** | *Your neighbourhood, alive with possibilities*: ask bar, friends' check-in stories, today card (weather and plans tonight), For you / Friends / Nearby feed with *The neighbourhood says* summaries, city updates, friends' must-tries, weekend events and deals, plus a filter sheet |
 | **Ask** | On-device answer engine: detects intent (events, cafés, food, traffic, metro, weather, air, water, power, civic, deals, groups, safety, services), merges sources, shows how many agree, filters and follow-ups |
-| **Explore** | *Find your next favourite*: radius picker, mood chips (coffee, food, outdoors, culture), an illustrative map of west Ahmedabad with pins you can tap and a draggable view, *Worth stepping out for* picked from your friends' visits, tonight's events, photo category tiles, category pages, deals, place and event pages with source trust panel, groups |
-| **City** | Live *City pulse* dashboard (weather, AQI dial, roads, next metro/BRTS/bus, water and power, ward civic health, parking), alerts and alert details, transit and commute, **report a civic issue** with duplicate detection and a tracker, city services, safety & SOS |
+| **Explore** | *Find your next favourite*: radius picker, mood chips (coffee, food, outdoors, culture), an illustrative map of west Ahmedabad with pins you can tap and a draggable view, *Worth stepping out for* picked from your friends' visits, tonight's events, *Spotted by locals* (new openings waiting for neighbours to confirm them), photo category tiles, category pages, deals, place and event pages with source trust panel, groups |
+| **City** | Live *City pulse* (weather, air, a traffic heat map, water and power, ward civic health), **Traffic**: a heat map of the roads with a from–to route planner that picks the best road right now, alerts and alert details, **report a civic issue** with duplicate detection and a tracker, city services, safety & SOS. Nearhood covers roads, not buses or the metro |
 | **Social** | Post details with replies, composer (question, recommendation, alert, lost & found, event, give away) with similar-question detection, updates, messages and chat |
 | **Friends & community reviews** | Follow friends; a strip on Home shows who checked in today. **Quick check-in** (place → what you had → Must try / Good / Skip, in about ten seconds) instead of long posts. Places show the share of locals who say *must try* and what people actually order, with friends' reviews first. Profiles with a **Want to try** list (a to-do list for the city), curated lists, taste match and "you both want to try" plans |
 | **Me & Settings** | Profile, saved items, onboarding, and full settings: account, location & commute, notifications, city alerts, appearance (light/dark/system, text size), language (English, ગુજરાતી, हिन्दी), accessibility, privacy, sources & AI answers, data & storage, safety contacts, help, about |
 
 Settings change behaviour, not just switches: turning off a source removes its listings and chips from answers, alert preferences filter the alert feed and tab badge, *Data saver* pauses the live city feed, theme, contrast, motion and text size apply app-wide, and language switches the interface.
+
+## Human-curated by design
+
+Nearhood is about people, not businesses. Nothing on it is imported, scraped, bought or listed by a business.
+
+| Question | How it works |
+| --- | --- |
+| **Where do places come from?** | A person adds a place the first time they check in somewhere that isn't on Nearhood yet. Every place page says who added it and how many locals with verified visits have confirmed it (*Added by Riya S. · Jan 2024 · Confirmed by 39 locals*). |
+| **How do new openings get in?** | Anyone can mark a new spot. It shows under **Spotted by locals** on Explore and goes live once **3 neighbours have verified visits** there, or a neighbourhood guide checks it. Nobody has to wait for us or for an AI to find it. |
+| **What can a business do?** | Claim its page with a licence (FSSAI or GST) and a code sent to the venue's phone, then keep hours, menu and photos right and reply to people. Owners can't post verdicts, pay for placement or hide reviews. Parks, lakes, markets and streets are public places and can't be claimed. |
+| **What does the AI do?** | Merges duplicate places, flags fake patterns (bursts of new accounts, copy-paste reviews) and summarises what neighbours said. It never adds places, writes reviews or ranks anyone for money. |
+| **Who can post?** | Verified residents. Guides earn the role through a history of helpful answers. Free or invited visits are labelled and don't count. |
+| **Trips outside the city?** | Friends' check-ins elsewhere (like Polo Forest) show in your friends' feed and in people's lists, with an *Outside Ahmedabad* label, but never in city browsing. Polo Forest is on Nearhood because Nikhil added it to his list *Day trips under 3 hours*. |
 
 ## Design
 
