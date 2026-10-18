@@ -29,6 +29,7 @@ import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 import { RichText, Sheet } from './ui';
 import { useIdentity } from './identity';
+import { eventHost } from '../lib/hosts';
 
 /* ---------- Avatar: a real photo when we have one, initials otherwise ---------- */
 export function Avatar({ who, size = 40, ring }: { who: Person; size?: number; ring?: boolean }) {
@@ -389,6 +390,7 @@ export function eventSourceLine(event: CityEvent) {
 
 export function EventTile({ event, width = 200 }: { event: CityEvent; width?: number }) {
   const when = `${event.day} · ${event.time.split(' – ')[0]}`;
+  const host = eventHost(event);
   return (
     <Link to={`/event/${event.id}`} className="photo-card" style={{ width }}>
       <Cover src={eventPhoto(event.id)} glyph={event.glyph} tone={event.tone} className="photo-card__media" alt="">
@@ -401,8 +403,8 @@ export function EventTile({ event, width = 200 }: { event: CityEvent; width?: nu
         <span className="meta">
           {event.area} · {price(event.price)}
         </span>
-        <span className="meta" style={{ color: event.confirmed ? 'var(--accent)' : 'var(--amber-ink)', fontWeight: 600 }}>
-          {event.confirmed ? eventSourceLine(event) : (event.unconfirmedNote ?? 'Unconfirmed')}
+        <span className="meta" style={{ color: event.confirmed ? 'var(--ink-2)' : 'var(--amber-ink)', fontWeight: 600 }}>
+          {event.confirmed ? (host ? `By ${host.name}` : eventSourceLine(event)) : (event.unconfirmedNote ?? 'Unconfirmed')}
         </span>
       </span>
     </Link>
@@ -411,6 +413,7 @@ export function EventTile({ event, width = 200 }: { event: CityEvent; width?: nu
 
 export function EventRow({ event }: { event: CityEvent }) {
   const { settings } = useSettings();
+  const host = eventHost(event);
   const allowed = enabledSources(settings);
   const agree = event.sources.filter(allowed).length;
   return (
@@ -422,6 +425,7 @@ export function EventRow({ event }: { event: CityEvent }) {
         </span>
         <span className="meta">
           {event.day}, {event.time} · {event.area} · {price(event.price)}
+          {host ? ` · by ${host.name}` : ''}
         </span>
         {event.confirmed ? (
           <span className="row meta" style={{ gap: 5 }}>

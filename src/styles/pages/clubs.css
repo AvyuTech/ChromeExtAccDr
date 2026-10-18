@@ -404,10 +404,14 @@
 .plan-post .buy-row__progress {
   margin: 0;
 }
-.plan-post__fine {
-  margin-top: -4px;
-  font-size: 0.6875rem;
-  color: var(--muted);
+.plan-post__join {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.plan-post__join + .feed-post__actions {
+  margin-top: -10px;
 }
 .plan-post .meetup-row__when {
   background: var(--surface-3);

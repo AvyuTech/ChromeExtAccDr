@@ -9,7 +9,7 @@ import { CalendarGlyph, CheckGlyph, ChevronRightGlyph, NamedGlyph, PinGlyph, Rep
 import { compact } from '../lib/format';
 import { DEFAULT_APP_DATA, useAppData, type AppData } from '../state/appData';
 import { useToast } from '../state/toast';
-import { Avatar, ClubTag, Cover, FaceStack } from './cards';
+import { Avatar, ClubTag, Cover, FaceStack, ShareButton } from './cards';
 import { useIdentity } from './identity';
 import { Sheet } from './ui';
 
@@ -216,6 +216,21 @@ function PlanHead({ hostId, club, what }: { hostId: string; club: Group; what: s
   );
 }
 
+/** The same action row as any post: replies on the left, share on the right. */
+function PlanActions({ club, replies, title }: { club: Group; replies: number; title: string }) {
+  const t = useT();
+  return (
+    <div className="feed-post__actions">
+      <Link to={`/clubs/${club.id}`} className="feed-action" aria-label={`${t('common.replies', { n: replies })} · ${t('clubs.post.open', { club: club.name })}`}>
+        <ReplyGlyph size={20} />
+        {replies}
+      </Link>
+      <span className="grow" />
+      <ShareButton title={title} path={`/clubs/${club.id}`} />
+    </div>
+  );
+}
+
 /** A meetup someone planned in a club, as it appears in the Home feed. */
 export function MeetupPost({ meetup, club }: { meetup: Meetup; club: Group }) {
   const t = useT();
@@ -242,7 +257,7 @@ export function MeetupPost({ meetup, club }: { meetup: Meetup; club: Group }) {
         </span>
       </Link>
       {meetup.note ? <p className="feed-post__text">{meetup.note}</p> : null}
-      <div className="feed-post__actions">
+      <div className="plan-post__join">
         <button
           type="button"
           className={`chip club-chip${mine ? ' chip--soft' : ''}`}
@@ -261,11 +276,8 @@ export function MeetupPost({ meetup, club }: { meetup: Meetup; club: Group }) {
           {t('clubs.goingCount', { n: ids.length })}
           {left !== undefined ? ` · ${left > 0 ? t('clubs.spotsLeft', { n: left }) : t('clubs.full')}` : ''}
         </span>
-        <span className="grow" />
-        <Link to={`/clubs/${club.id}`} className="feed-action" aria-label={t('clubs.post.open', { club: club.name })}>
-          <ReplyGlyph size={19} />
-        </Link>
       </div>
+      <PlanActions club={club} replies={meetup.replies ?? 0} title={meetup.title} />
     </article>
   );
 }
@@ -289,7 +301,7 @@ export function BuyPost({ buy, club }: { buy: GroupBuy; club: Group }) {
       <div className="buy-row__progress" role="progressbar" aria-valuemin={0} aria-valuemax={buy.target} aria-valuenow={n} aria-label={t('clubs.progress', { n, target: buy.target })}>
         <span style={{ width: `${(n / buy.target) * 100}%` }} className={enough ? 'is-done' : undefined} />
       </div>
-      <div className="feed-post__actions">
+      <div className="plan-post__join">
         <button
           type="button"
           className={`chip club-chip${mine ? ' chip--soft' : ''}`}
@@ -306,12 +318,8 @@ export function BuyPost({ buy, club }: { buy: GroupBuy; club: Group }) {
           <FaceStack ids={ids} size={18} max={4} />
           {t('clubs.progress', { n: ids.length, target: buy.target })} · {enough ? t('clubs.post.enough') : t('clubs.moreNeeded', { n: buy.target - ids.length })}
         </span>
-        <span className="grow" />
-        <Link to={`/clubs/${club.id}`} className="feed-action" aria-label={t('clubs.post.open', { club: club.name })}>
-          <ReplyGlyph size={19} />
-        </Link>
       </div>
-      <span className="plan-post__fine">{t('clubs.post.fine')}</span>
+      <PlanActions club={club} replies={buy.replies ?? 0} title={buy.title} />
     </article>
   );
 }

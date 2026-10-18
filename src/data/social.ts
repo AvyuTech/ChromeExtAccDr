@@ -15,10 +15,10 @@ export const GROUPS: Group[] = [
     privacy: 'neighbours',
     kind: 'neighbours',
     areaId: 'bodakdev',
-    meetups: [{ id: 'm-clean', title: 'Lane clean-up and chai', when: 'Sun, 7 am', where: 'Judges Bungalow Rd, near the park gate', hostId: 'aditi', going: ['aditi', 'harsh', 'dev', 'farah'], note: 'Gloves and bags provided. Chai after, on the corner.' }],
+    meetups: [{ id: 'm-clean', title: 'Lane clean-up and chai', when: 'Sun, 7 am', where: 'Judges Bungalow Rd, near the park gate', hostId: 'aditi', going: ['aditi', 'harsh', 'dev', 'farah'], note: 'Gloves and bags provided. Chai after, on the corner.' , replies: 8 }],
     buys: [
-      { id: 'b-solar', title: 'Rooftop solar for 10 homes', hostId: 'harsh', note: 'Installers quote about 15% less when ten homes sign up together. I’m collecting names, then we compare quotes as a group.', target: 10, joined: ['harsh', 'dev', 'aditi', 'meera', 'farah', 'nikhil'], ends: 'Ends in 9 days' },
-      { id: 'b-car', title: 'Buying a mid-size SUV? Let’s go together', hostId: 'dev', note: 'Dealers give a fleet discount for 3 or more cars from one showroom. Two of us are buying this month.', target: 3, joined: ['dev', 'harsh'], ends: 'Ends Sunday' },
+      { id: 'b-solar', title: 'Rooftop solar for 10 homes', hostId: 'harsh', note: 'Installers quote about 15% less when ten homes sign up together. I’m collecting names, then we compare quotes as a group.', target: 10, joined: ['harsh', 'dev', 'aditi', 'meera', 'farah', 'nikhil'], ends: 'Ends in 9 days' , replies: 14 },
+      { id: 'b-car', title: 'Buying a mid-size SUV? Let’s go together', hostId: 'dev', note: 'Dealers give a fleet discount for 3 or more cars from one showroom. Two of us are buying this month.', target: 3, joined: ['dev', 'harsh'], ends: 'Ends Sunday' , replies: 5 },
     ],
   },
   {
@@ -35,7 +35,7 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'food',
     areaId: 'navrangpura',
-    meetups: [{ id: 'm-manek', title: 'Manek Chowk night walk', when: 'Fri, 9:30 pm', where: 'Manek Chowk, by the main gate', hostId: 'riya', going: ['riya', 'zoya', 'sana', 'karan', 'aditi'], spots: 12, note: 'Sandwich, pav bhaji, kulfi. Everyone pays for themselves.' }],
+    meetups: [{ id: 'm-manek', title: 'Manek Chowk night walk', when: 'Fri, 9:30 pm', where: 'Manek Chowk, by the main gate', hostId: 'riya', going: ['riya', 'zoya', 'sana', 'karan', 'aditi'], spots: 12, note: 'Sandwich, pav bhaji, kulfi. Everyone pays for themselves.' , replies: 17 }],
   },
   {
     id: 'west-commuters',
@@ -51,7 +51,7 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'neighbours',
     areaId: 'sg-highway',
-    meetups: [{ id: 'm-carpool', title: 'Weekday carpool to SG Highway', when: 'Mon–Fri, 9 am', where: 'Bodakdev → Iscon', hostId: 'nikhil', going: ['nikhil', 'kavya'], spots: 4 }],
+    meetups: [{ id: 'm-carpool', title: 'Weekday carpool to SG Highway', when: 'Mon–Fri, 9 am', where: 'Bodakdev → Iscon', hostId: 'nikhil', going: ['nikhil', 'kavya'], spots: 4 , replies: 3 }],
   },
   {
     id: 'parents-thaltej',
@@ -67,8 +67,8 @@ export const GROUPS: Group[] = [
     privacy: 'neighbours',
     kind: 'parents',
     areaId: 'thaltej',
-    meetups: [{ id: 'm-playdate', title: 'Saturday playdate in the park', when: 'Sat, 5 pm', where: 'Thaltej garden, near the swings', hostId: 'sana', going: ['sana', 'kavya', 'priyank'] }],
-    buys: [{ id: 'b-books', title: 'Class 6 textbooks in bulk', hostId: 'sana', note: 'The stationer on the main road gives 20% off for 15 or more sets.', target: 15, joined: ['sana', 'kavya', 'priyank', 'meera', 'aditi', 'farah', 'zoya', 'dev', 'arjun'], ends: 'Ends in 4 days' }],
+    meetups: [{ id: 'm-playdate', title: 'Saturday playdate in the park', when: 'Sat, 5 pm', where: 'Thaltej garden, near the swings', hostId: 'sana', going: ['sana', 'kavya', 'priyank'] , replies: 4 }],
+    buys: [{ id: 'b-books', title: 'Class 6 textbooks in bulk', hostId: 'sana', note: 'The stationer on the main road gives 20% off for 15 or more sets.', target: 15, joined: ['sana', 'kavya', 'priyank', 'meera', 'aditi', 'farah', 'zoya', 'dev', 'arjun'], ends: 'Ends in 4 days' , replies: 11 }],
   },
   {
     id: 'green-amdavad',
@@ -84,7 +84,7 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'outdoors',
     areaId: 'vastrapur',
-    meetups: [{ id: 'm-trees', title: 'Plant 50 trees by the lake', when: 'Sun, 7 am', where: 'Vastrapur Lake, east gate', hostId: 'farah', going: ['farah', 'aditi', 'nikhil', 'kavya', 'meera', 'arjun'], spots: 40 }],
+    meetups: [{ id: 'm-trees', title: 'Plant 50 trees by the lake', when: 'Sun, 7 am', where: 'Vastrapur Lake, east gate', hostId: 'farah', going: ['farah', 'aditi', 'nikhil', 'kavya', 'meera', 'arjun'], spots: 40 , replies: 12 }],
   },
   {
     id: 'pickleball-ahd',
@@ -100,7 +100,7 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'sports',
     areaId: 'thaltej',
-    meetups: [{ id: 'm-pickle', title: 'Beginners’ doubles', when: 'Today, 7 pm', where: 'Pickle & Play, Thaltej', hostId: 'karan', going: ['karan', 'nikhil', 'riya'], spots: 8, note: 'Court split four ways; paddles to borrow.' }],
+    meetups: [{ id: 'm-pickle', title: 'Beginners’ doubles', when: 'Today, 7 pm', where: 'Pickle & Play, Thaltej', hostId: 'karan', going: ['karan', 'nikhil', 'riya'], spots: 8, note: 'Court split four ways; paddles to borrow.' , replies: 6 }],
   },
   {
     id: 'founders-prahlad',
@@ -116,8 +116,8 @@ export const GROUPS: Group[] = [
     privacy: 'neighbours',
     kind: 'founders',
     areaId: 'prahlad-nagar',
-    meetups: [{ id: 'm-founders', title: 'Founders’ breakfast', when: 'Sat, 8 am', where: 'The Quiet Cup, Prahlad Nagar', hostId: 'priyank', going: ['priyank', 'arjun', 'riya', 'karan', 'meera'], spots: 12, note: 'This week: hiring your first five people.' }],
-    buys: [{ id: 'b-chairs', title: 'Ergonomic chairs for small teams', hostId: 'arjun', note: 'A Naroda maker sells at about 25% off for 20 chairs or more. Split across teams.', target: 20, joined: ['arjun', 'priyank', 'meera', 'karan'], ends: 'Ends in 2 weeks' }],
+    meetups: [{ id: 'm-founders', title: 'Founders’ breakfast', when: 'Sat, 8 am', where: 'The Quiet Cup, Prahlad Nagar', hostId: 'priyank', going: ['priyank', 'arjun', 'riya', 'karan', 'meera'], spots: 12, note: 'This week: hiring your first five people.' , replies: 10 }],
+    buys: [{ id: 'b-chairs', title: 'Ergonomic chairs for small teams', hostId: 'arjun', note: 'A Naroda maker sells at about 25% off for 20 chairs or more. Split across teams.', target: 20, joined: ['arjun', 'priyank', 'meera', 'karan'], ends: 'Ends in 2 weeks' , replies: 6 }],
   },
   {
     id: 'sunday-cricket',
@@ -133,8 +133,8 @@ export const GROUPS: Group[] = [
     privacy: 'public',
     kind: 'sports',
     areaId: 'vastrapur',
-    meetups: [{ id: 'm-cricket', title: 'Sunday morning match', when: 'Sun, 6:30 am', where: 'Vastrapur ground', hostId: 'karan', going: ['karan', 'dev', 'nikhil', 'harsh', 'arjun', 'priyank', 'kavya', 'zoya', 'riya', 'aditi', 'meera', 'sana', 'farah'], spots: 22 }],
-    buys: [{ id: 'b-kit', title: 'Club jerseys, 15 or more', hostId: 'dev', note: 'A printer in Satellite does custom jerseys at a bulk price for 15+.', target: 15, joined: ['dev', 'karan', 'harsh', 'arjun', 'nikhil', 'priyank', 'kavya'], ends: 'Ends Friday' }],
+    meetups: [{ id: 'm-cricket', title: 'Sunday morning match', when: 'Sun, 6:30 am', where: 'Vastrapur ground', hostId: 'karan', going: ['karan', 'dev', 'nikhil', 'harsh', 'arjun', 'priyank', 'kavya', 'zoya', 'riya', 'aditi', 'meera', 'sana', 'farah'], spots: 22 , replies: 21 }],
+    buys: [{ id: 'b-kit', title: 'Club jerseys, 15 or more', hostId: 'dev', note: 'A printer in Satellite does custom jerseys at a bulk price for 15+.', target: 15, joined: ['dev', 'karan', 'harsh', 'arjun', 'nikhil', 'priyank', 'kavya'], ends: 'Ends Friday' , replies: 9 }],
   },
   {
     id: 'book-club-navrangpura',
@@ -233,7 +233,10 @@ export const POSTS: Post[] = [
     text: 'Found a friendly beagle with a red collar near Thaltej crossroads. Keeping him safe at home; message me if he’s yours.',
     upvotes: 64,
     replyCount: 12,
-    replies: [{ id: 'r8', authorId: 'karan', text: 'Shared in the Thaltej society groups.', ago: '40m', upvotes: 5 }],
+    replies: [
+      { id: 'r8', authorId: 'karan', text: 'Shared in the Thaltej society groups.', ago: '40m', upvotes: 5 },
+      { id: 'r8b', authorId: 'kavya', text: 'A family on Drive-In Road was asking about a beagle this morning. Sent them your post.', ago: '25m', upvotes: 12, helpful: true },
+    ],
   },
   {
     id: 'pickle-partners',
@@ -258,7 +261,11 @@ export const POSTS: Post[] = [
     text: 'Giving away a box of school textbooks (classes 6–8, state board). Pick up from Navrangpura this week.',
     upvotes: 22,
     replyCount: 6,
-    replies: [],
+    replies: [
+      { id: 'r11', authorId: 'sana', text: 'Could I pick up the class 7 books on Thursday evening? My daughter moves up next term.', ago: '5h', upvotes: 4 },
+      { id: 'r12', authorId: 'meera', text: 'Yes, Thursday after 6 works. I’ll message you the gate number.', ago: '5h', upvotes: 2 },
+      { id: 'r13', authorId: 'farah', text: 'If any are left, the reading corner at the Thaltej community hall takes donations.', ago: '3h', upvotes: 7, helpful: true },
+    ],
     groupId: 'parents-thaltej',
   },
   {

@@ -135,6 +135,10 @@ export interface CityEvent {
   unconfirmedNote?: string;
   /** Where to read more or get tickets. Nearhood never books or sells. */
   link?: { label: string; url: string };
+  /** Who posted it: a page (the venue), a club, or a person sharing it. */
+  host?: { kind: 'page' | 'club' | 'person'; id: string };
+  /** The venue's page, when it has one. */
+  venueId?: string;
 }
 
 export type PostType = 'question' | 'recommendation' | 'alert' | 'lostfound' | 'event' | 'giveaway';
@@ -200,6 +204,8 @@ export interface Meetup {
   going: string[];
   spots?: number;
   note?: string;
+  /** Replies in the club thread about it. */
+  replies?: number;
 }
 
 /**
@@ -215,6 +221,8 @@ export interface GroupBuy {
   target: number;
   joined: string[];
   ends: string;
+  /** Replies in the club thread about it. */
+  replies?: number;
 }
 
 /** A club or group: neighbours, founders, cricket lovers, parents… created and run by people. */

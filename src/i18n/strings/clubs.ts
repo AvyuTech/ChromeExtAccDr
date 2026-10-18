@@ -119,5 +119,4 @@ export const clubs: Dict = {
   'clubs.post.buy': { en: 'Started a group buy', gu: 'સાથે ખરીદી શરૂ કરી', hi: 'साथ में ख़रीदारी शुरू की' },
   'clubs.post.enough': { en: 'enough people', gu: 'પૂરતા લોકો', hi: 'काफ़ी लोग' },
   'clubs.post.open': { en: 'Open {club}', gu: '{club} ખોલો', hi: '{club} खोलें' },
-  'clubs.post.fine': { en: 'Nearhood only gathers people; the deal and payment happen outside the app.', gu: 'Nearhood ફક્ત લોકોને ભેગા કરે છે; સોદો અને ચુકવણી એપની બહાર થાય છે.', hi: 'Nearhood सिर्फ़ लोगों को जोड़ता है; सौदा और भुगतान ऐप के बाहर होता है।' },
 };

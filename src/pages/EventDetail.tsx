@@ -1,16 +1,20 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { eventPhoto } from '../assets/photos';
-import { SourceChips } from '../components/cards';
+import { eventPhoto, placePhoto } from '../assets/photos';
+import { Avatar, SourceChips } from '../components/cards';
+import { clubPhoto } from '../components/clubs';
 import { RecommendSheet } from '../components/community';
-import { downloadEventIcs, EventLinkRow, eventFriends, eventSourceLine, friendsLine, IconAction, ProfileHead, useShare } from '../components/discover';
+import { downloadEventIcs, EventLinkRow, eventFriends, eventSourceLine, friendsLine, useShare } from '../components/discover';
 import { AvatarStack } from '../components/friends';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
+import { person } from '../data/core';
 import { EVENTS, eventById } from '../data/events';
+import { groupById } from '../data/social';
 import { useT } from '../i18n';
-import { AlertGlyph, CalendarGlyph, ExternalGlyph, FriendsGlyph, GlobeGlyph, NavigateGlyph, SendGlyph, ShareGlyph, TrustRing, WantGlyph } from '../icons';
+import { AlertGlyph, CalendarGlyph, ExternalGlyph, FriendsGlyph, NavigateGlyph, PinGlyph, SendGlyph, ShareGlyph, TrustRing, WantGlyph } from '../icons';
 import { km, price } from '../lib/format';
 import { isWanted } from '../lib/friends';
+import { eventHost, venuePage, type Host } from '../lib/hosts';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
@@ -38,8 +42,40 @@ function host(url: string) {
   }
 }
 
+/** "Pickle & Play · Pickleball courts · Thaltej · posted an event": who shared it. */
+function EventHostHead({ host }: { host: Host }) {
+  const icon =
+    host.kind === 'person' ? (
+      <Avatar who={person(host.id)} size={34} />
+    ) : (
+      <span className="host-icon" aria-hidden="true">
+        {host.kind === 'page' ? (
+          placePhoto(host.id) ? <img src={placePhoto(host.id)} alt="" /> : <PinGlyph size={16} />
+        ) : groupById(host.id) ? (
+          <img src={clubPhoto(groupById(host.id)!)} alt="" />
+        ) : null}
+      </span>
+    );
+  return (
+    <div className="feed-post__head">
+      <Link to={host.to} aria-label={host.name}>
+        {icon}
+      </Link>
+      <div className="feed-post__who">
+        <span className="feed-post__line">
+          <Link to={host.to} className="feed-post__name">
+            {host.name}
+          </Link>
+          <span className="host-kind">{host.kind === 'person' ? 'shared an event' : host.kind === 'page' ? 'Page' : 'Club'}</span>
+        </span>
+        <span className="meta">{host.sub}</span>
+      </div>
+    </div>
+  );
+}
+
 /**
- * A city event, found on ticketing sites, organisers' pages, reels and news.
+ * An event is a post by a person, a page or a club. Found on ticketing sites, organisers' pages, reels and news.
  * Nearhood doesn't sell tickets or take RSVPs: it links out, and shows which
  * friends want to go or went.
  */
@@ -82,89 +118,80 @@ export default function EventDetail() {
   const wanted = isWanted(data, wantItem);
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.venue}, ${event.area}, Ahmedabad`)}`;
   const from = eventSourceLine(event);
+  const hostInfo = eventHost(event);
+  const venue = venuePage(event);
 
   return (
     <>
-      <PageHeader title={event.title} fallback="/explore/events" />
+      <PageHeader title="Event" fallback="/explore/events" />
       <main className="page page--with-header">
-        <ProfileHead
-          cover={eventPhoto(event.id)}
-          coverBadge={
-            event.day === 'Today' ? (
-              <span className="hero-chip hero-chip--lime" style={{ position: 'absolute', top: 12, left: 'var(--gutter)', zIndex: 1 }}>
-                Tonight · {startTime}
-              </span>
-            ) : undefined
-          }
-          tone={event.tone === 'night' ? 'violet' : event.tone}
-          icon={
-            <span className="profile-head__date" aria-hidden="true">
-              <b>{event.day === 'Sat–Sun' ? 'Sat' : event.day}</b>
-              <span>{startTime}</span>
+        <article className="feed-post event-post">
+          {hostInfo ? <EventHostHead host={hostInfo} /> : null}
+          <figure className="feed-post__media">
+            {eventPhoto(event.id) ? <img src={eventPhoto(event.id)} alt="" /> : null}
+            <span className="photo-pill event-post__when">
+              {event.day === 'Today' ? `Tonight · ${startTime}` : `${event.day} · ${startTime}`}
             </span>
-          }
-          stats={[
-            { value: String(want.length + went.length + (wanted ? 1 : 0)), label: t('discover.stat.friendsKeen'), tone: 'mint' as const },
-            { value: String(sources.length), label: t('discover.stat.sources') },
-            { value: km(event.distanceKm), label: t('discover.stat.away') },
-          ]}
-          title={event.title}
-          sub={
-            <>
-              {CATEGORY_LABEL[event.category] ?? event.category} · {when}
-            </>
-          }
-        >
-          <p className="profile-head__sub" style={{ fontWeight: 500 }}>
-            {event.venue}, {event.area} · {event.price === 0 ? 'Free entry' : `Entry ${price(event.price)}`}
+          </figure>
+          <h1 className="event-post__title">{event.title}</h1>
+          <p className="feed-post__facts">
+            <span>{CATEGORY_LABEL[event.category] ?? event.category}</span>
+            <span>{when}</span>
+            <span>{event.price === 0 ? 'Free entry' : `Entry ${price(event.price)}`}</span>
+            <span>{km(event.distanceKm)}</span>
           </p>
-          <p className="origin-line" style={{ cursor: 'default' }}>
-            <GlobeGlyph size={14} />
-            <span className="grow">{from ? t('discover.event.foundOn', { sources: from }) : t('discover.event.organisedBy', { name: event.organiser })}</span>
+          <p className="feed-post__text">{event.description}</p>
+          <p className="event-post__where">
+            <PinGlyph size={14} />
+            <span>
+              {venue ? <Link to={`/place/${venue.id}`}>{venue.name}</Link> : event.venue}
+              <span className="muted">, {event.area}</span>
+            </span>
           </p>
-        </ProfileHead>
-
-        <nav className="icon-row" aria-label={t('discover.event.actions')}>
           {event.link ? (
-            <IconAction
-              primary
-              href={event.link.url}
-              icon={<ExternalGlyph size={18} />}
-              label={t('discover.action.details')}
-              ariaLabel={`${event.link.label} (opens in a new tab)`}
-            />
+            <a className="btn btn--primary btn--block event-post__link" href={event.link.url} target="_blank" rel="noopener noreferrer">
+              {event.link.label}
+              <ExternalGlyph size={15} />
+            </a>
           ) : null}
-          <IconAction
-            pressed={wanted}
-            onClick={() => {
-              const added = toggleWant(wantItem);
-              toast(added ? `Added "${event.title}" to Want to try` : 'Removed from Want to try');
-            }}
-            icon={<WantGlyph size={18} active={wanted} />}
-            label={t('discover.action.wantToGo')}
-            ariaLabel={wanted ? 'On your Want to try list' : 'Add to Want to try'}
-          />
-          <IconAction onClick={() => setSendOpen(true)} icon={<SendGlyph size={17} />} label={t('discover.action.send')} ariaLabel={t('discover.event.send')} />
-          <IconAction
-            onClick={() => toast(downloadEventIcs(event) ? 'Calendar file downloaded' : 'Could not create a calendar file')}
-            icon={<CalendarGlyph size={18} />}
-            label={t('discover.action.calendar')}
-            ariaLabel={t('discover.event.calendar')}
-          />
-          <IconAction href={mapsUrl} icon={<NavigateGlyph size={18} />} label={t('discover.action.directions')} />
-          <IconAction onClick={() => share(event.title, `/event/${event.id}`)} icon={<ShareGlyph size={17} />} label={t('common.share')} />
-        </nav>
-
-        {event.link ? (
-          <a className="linkout-row" href={event.link.url} target="_blank" rel="noopener noreferrer">
-            <span className="linkout-row__body">
-              <span className="linkout-row__title">{event.link.label}</span>
-              <span className="linkout-row__host">{host(event.link.url)}</span>
-            </span>
-            <ExternalGlyph size={16} />
-          </a>
-        ) : null}
-        <p className="meta linkout-note">{t('discover.event.noTickets')}</p>
+          <p className="meta" style={{ margin: 0 }}>
+            {event.link ? `Opens ${host(event.link.url)}. ` : ''}
+            {t('discover.event.noTickets')}
+          </p>
+          <div className="feed-post__actions">
+            <button
+              type="button"
+              className="feed-action"
+              aria-pressed={wanted}
+              style={wanted ? { color: 'var(--accent)' } : undefined}
+              onClick={() => {
+                const added = toggleWant(wantItem);
+                toast(added ? `Added "${event.title}" to Want to try` : 'Removed from Want to try');
+              }}
+            >
+              <WantGlyph size={20} active={wanted} />
+              {t('discover.action.wantToGo')}
+            </button>
+            <button
+              type="button"
+              className="feed-action"
+              aria-label={t('discover.event.calendar')}
+              onClick={() => toast(downloadEventIcs(event) ? 'Calendar file downloaded' : 'Could not create a calendar file')}
+            >
+              <CalendarGlyph size={20} />
+            </button>
+            <a className="feed-action" href={mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={t('discover.action.directions')}>
+              <NavigateGlyph size={20} />
+            </a>
+            <span className="grow" />
+            <button type="button" className="feed-action" aria-label={t('discover.event.send')} onClick={() => setSendOpen(true)}>
+              <SendGlyph size={19} />
+            </button>
+            <button type="button" className="feed-action" aria-label={t('common.share')} onClick={() => share(event.title, `/event/${event.id}`)}>
+              <ShareGlyph size={19} />
+            </button>
+          </div>
+        </article>
 
         <section className="friends-going" aria-label={t('community.friendsInterested')}>
           {want.length || went.length ? (
@@ -179,21 +206,6 @@ export default function EventDetail() {
               ? [friendsLine(went, { one: 'went', many: 'went' }), friendsLine(want, { one: 'wants to go', many: 'want to go' })].filter(Boolean).join(' · ')
               : t('discover.event.noFriends')}
           </span>
-        </section>
-
-        <section className="dsec" aria-labelledby="about-title" style={{ borderTop: 'none', paddingTop: 0 }}>
-          <h2 className="section__title" id="about-title">
-            {t('discover.event.about')}
-          </h2>
-          <p className="body">{event.description}</p>
-          <p className="meta">{t('discover.event.organisedBy', { name: event.organiser })}</p>
-          <div className="chip-wrap" style={{ gap: 6 }}>
-            {event.tags.map((tag) => (
-              <Link key={tag} to={`/ask?q=${encodeURIComponent(`${tag} events this weekend`)}`} className="chip" style={{ height: 28, padding: '0 11px', fontSize: '0.75rem' }}>
-                {tag}
-              </Link>
-            ))}
-          </div>
         </section>
 
         <section className="dsec" aria-labelledby="trust-title">
@@ -213,6 +225,10 @@ export default function EventDetail() {
             </div>
           ) : null}
           <SourceChips sources={sources} label="Seen on" />
+          <p className="meta" style={{ margin: 0 }}>
+            {t('discover.event.organisedBy', { name: event.organiser })}
+            {from ? ` · ${t('discover.event.foundOn', { sources: from })}` : ''}
+          </p>
           <p className="meta">{t('discover.event.fromWeb')}</p>
         </section>
 

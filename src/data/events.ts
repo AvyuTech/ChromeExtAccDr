@@ -3,6 +3,8 @@ import type { CityEvent } from './types';
 export const EVENTS: CityEvent[] = [
   {
     id: 'sufi-night',
+    venueId: 'riverfront-park',
+    host: { kind: 'person', id: 'riya' },
     title: 'Sufi night by the riverfront',
     category: 'music',
     day: 'Sat',
@@ -22,6 +24,8 @@ export const EVENTS: CityEvent[] = [
   },
   {
     id: 'flea-market',
+    venueId: 'vastrapur-lake',
+    host: { kind: 'person', id: 'farah' },
     title: 'Sunday flea market',
     category: 'market',
     day: 'Sun',
@@ -41,6 +45,7 @@ export const EVENTS: CityEvent[] = [
   },
   {
     id: 'open-mic',
+    host: { kind: 'person', id: 'karan' },
     title: 'Stand-up open mic night',
     category: 'comedy',
     day: 'Sat',
@@ -60,6 +65,7 @@ export const EVENTS: CityEvent[] = [
   },
   {
     id: 'heritage-walk',
+    host: { kind: 'person', id: 'farah' },
     title: 'Old city heritage walk',
     category: 'heritage',
     day: 'Sun',
@@ -79,6 +85,7 @@ export const EVENTS: CityEvent[] = [
   },
   {
     id: 'food-trucks',
+    host: { kind: 'person', id: 'zoya' },
     title: 'Food truck festival',
     category: 'food',
     day: 'Sat–Sun',
@@ -99,6 +106,8 @@ export const EVENTS: CityEvent[] = [
   },
   {
     id: 'pottery',
+    venueId: 'clay-studio',
+    host: { kind: 'page', id: 'clay-studio' },
     title: 'Beginner pottery workshop',
     category: 'workshop',
     day: 'Sun',
@@ -118,6 +127,7 @@ export const EVENTS: CityEvent[] = [
   },
   {
     id: 'kite-workshop',
+    host: { kind: 'club', id: 'parents-thaltej' },
     title: 'Kids’ kite-making morning',
     category: 'kids',
     day: 'Sat',
@@ -130,13 +140,14 @@ export const EVENTS: CityEvent[] = [
     distanceKm: 3.0,
     tags: ['kids', 'free', 'family', 'indoor'],
     description: 'Make and decorate paper kites with local kite-makers. Ages 6–12; one adult per child.',
-    organiser: 'Thaltej Neighbours group',
+    organiser: 'Thaltej Parents club',
     tone: 'yellow',
     glyph: 'kids',
     link: { label: 'Details from the city', url: 'https://ahmedabadcity.gov.in/' },
   },
   {
     id: 'rooftop-acoustic',
+    host: { kind: 'person', id: 'riya' },
     title: 'Rooftop acoustic sessions',
     category: 'music',
     day: 'Today',
@@ -156,6 +167,8 @@ export const EVENTS: CityEvent[] = [
   },
   {
     id: 'pickleball-social',
+    venueId: 'pickle-play',
+    host: { kind: 'page', id: 'pickle-play' },
     title: 'Pickleball beginners’ social',
     category: 'sports',
     day: 'Today',
@@ -175,6 +188,8 @@ export const EVENTS: CityEvent[] = [
   },
   {
     id: 'sunrise-yoga',
+    venueId: 'vastrapur-lake',
+    host: { kind: 'person', id: 'kavya' },
     title: 'Sunrise yoga at the lake',
     category: 'wellness',
     day: 'Tomorrow',

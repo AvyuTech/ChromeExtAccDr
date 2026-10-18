@@ -2,7 +2,7 @@
 
 /* ---------- Bottom composers (reply + chat) ---------- */
 .page--with-composer {
-  padding-bottom: calc(var(--nav-height) + 84px);
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
 }
 .composer-bar {
   position: fixed;
@@ -19,6 +19,50 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border);
+}
+/* Reply bar on a post: the tab bar is hidden, so it sits at the very bottom, one line high. */
+.composer-bar--reply {
+  bottom: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 8px var(--gutter) calc(8px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-top: 1px solid var(--divider);
+}
+.composer-bar--reply .composer-bar__input {
+  min-height: 36px;
+  max-height: 96px;
+  padding: 7px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-size: 0.875rem;
+}
+.composer-bar--reply .composer-bar__input:focus {
+  border-color: var(--ink-3, var(--muted));
+  background: transparent;
+  box-shadow: none;
+}
+.composer-bar--reply .composer-bar__input::placeholder {
+  color: var(--muted);
+}
+.composer-bar__send {
+  flex-shrink: 0;
+  padding: 0 2px;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.composer-bar__send:disabled {
+  color: var(--muted);
+  opacity: 0.6;
+  cursor: default;
 }
 .composer-bar--chat {
   bottom: 0;
@@ -61,6 +105,35 @@
 }
 
 /* ---------- Post detail ---------- */
+.replies-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.replies-order {
+  display: inline-flex;
+  gap: 14px;
+}
+.replies-order button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.replies-order button[aria-pressed='true'] {
+  color: var(--ink);
+  font-weight: 700;
+}
+.replies-more {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
 .post-detail {
   border-top: none;
   padding-top: 6px;
@@ -730,4 +803,77 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* ---------- Event: a post by a person, a page or a club ---------- */
+.event-post {
+  border-top: none;
+  padding-top: 6px;
+}
+.event-post__when {
+  top: 12px;
+  left: var(--gutter);
+}
+.event-post__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+.event-post .feed-post__facts {
+  margin-top: -6px;
+}
+.event-post__where {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.event-post__where a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.event-post__link {
+  gap: 8px;
+}
+.host-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-3);
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.host-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.host-kind {
+  margin-left: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Nearhood says under a post: a rule, not a box, like in the feed. */
+.post-detail + .answer-card {
+  padding: 2px 0 2px 12px;
+  background: none;
+  border: none;
+  border-left: 2px solid var(--accent-line);
+  border-radius: 0;
+}
+.post-detail + .answer-card .tile {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 9px !important;
 }
