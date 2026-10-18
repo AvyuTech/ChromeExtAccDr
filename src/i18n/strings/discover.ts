@@ -2,7 +2,7 @@ import type { Dict } from '../types';
 
 export const discover: Dict = {
   'discover.ask.title': { en: 'Ask Nearhood', gu: 'Nearhood ને પૂછો', hi: 'Nearhood से पूछें' },
-  'discover.ask.placeholder': { en: 'Ask anything about your city…', gu: 'તમારા શહેર વિશે કંઈ પણ પૂછો…', hi: 'अपने शहर के बारे में कुछ भी पूछें…' },
+  'discover.ask.placeholder': { en: 'Ask your city anything', gu: 'તમારા શહેરને કંઈ પણ પૂછો', hi: 'अपने शहर से कुछ भी पूछें' },
   'discover.ask.thinking': { en: 'Checking sources near you…', gu: 'તમારી નજીકના સ્રોતો તપાસી રહ્યા છીએ…', hi: 'आपके आस-पास के स्रोत देख रहे हैं…' },
   'discover.ask.followUp': { en: 'Ask a follow-up', gu: 'આગળનો પ્રશ્ન પૂછો', hi: 'आगे का सवाल पूछें' },
   'discover.ask.recent': { en: 'Recent searches', gu: 'તાજેતરની શોધ', hi: 'हाल की खोजें' },
@@ -80,6 +80,19 @@ export const discover: Dict = {
   'discover.place.talk': { en: 'Neighbours talking about it', gu: 'પડોશીઓ આ વિશે વાત કરે છે', hi: 'पड़ोसी इसके बारे में बात कर रहे हैं' },
   'discover.place.deals': { en: 'Deals here', gu: 'અહીંની ડીલ્સ', hi: 'यहाँ की डील' },
   'discover.place.similar': { en: 'Similar places', gu: 'સમાન સ્થળો', hi: 'मिलती-जुलती जगहें' },
+  'discover.place.photos': { en: 'Photos from locals', gu: 'સ્થાનિકોના ફોટા', hi: 'स्थानीय लोगों की तस्वीरें' },
+  'discover.deals.eyebrow': { en: '{n} live around {area}', gu: '{area} આસપાસ {n} ચાલુ', hi: '{area} के आस-पास {n} चालू' },
+  'discover.deals.headline': { en: 'Little treats, close to home.', gu: 'ઘર પાસે નાની મજા.', hi: 'घर के पास छोटी खुशियाँ।' },
+  'discover.groups.eyebrow': { en: 'Groups near you', gu: 'તમારી નજીકના ગ્રુપ', hi: 'आपके पास के ग्रुप' },
+  'discover.groups.headline': { en: 'Find your people, one street at a time.', gu: 'એક એક ગલીએ, તમારા લોકો શોધો.', hi: 'एक-एक गली में, अपने लोग खोजें।' },
+  'discover.ask.eyebrow': { en: 'Ask {city}', gu: '{city}ને પૂછો', hi: '{city} से पूछें' },
+  'discover.ask.headline': { en: 'What would you like to know?', gu: 'તમે શું જાણવા માંગો છો?', hi: 'आप क्या जानना चाहेंगे?' },
+  'discover.ask.intro': {
+    en: 'One answer, merged from neighbours, maps, tickets and news, with every source shown.',
+    gu: 'પડોશીઓ, નકશા, ટિકિટ અને સમાચારમાંથી એક જવાબ, દરેક સ્ત્રોત સાથે.',
+    hi: 'पड़ोसियों, मैप, टिकट और ख़बरों से मिला एक जवाब, हर स्रोत के साथ।',
+  },
+  'discover.ask.youAsked': { en: 'You asked', gu: 'તમે પૂછ્યું', hi: 'आपने पूछा' },
   'discover.place.notFound': { en: 'We couldn’t find that place', gu: 'એ સ્થળ મળ્યું નહીં', hi: 'वह जगह नहीं मिली' },
 
   'discover.event.going': { en: 'Going', gu: 'જઈશ', hi: 'जा रहा/रही हूँ' },

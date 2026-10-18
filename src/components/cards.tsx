@@ -1,6 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { eventPhoto, personPhoto, placePhoto } from '../assets/photos';
+import { eventPhoto, groupPhoto, personPhoto, placePhoto } from '../assets/photos';
 import { ALERT_KIND_META } from '../data/city';
 import { person, SOURCES } from '../data/core';
 import type { CityAlert, CityEvent, Deal, Group, Person, Place, Post, SourceId, Tone } from '../data/types';
@@ -546,9 +546,7 @@ export function GroupRow({ group }: { group: Group }) {
   const joined = has('joinedGroups', group.id);
   return (
     <div className="card card--tight row" style={{ gap: 12 }}>
-      <span className={`tile tile--round tone-${group.tone}`} style={{ width: 46, height: 46 }}>
-        <NamedGlyph name={group.glyph} size={22} duo />
-      </span>
+      <Cover src={groupPhoto(group.id)} glyph={group.glyph} tone={group.tone} className="place-thumb" />
       <Link to={`/groups/${group.id}`} className="stack grow" style={{ gap: 2, textDecoration: 'none', color: 'inherit', minWidth: 0 }}>
         <span className="strong" style={{ fontSize: '0.9688rem' }}>
           {group.name}

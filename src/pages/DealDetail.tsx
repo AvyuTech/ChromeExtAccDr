@@ -1,5 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
+import { dealPhoto } from '../assets/photos';
 import { PlaceRow, ShareButton } from '../components/cards';
+import { DetailHero } from '../components/discover';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { placeById } from '../data/places';
 import { dealById } from '../data/social';
@@ -37,6 +39,7 @@ export default function DealDetail() {
 
   const claimed = has('claimedDeals', deal.id);
   const place = deal.placeId ? placeById(deal.placeId) : undefined;
+  const photoSrc = dealPhoto(deal);
 
   const copy = async () => {
     if (!deal.code) return;
@@ -52,35 +55,48 @@ export default function DealDetail() {
     <>
       <PageHeader title={deal.merchant} fallback="/deals" actions={<ShareButton title={`${deal.title} at ${deal.merchant}`} path={`/deals/${deal.id}`} />} />
       <main className="page page--with-header">
-        <section className="deal-hero glyph-host">
-          <span className="tile tile--lg" style={{ background: 'var(--mint-strong)', color: '#ffffff', width: 56, height: 56, borderRadius: 18 }}>
-            <NamedGlyph name="deals" size={28} live={!claimed} />
+        {photoSrc ? (
+          <DetailHero tone={deal.tone} glyph={deal.glyph} src={photoSrc} height={236}>
+            <span className="deal-burst" aria-hidden="true">
+              {deal.discount}
+            </span>
+          </DetailHero>
+        ) : (
+          <section className="deal-hero glyph-host" aria-hidden="true">
+            <span className="deal-hero__icon">
+              <NamedGlyph name={deal.glyph} size={28} live={!claimed} />
+            </span>
+            <span className={`deal-hero__big${deal.discount.length > 9 ? ' deal-hero__big--long' : ''}`}>{deal.discount}</span>
+          </section>
+        )}
+
+        <div className="stack detail-head" style={{ gap: 8 }}>
+          <span className="eyebrow" style={{ color: 'var(--accent)' }}>
+            {t('home.deal')} · {deal.ends}
           </span>
-          <span className="deal-hero__big">{deal.discount}</span>
-          <h1 className="detail-title" style={{ fontSize: '1.25rem' }}>
-            {deal.title}
-          </h1>
-          <span className="meta">
+          <h1 className="detail-title">{deal.title}</h1>
+          <span className="meta" style={{ fontSize: '0.875rem' }}>
             {place ? (
-              <Link to={`/place/${place.id}`} style={{ fontWeight: 600 }}>
+              <Link to={`/place/${place.id}`} style={{ fontWeight: 700, color: 'var(--accent)', textDecoration: 'none' }}>
                 {deal.merchant}
               </Link>
             ) : (
               deal.merchant
-            )}{' '}
+            )}
             {deal.merchant.includes(deal.area) ? '' : ` · ${deal.area}`} · {km(deal.distanceKm)}
           </span>
-          <span className="row meta" style={{ gap: 12, marginTop: 4 }}>
-            <span className="row" style={{ gap: 4 }}>
-              <ClockGlyph size={14} />
+          <span className="row row--wrap" style={{ gap: 6, marginTop: 2 }}>
+            <span className="badge" style={{ gap: 5 }}>
+              <ClockGlyph size={13} />
               {deal.ends}
             </span>
-            <span className="row" style={{ gap: 4 }}>
-              <UsersGlyph size={14} />
+            <span className="badge tone-mint" style={{ gap: 5 }}>
+              <UsersGlyph size={13} />
               {compact(deal.claimedBy + (claimed ? 1 : 0))} claimed
             </span>
+            {deal.code ? <span className="badge">Code at checkout</span> : <span className="badge">No code needed</span>}
           </span>
-        </section>
+        </div>
 
         {claimed ? (
           <section className="stack fade-up" aria-label={t('discover.deals.code')}>

@@ -7,7 +7,7 @@ import { neighbourhoodName } from '../data/core';
 import { eventById } from '../data/events';
 import { placeById } from '../data/places';
 import { useT } from '../i18n';
-import { BackGlyph, ClockGlyph, CloseGlyph, MicLineGlyph, SearchGlyph, SparkGlyph } from '../icons';
+import { ArrowRightGlyph, BackGlyph, ClockGlyph, CloseGlyph, MicLineGlyph, NamedGlyph, SparkGlyph, SparkleMark, type GlyphName } from '../icons';
 import { ask, SUGGESTED_QUESTIONS, type AskResult, type ResultRef } from '../lib/askEngine';
 import { stripBold } from '../lib/format';
 import { useAppData } from '../state/appData';
@@ -47,6 +47,19 @@ function passes(ref: ResultRef, filter: string, radiusKm: number) {
     return true;
   }
   return filter === 'All';
+}
+
+/** A glyph and tint for each suggested question. */
+function suggestionLook(q: string): { glyph: GlyphName; tone: string } {
+  const s = q.toLowerCase();
+  if (s.includes('friend')) return { glyph: 'friends', tone: 'violet' };
+  if (s.includes('weekend') || s.includes('happening')) return { glyph: 'events', tone: 'peach' };
+  if (s.includes('café') || s.includes('cafe') || s.includes('coffee')) return { glyph: 'cafe', tone: 'clay' };
+  if (s.includes('traffic')) return { glyph: 'car', tone: 'amber' };
+  if (s.includes('metro') || s.includes('bus')) return { glyph: 'transit', tone: 'blue' };
+  if (s.includes('water') || s.includes('power')) return { glyph: 'services', tone: 'teal' };
+  if (s.includes('kids')) return { glyph: 'kids', tone: 'mint' };
+  return { glyph: 'spark', tone: 'violet' };
 }
 
 function filterLabel(f: string, radiusKm: number) {
@@ -139,8 +152,7 @@ export default function Ask() {
   };
 
   return (
-    <main className="page">
-      <h1 className="sr-only">{q ? `${t('answer.label')}: ${q}` : t('answer.label')}</h1>
+    <main className="page ask-page">
       <form className="row" style={{ gap: 8 }} onSubmit={onSubmit} role="search">
         <button
           type="button"
@@ -151,7 +163,7 @@ export default function Ask() {
           <BackGlyph size={20} />
         </button>
         <label className="ask-bar" htmlFor="ask-q">
-          <SparkGlyph size={18} thinking={thinking} />
+          <SparkGlyph size={20} thinking={thinking} />
           <input
             id="ask-q"
             type="text"
@@ -168,13 +180,23 @@ export default function Ask() {
             </button>
           ) : null}
           <button type="submit" className="ask-bar__go" aria-label={t('common.search')}>
-            <SearchGlyph size={16} />
+            <ArrowRightGlyph size={18} />
           </button>
         </label>
       </form>
 
       {!result ? (
         <>
+          <div className="page-intro ask-intro">
+            <span className="eyebrow muted">{t('discover.ask.eyebrow', { city: settings.location.city })}</span>
+            <h1 className="hero-title">
+              {t('discover.ask.headline')}
+              <SparkleMark size={24} className="hero-title__spark" />
+            </h1>
+            <p className="body-sm muted" style={{ margin: 0 }}>
+              {t('discover.ask.intro')}
+            </p>
+          </div>
           {data.recentSearches.length > 0 ? (
             <section className="section" aria-labelledby="recent-title">
               <div className="section__head">
@@ -205,17 +227,28 @@ export default function Ask() {
             <h2 className="section__title" id="try-title">
               {t('discover.ask.try')}
             </h2>
-            <div className="chip-wrap">
-              {SUGGESTED_QUESTIONS.map((s) => (
-                <button key={s} type="button" className="chip chip--soft" onClick={() => go(s)}>
-                  {s}
-                </button>
-              ))}
+            <div className="ask-prompts">
+              {SUGGESTED_QUESTIONS.map((s) => {
+                const look = suggestionLook(s);
+                return (
+                  <button key={s} type="button" className="ask-prompt glyph-host" onClick={() => go(s)}>
+                    <span className={`tile tone-${look.tone}`}>
+                      <NamedGlyph name={look.glyph} size={20} duo />
+                    </span>
+                    <span className="ask-prompt__text">{s}</span>
+                    <ArrowRightGlyph size={16} />
+                  </button>
+                );
+              })}
             </div>
           </section>
         </>
       ) : (
         <>
+          <div className="ask-question">
+            <span className="eyebrow muted">{t('discover.ask.youAsked')}</span>
+            <h1 className="ask-question__text">{q}</h1>
+          </div>
           {result.filters.length > 0 ? (
             <div className="chip-row" role="group" aria-label="Filter results">
               {result.filters.map((f) => (

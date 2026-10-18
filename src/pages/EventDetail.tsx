@@ -1,4 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
+import { eventPhoto } from '../assets/photos';
 import { EventTile, SourceChips } from '../components/cards';
 import { DetailHero, downloadEventIcs, useShare } from '../components/discover';
 import { AvatarStack, WantButton } from '../components/friends';
@@ -12,6 +13,18 @@ import { allCheckIns, profileInfo } from '../lib/friends';
 import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
+
+const CATEGORY_LABEL: Record<string, string> = {
+  music: 'Live music',
+  market: 'Market',
+  comedy: 'Comedy',
+  heritage: 'Heritage',
+  workshop: 'Workshop',
+  food: 'Food',
+  sports: 'Sports',
+  kids: 'Kids',
+  wellness: 'Wellness',
+};
 
 const DAY_NAME: Record<string, string> = { Sat: 'Saturday', Sun: 'Sunday', Fri: 'Friday', 'Sat–Sun': 'Saturday & Sunday', Today: 'Today', Tomorrow: 'Tomorrow' };
 
@@ -52,6 +65,7 @@ export default function EventDetail() {
   const agree = Math.min(sources.length, 4);
   const similar = EVENTS.filter((e) => e.id !== event.id && (e.category === event.category || e.tags.some((tag) => event.tags.includes(tag)))).slice(0, 5);
   const when = `${DAY_NAME[event.day] ?? event.day}, ${event.time}`;
+  const startTime = event.time.split(' – ')[0];
   const soldOutSoon = event.seatsLeft !== undefined && event.seatsLeft <= 12;
   // People you follow who want to go (on their list) or already went (checked in).
   const friendIds = data.following.filter(
@@ -69,9 +83,33 @@ export default function EventDetail() {
     <>
       <PageHeader title={event.title} fallback="/explore/events" />
       <main className="page page--with-header">
-        <DetailHero tone={event.tone} glyph={event.glyph} badge={`${event.day.toUpperCase()} · ${event.time.split(' – ')[0].toUpperCase()}`} />
+        <DetailHero
+          tone={event.tone}
+          glyph={event.glyph}
+          src={eventPhoto(event.id)}
+          height={268}
+          badge={eventPhoto(event.id) ? undefined : `${event.day.toUpperCase()} · ${startTime.toUpperCase()}`}
+        >
+          {eventPhoto(event.id) ? (
+            <>
+              <span className={`hero-chip ${event.day === 'Today' ? 'hero-chip--lime' : ''}`} style={{ position: 'absolute', top: 14, left: 14, zIndex: 1 }}>
+                {event.day === 'Today' ? 'Tonight' : event.day} · {startTime}
+              </span>
+              <span className="hero-chips">
+                <span className="hero-chip hero-chip--ink">
+                  <UsersGlyph size={14} />
+                  {compact(goingCount)} going
+                </span>
+                <span className="hero-chip">{price(event.price)}</span>
+              </span>
+            </>
+          ) : null}
+        </DetailHero>
 
-        <div className="stack" style={{ gap: 10 }}>
+        <div className="stack detail-head" style={{ gap: 10 }}>
+          <span className="eyebrow muted">
+            {CATEGORY_LABEL[event.category] ?? event.category} · {event.area}
+          </span>
           <h1 className="detail-title">{event.title}</h1>
           <ul className="fact-list">
             <li>

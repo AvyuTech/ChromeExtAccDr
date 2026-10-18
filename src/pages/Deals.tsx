@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { dealPhoto } from '../assets/photos';
+import { Cover } from '../components/cards';
 import { EmptyState, PageHeader } from '../components/ui';
+import { neighbourhoodName } from '../data/core';
 import { DEALS } from '../data/social';
 import type { Deal } from '../data/types';
 import { useT } from '../i18n';
-import { CheckGlyph, ClockGlyph, NamedGlyph, PinGlyph, UsersGlyph } from '../icons';
+import { CheckGlyph, ClockGlyph, PinGlyph, SparkleMark, UsersGlyph } from '../icons';
 import { compact, km } from '../lib/format';
 import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
@@ -20,6 +23,15 @@ const FILTERS: Array<{ id: 'all' | Deal['category'] | 'near'; label: string }> =
   { id: 'transport', label: 'Transport' },
 ];
 
+const CATEGORY_LABEL: Record<Deal['category'], string> = {
+  food: 'Food',
+  cafe: 'Café',
+  shopping: 'Shopping',
+  wellness: 'Wellness',
+  movies: 'Movies',
+  transport: 'Getting around',
+};
+
 export function DealTile({ deal }: { deal: Deal }) {
   const t = useT();
   const navigate = useNavigate();
@@ -27,23 +39,24 @@ export function DealTile({ deal }: { deal: Deal }) {
   const { has, add } = useAppData();
   const claimed = has('claimedDeals', deal.id);
   return (
-    <article className={`card deal-tile tone-${deal.tone}`}>
+    <article className="card deal-tile">
       <Link to={`/deals/${deal.id}`} className="deal-tile__top glyph-host">
-        <span className="tile tile--lg">
-          <NamedGlyph name={deal.glyph} size={24} duo live={!claimed} />
-        </span>
-        <span className="stack grow" style={{ gap: 4, minWidth: 0 }}>
-          <span className="deal-tile__discount">{deal.discount}</span>
-          <span className="strong" style={{ fontSize: '0.9375rem', lineHeight: 1.3 }}>
-            {deal.title}
+        <Cover src={dealPhoto(deal)} glyph={deal.glyph} tone={deal.tone} className="deal-tile__thumb">
+          <span className="deal-ribbon">{deal.discount}</span>
+        </Cover>
+        <span className="stack grow" style={{ gap: 5, minWidth: 0 }}>
+          <span className="eyebrow" style={{ color: 'var(--accent)' }}>
+            {CATEGORY_LABEL[deal.category]}
           </span>
+          <span className="deal-tile__title">{deal.title}</span>
           <span className="meta row" style={{ gap: 4 }}>
             <PinGlyph size={12} />
-            {deal.merchant.includes(deal.area) ? deal.merchant : `${deal.merchant} · ${deal.area}`} · {km(deal.distanceKm)}
+            <span className="truncate">{deal.merchant.includes(deal.area) ? deal.merchant : `${deal.merchant} · ${deal.area}`}</span>
+            <span style={{ flexShrink: 0 }}>· {km(deal.distanceKm)}</span>
           </span>
         </span>
       </Link>
-      <div className="row" style={{ gap: 8 }}>
+      <div className="row deal-tile__foot" style={{ gap: 8 }}>
         <span className="meta row grow" style={{ gap: 10 }}>
           <span className="row" style={{ gap: 4 }}>
             <ClockGlyph size={13} />
@@ -85,8 +98,15 @@ export default function Deals() {
   );
   return (
     <>
-      <PageHeader title={t('discover.deals.title')} fallback="/explore" sub={`${DEALS.length} live deals`} />
+      <PageHeader title={t('discover.deals.title')} fallback="/explore" />
       <main className="page page--with-header">
+        <div className="page-intro">
+          <span className="eyebrow muted">{t('discover.deals.eyebrow', { n: DEALS.length, area: neighbourhoodName(settings.location.home) })}</span>
+          <h2 className="hero-title" style={{ fontSize: '1.75rem' }}>
+            {t('discover.deals.headline')}
+            <SparkleMark size={22} className="hero-title__spark" />
+          </h2>
+        </div>
         <div className="chip-row" role="group" aria-label="Filter deals">
           {FILTERS.map((f) => (
             <button key={f.id} type="button" className="chip" aria-pressed={filter === f.id} onClick={() => setFilter(f.id)}>

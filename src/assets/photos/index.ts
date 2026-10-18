@@ -54,6 +54,30 @@ export function itemPhoto(item: string | undefined, placeId?: string, eventId?: 
   return own ?? (placeId ? placePhoto(placeId) : undefined) ?? (eventId ? eventPhoto(eventId) : undefined);
 }
 
+/** A dish or activity's own photo only (no place fallback), for galleries. */
+export const ownItemPhoto = (item: string) => BY_KEY[ITEM_PHOTO[item] ?? ''];
+
+const GROUP_PHOTO: Record<string, string> = {
+  'bodakdev-neighbours': 'scene-friends',
+  'amdavad-foodies': 'scene-table',
+  'west-commuters': 'scene-promenade',
+  'parents-thaltej': 'event-kite-workshop',
+  'green-amdavad': 'scene-lake',
+  'pickleball-ahd': 'event-pickleball-social',
+};
+export const groupPhoto = (id: string) => BY_KEY[GROUP_PHOTO[id] ?? ''];
+
+/** Deals use their venue's photo when they have one. */
+export const dealPhoto = (deal: { placeId?: string }) => (deal.placeId ? placePhoto(deal.placeId) : undefined);
+
+const CATEGORY_PHOTO: Record<string, string> = {
+  food: 'scene-table',
+  events: 'scene-concert',
+  getaways: 'place-polo-forest',
+  places: 'place-vastrapur-lake',
+};
+export const categoryPhoto = (id: string) => BY_KEY[CATEGORY_PHOTO[id] ?? ''];
+
 export interface PhotoSource {
   source: string;
   url: string;

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { ownItemPhoto, placePhoto } from '../assets/photos';
 import { AnswerCard, DealCard, PlaceRow, PostCard } from '../components/cards';
 import { FriendVerdictRow, RecommendSheet, TrustSheet } from '../components/community';
 import { DetailHero, useShare } from '../components/discover';
@@ -8,8 +9,8 @@ import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { PLACES, placeById } from '../data/places';
 import { DEALS, POSTS } from '../data/social';
 import { useT } from '../i18n';
-import { CheckGlyph, CheckInGlyph, ClockGlyph, InfoGlyph, MustGlyph, NavigateGlyph, PinGlyph, SaveGlyph, SendGlyph, ShareGlyph, ShieldGlyph, SparkGlyph } from '../icons';
-import { placeCommunity } from '../lib/friends';
+import { CheckGlyph, CheckInGlyph, ClockGlyph, InfoGlyph, MustGlyph, NavigateGlyph, PinGlyph, SaveGlyph, SendGlyph, ShareGlyph, ShieldGlyph, SparkGlyph, StarGlyph } from '../icons';
+import { itemsFor, placeCommunity } from '../lib/friends';
 import { compact, km, priceLevel } from '../lib/format';
 import { useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
@@ -58,19 +59,38 @@ export default function PlaceDetail() {
   const friendCheckIns = community.reviews.filter((c) => c.authorId === 'me' || data.following.includes(c.authorId));
   const reviews = allReviews ? community.reviews : community.reviews.slice(0, 4);
   const checkInLink = `/checkin?place=${place.id}${isFood ? '' : '&kind=did'}`;
+  // Dishes and activities that have their own photo, most-ordered first.
+  const gallery = Array.from(new Set([...community.items.map((i) => i.name), ...itemsFor(place.id)]))
+    .map((name) => ({ name, src: ownItemPhoto(name), mustPct: community.items.find((i) => i.name === name)?.mustPct }))
+    .filter((g): g is { name: string; src: string; mustPct: number | undefined } => !!g.src && g.src !== placePhoto(place.id))
+    .slice(0, 6);
+  const closes = place.hours.split('–')[1]?.trim();
 
   return (
     <>
       <PageHeader title={place.name} fallback="/explore" />
       <main className="page page--with-header">
-        <DetailHero tone={place.tone} glyph={place.glyph} badge={place.isNew ? 'NEW THIS WEEK' : undefined} />
+        <DetailHero tone={place.tone} glyph={place.glyph} src={placePhoto(place.id)} height={268} badge={place.isNew ? 'New this week' : undefined}>
+          {placePhoto(place.id) ? (
+            <span className="hero-chips">
+              <span className="hero-chip">
+                <span className={`live-dot${place.openNow ? '' : ' live-dot--muted'}`} />
+                {place.openNow ? `${t('common.open')}${closes ? ` · till ${closes}` : ''}` : t('common.closed')}
+              </span>
+              <span className="hero-chip hero-chip--rating">
+                <StarGlyph size={14} />
+                {place.rating.toFixed(1)}
+              </span>
+            </span>
+          ) : null}
+        </DetailHero>
 
-        <div className="stack" style={{ gap: 8 }}>
-          <h1 className="detail-title">{place.name}</h1>
-          <span className="meta" style={{ fontSize: '0.875rem' }}>
+        <div className="stack detail-head" style={{ gap: 8 }}>
+          <span className="eyebrow muted">
             {place.kind} · {place.area}
           </span>
-          <div className="row row--wrap" style={{ gap: 6 }}>
+          <h1 className="detail-title">{place.name}</h1>
+          <div className="row row--wrap" style={{ gap: 6, marginTop: 2 }}>
             {community.total ? (
               <span className="badge tone-mint" style={{ gap: 4 }}>
                 <MustGlyph size={13} duo />
@@ -81,10 +101,12 @@ export default function PlaceDetail() {
             )}
             <span className="badge">{priceLevel(place.price)}</span>
             <span className="badge">{km(place.distanceKm)} away</span>
-            <span className={`badge ${place.openNow ? 'tone-mint' : 'tone-amber'}`} style={{ gap: 6 }}>
-              <span className={`live-dot${place.openNow ? '' : ' live-dot--muted'}`} />
-              {place.openNow ? t('common.open') : t('common.closed')}
-            </span>
+            {placePhoto(place.id) ? null : (
+              <span className={`badge ${place.openNow ? 'tone-mint' : 'tone-amber'}`} style={{ gap: 6 }}>
+                <span className={`live-dot${place.openNow ? '' : ' live-dot--muted'}`} />
+                {place.openNow ? t('common.open') : t('common.closed')}
+              </span>
+            )}
           </div>
         </div>
 
@@ -156,9 +178,26 @@ export default function PlaceDetail() {
           </section>
         ) : null}
 
-        {community.items.length ? (
+        {community.items.length || gallery.length ? (
           <section className="section" aria-labelledby="order-title">
             <SectionHead id="order-title" title={isFood ? t('community.whatPeopleOrder') : t('community.whatPeopleDo')} />
+            {gallery.length ? (
+              <div className="hscroll item-gallery" role="list" aria-label={t('discover.place.photos')}>
+                {gallery.map((g) => (
+                  <figure key={g.name} className="item-photo" role="listitem">
+                    <img src={g.src} alt={g.name} loading="lazy" decoding="async" />
+                    {g.mustPct !== undefined && g.mustPct >= 60 ? (
+                      <span className="item-photo__must">
+                        <MustGlyph size={12} duo />
+                        {g.mustPct}%
+                      </span>
+                    ) : null}
+                    <figcaption>{g.name}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            ) : null}
+            {community.items.length ? (
             <div className="list">
               {community.items.slice(0, 5).map((item) => (
                 <div key={item.name} className="list-row order-row">
@@ -176,6 +215,7 @@ export default function PlaceDetail() {
                 </div>
               ))}
             </div>
+            ) : null}
           </section>
         ) : null}
 

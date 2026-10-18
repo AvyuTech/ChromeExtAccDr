@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GroupRow } from '../components/cards';
+import { GroupCard } from '../components/discover';
 import { EmptyState, PageHeader, SectionHead } from '../components/ui';
 import { GROUPS } from '../data/social';
 import { useT } from '../i18n';
@@ -28,6 +28,12 @@ export default function Groups() {
     <>
       <PageHeader title={t('discover.groups.title')} fallback="/explore" />
       <main className="page page--with-header">
+        <div className="page-intro">
+          <span className="eyebrow muted">{t('discover.groups.eyebrow')}</span>
+          <h2 className="hero-title" style={{ fontSize: '1.75rem' }}>
+            {t('discover.groups.headline')}
+          </h2>
+        </div>
         <div className="tabs" role="tablist" aria-label={t('discover.groups.title')}>
           <button type="button" role="tab" className="tab" aria-selected={tab === 'yours'} onClick={() => setTab('yours')}>
             {t('discover.groups.yours')} · {data.joinedGroups.length}
@@ -38,20 +44,20 @@ export default function Groups() {
         </div>
 
         <label htmlFor="group-q" className="search-field">
-          <SearchGlyph size={18} />
+          <SearchGlyph size={22} />
           <input id="group-q" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('discover.groups.search')} autoComplete="off" />
         </label>
 
         {list.length ? (
           <div className="stack" role="tabpanel">
             {list.map((g) => (
-              <GroupRow key={g.id} group={g} />
+              <GroupCard key={g.id} group={g} compact={tab === 'yours'} />
             ))}
             {tab === 'yours' && !q && suggested.length ? (
               <section className="section" aria-labelledby="suggested-title" style={{ marginTop: 8 }}>
                 <SectionHead id="suggested-title" title="Suggested for you" />
                 {suggested.map((g) => (
-                  <GroupRow key={g.id} group={g} />
+                  <GroupCard key={g.id} group={g} />
                 ))}
               </section>
             ) : null}

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { groupPhoto } from '../assets/photos';
 import { Avatar, PostCard } from '../components/cards';
+import { DetailHero } from '../components/discover';
 import { EmptyState, PageHeader, SectionHead, Sheet } from '../components/ui';
 import { person } from '../data/core';
 import { groupById, POSTS } from '../data/social';
@@ -38,6 +40,7 @@ export default function GroupDetail() {
   }
 
   const joined = has('joinedGroups', group.id);
+  const cover = groupPhoto(group.id);
   const posts = [...data.myPosts, ...POSTS].filter((p) => p.groupId === group.id);
   // Seeded memberships are already part of the sample member counts.
   const members = group.members + (joined ? 1 : 0) - (DEFAULT_APP_DATA.joinedGroups.includes(group.id) ? 1 : 0);
@@ -46,9 +49,14 @@ export default function GroupDetail() {
     <>
       <PageHeader title={group.name} fallback="/groups" />
       <main className="page page--with-header">
-        <section className={`card group-hero tone-${group.tone} glyph-host`}>
+        {cover ? (
+          <div className="group-cover">
+            <DetailHero tone={group.tone} glyph={group.glyph} src={cover} height={220} />
+          </div>
+        ) : null}
+        <section className={`card group-hero glyph-host${cover ? '' : ' group-hero--plain'}`}>
           <span className="group-hero__mark">
-            <NamedGlyph name={group.glyph} size={34} live />
+            <NamedGlyph name={group.glyph} size={32} live />
           </span>
           <h1 className="detail-title" style={{ fontSize: '1.375rem' }}>
             {group.name}

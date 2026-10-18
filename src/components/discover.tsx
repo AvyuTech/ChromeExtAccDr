@@ -1,19 +1,22 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { groupPhoto } from '../assets/photos';
 import { EMERGENCY, FACILITIES, ISSUE_TYPES, REPORT_STEPS, reportById, SERVICES } from '../data/city';
 import { eventById } from '../data/events';
 import { placeById } from '../data/places';
 import { dealById, groupById, postById } from '../data/social';
 import { alertById } from '../data/city';
-import type { CityEvent, CityPulse, Corridor, Tone, TransitArrival } from '../data/types';
+import type { CityEvent, CityPulse, Corridor, Group, Tone, TransitArrival } from '../data/types';
 import { ChevronRightGlyph, CountdownRing, NamedGlyph, PhoneGlyph, TrafficGlyph } from '../icons';
 import { TRAFFIC_LABEL } from '../icons/live';
 import type { ResultRef } from '../lib/askEngine';
-import { km, rupees } from '../lib/format';
-import { AlertCard, DealCard, EventRow, GroupRow, PlaceRow, PostCard } from './cards';
+import { compact, km, rupees } from '../lib/format';
+import { AlertCard, Cover, DealCard, EventRow, GroupRow, PlaceRow, PostCard } from './cards';
 import { CheckInCard } from './friends';
 import { checkInById } from '../data/friends';
+import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
+import { useT } from '../i18n';
 import { LinkRow, Tile } from './ui';
 
 /* ---------- Rows for live city results ---------- */
@@ -200,6 +203,69 @@ export function ResultList({ refs, pulse }: { refs: ResultRef[]; pulse: CityPuls
   return <div className="stack">{blocks}</div>;
 }
 
+/* ---------- Groups ---------- */
+
+/** A group with its cover photo: a photo card, or a compact row for groups you're in. */
+export function GroupCard({ group, compact: small }: { group: Group; compact?: boolean }) {
+  const t = useT();
+  const toast = useToast();
+  const { has, toggle } = useAppData();
+  const joined = has('joinedGroups', group.id);
+  const src = groupPhoto(group.id);
+  const join = (
+    <button
+      type="button"
+      className={`btn btn--sm ${joined ? 'btn--secondary' : 'btn--primary'}`}
+      aria-pressed={joined}
+      onClick={() => {
+        const on = toggle('joinedGroups', group.id);
+        toast(on ? `Joined ${group.name}` : `Left ${group.name}`);
+      }}
+    >
+      {joined ? t('common.joined') : t('common.join')}
+    </button>
+  );
+  const meta = (
+    <span className="meta">
+      {compact(group.members)} members · <span style={{ color: 'var(--mint-ink)', fontWeight: 700, whiteSpace: 'nowrap' }}>{group.postsToday} posts today</span>
+    </span>
+  );
+  if (small) {
+    return (
+      <div className="card group-row">
+        <Link to={`/groups/${group.id}`} className="group-row__link">
+          <Cover src={src} glyph={group.glyph} tone={group.tone} className="group-row__thumb" />
+          <span className="stack grow" style={{ gap: 3, minWidth: 0 }}>
+            <span className="group-card__name">{group.name}</span>
+            {meta}
+          </span>
+        </Link>
+        {join}
+      </div>
+    );
+  }
+  return (
+    <article className="card group-card">
+      <Link to={`/groups/${group.id}`} className="group-card__link">
+        <Cover src={src} glyph={group.glyph} tone={group.tone} className="group-card__media">
+          <span className="group-card__mark">
+            <NamedGlyph name={group.glyph} size={20} />
+          </span>
+        </Cover>
+        <span className="group-card__body">
+          <span className="group-card__name">{group.name}</span>
+          {meta}
+          <span className="body-sm group-card__desc">{group.description}</span>
+        </span>
+      </Link>
+      <div className="group-card__foot">
+        <span className="meta grow">{group.area}</span>
+        {join}
+      </div>
+    </article>
+  );
+}
+
 /* ---------- Calendar export ---------- */
 
 const DAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
@@ -269,7 +335,6 @@ export function downloadEventIcs(e: CityEvent): boolean {
   }
 }
 
-/** Big tone block used at the top of detail screens. */
 /**
  * Top-of-page hero for places, events, deals and groups. With a photo it is a
  * rounded photo card with a soft scrim; without one, a tinted panel with the glyph.

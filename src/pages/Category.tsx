@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { DealCard, EventRow, PlaceRow } from '../components/cards';
+import { categoryPhoto, placePhoto } from '../assets/photos';
+import { Cover, DealCard, EventRow, PlaceRow } from '../components/cards';
 import { EmptyState, PageHeader, SectionHead, Segmented } from '../components/ui';
 import { EVENTS, MOVIES } from '../data/events';
 import { PLACES } from '../data/places';
@@ -26,7 +27,7 @@ interface Config {
 const CONFIG: Record<string, Config> = {
   food: { titleKey: 'discover.cat.food', glyph: 'food', tone: 'peach', blurb: 'Restaurants, cafés and street food, ranked by what neighbours say.' },
   events: { titleKey: 'discover.cat.events', glyph: 'events', tone: 'violet', blurb: 'Merged from ticketing sites, reels, news and neighbours.' },
-  movies: { titleKey: 'discover.cat.movies', glyph: 'movies', tone: 'blue', blurb: 'Showtimes at halls near you today.' },
+  movies: { titleKey: 'discover.cat.movies', glyph: 'movies', tone: 'night', blurb: 'Showtimes at halls near you today.' },
   getaways: { titleKey: 'discover.cat.getaways', glyph: 'getaways', tone: 'teal', blurb: 'Day trips and weekends within a few hours of the city.' },
   places: { titleKey: 'discover.cat.places', glyph: 'pin', tone: 'green', blurb: 'Lakes, markets, heritage and things to do around you.' },
 };
@@ -131,23 +132,25 @@ export default function Category() {
   }
 
   const chips = category === 'events' ? EVENT_CHIPS : PLACE_CHIPS[category];
+  const banner = categoryPhoto(category);
   const count = category === 'events' ? events.length : category === 'movies' ? MOVIES.length : places.length;
 
   return (
     <>
       <PageHeader title={t(config.titleKey)} fallback="/explore" />
       <main className="page page--with-header">
-        <div className="cat-head">
-          <span className={`tile tile--xl tone-${config.tone} glyph-host`}>
-            <NamedGlyph name={config.glyph} size={34} duo live />
+        <section className={`cat-banner glyph-host${banner ? ' cat-banner--photo' : ` tone-${config.tone}`}`} aria-label={t(config.titleKey)}>
+          {banner ? <img src={banner} alt="" /> : null}
+          <span className="cat-banner__icon">
+            <NamedGlyph name={config.glyph} size={24} duo={!banner} live />
           </span>
-          <div className="cat-head__text">
-            <span className="display strong" style={{ fontSize: '1.25rem' }}>
+          <span className="cat-banner__text">
+            <span className="cat-banner__count">
               {count} {category === 'events' ? 'events' : category === 'movies' ? 'films' : 'places'}
             </span>
-            <p className="body-sm muted">{config.blurb}</p>
-          </div>
-        </div>
+            <span className="cat-banner__blurb">{config.blurb}</span>
+          </span>
+        </section>
 
         {chips ? (
           <div className="chip-row" role="group" aria-label="Filter">
@@ -243,17 +246,20 @@ export default function Category() {
             category === 'getaways' ? (
               <div className="stack">
                 {places.map((p) => (
-                  <Link key={p.id} to={`/place/${p.id}`} className="card card--tight glyph-host" style={{ display: 'flex', gap: 12, textDecoration: 'none', color: 'inherit' }}>
-                    <span className={`tile tile--xl tone-${p.tone}`}>
-                      <NamedGlyph name={p.glyph} size={30} duo />
-                    </span>
-                    <span className="stack grow" style={{ gap: 5, minWidth: 0 }}>
-                      <span className="strong" style={{ fontSize: '0.9375rem' }}>
-                        {p.name}
+                  <Link key={p.id} to={`/place/${p.id}`} className="card getaway-card glyph-host">
+                    <Cover src={placePhoto(p.id)} glyph={p.glyph} tone={p.tone} className="getaway-card__media">
+                      <span className="photo-pill" style={{ top: 12, left: 12 }}>
+                        {driveTime(p.distanceKm)}
                       </span>
-                      <span className="meta">
-                        {p.kind} · {km(p.distanceKm)} · {driveTime(p.distanceKm)}
+                    </Cover>
+                    <span className="getaway-card__body">
+                      <span className="row" style={{ gap: 8, alignItems: 'baseline' }}>
+                        <span className="getaway-card__title grow">{p.name}</span>
+                        <span className="meta" style={{ flexShrink: 0 }}>
+                          {km(p.distanceKm)}
+                        </span>
                       </span>
+                      <span className="meta">{p.kind}</span>
                       <span className="body-sm" style={{ color: 'var(--ink-3)' }}>
                         {p.summary}
                       </span>
