@@ -86,10 +86,11 @@
 }
 .profile-hero__stats {
   flex-grow: 1;
+  align-self: flex-start;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-  padding-bottom: 4px;
+  /* Clear of the cover: the row starts 48px above the cover's edge */
+  margin: 60px 0 0;
 }
 .profile-hero__stat {
   display: flex;
@@ -827,4 +828,103 @@ a.want-row__title:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* ---------- Identity: work, checks, ask me about ---------- */
+.id-work {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.id-work > .glyph {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+.id-tick {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mint-strong);
+  color: #ffffff;
+}
+.id-trust {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: left;
+}
+.id-trust.is-full > .glyph:first-child {
+  color: var(--mint-strong);
+}
+.id-ask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+}
+.id-ask__label {
+  margin-right: 2px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.id-ask__chip {
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  color: var(--ink);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.id-row__icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.id-row__state {
+  flex-shrink: 0;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-weight: 700;
+}
+.id-row__state.is-done {
+  background: var(--mint-strong);
+  color: #ffffff;
+}
+
+/* Me › Menu sheet */
+.me-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }

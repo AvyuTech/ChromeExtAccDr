@@ -78,12 +78,12 @@ export default function SettingsHome() {
             </span>
             <span className="row row--wrap" style={{ gap: 5, marginTop: 4 }}>
               {settings.profile.verifiedResident ? (
-                <span className="badge badge--sm tone-mint" style={{ gap: 4 }}>
+                <span className="badge badge--sm" style={{ gap: 4 }}>
                   <CheckGlyph size={12} />
                   {t('settings.home.verified')}
                 </span>
               ) : null}
-              {PEOPLE.me.badge ? <span className="badge badge--sm tone-violet">{PEOPLE.me.badge}</span> : null}
+              {PEOPLE.me.badge ? <span className="badge badge--sm">{PEOPLE.me.badge}</span> : null}
             </span>
           </span>
           <ChevronRightGlyph size={18} style={{ color: 'var(--muted)', flexShrink: 0 }} />

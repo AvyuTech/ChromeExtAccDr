@@ -6,10 +6,12 @@ import { SECTIONS, type SectionId } from './meta';
 import { AccessibilitySection, AppearanceSection, LanguageSection } from './sectionsDisplay';
 import { AboutSection, HelpSection, HumanSection, PhotoCreditsSection, SafetySection } from './sectionsSupport';
 import { DataSection, PrivacySection, SourcesSection } from './sectionsTrust';
+import { IdentitySection } from './sectionsIdentity';
 import { AccountSection, AlertsSection, LocationSection, NotificationsSection } from './sectionsYou';
 
 const BODIES: Record<SectionId, ComponentType> = {
   account: AccountSection,
+  identity: IdentitySection,
   location: LocationSection,
   notifications: NotificationsSection,
   alerts: AlertsSection,

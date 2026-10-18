@@ -11,6 +11,7 @@ import {
   LayersGlyph,
   LockGlyph,
   PaletteGlyph,
+  ShieldGlyph,
   SosGlyph,
   UserGlyph,
   UsersGlyph,
@@ -20,6 +21,7 @@ import type { GlyphComp } from './parts';
 
 export type SectionId =
   | 'account'
+  | 'identity'
   | 'location'
   | 'notifications'
   | 'alerts'
@@ -49,6 +51,7 @@ export interface SectionMeta {
 
 export const SECTIONS: SectionMeta[] = [
   { id: 'account', key: 'settings.account', G: UserGlyph, tone: 'violet', group: 'you', keywords: 'profile name email phone username bio delete verified' },
+  { id: 'identity', key: 'settings.identity', G: ShieldGlyph, tone: 'mint', group: 'you', keywords: 'verify verification id digilocker work job profession doctor lawyer trust vouch ask me about' },
   { id: 'location', key: 'settings.location', G: CommuteGlyph, tone: 'teal', group: 'you', keywords: 'city home work neighbourhood radius commute road car travel time' },
   { id: 'notifications', key: 'settings.notifications', G: BellGlyph, tone: 'amber', group: 'you', keywords: 'push email digest quiet hours replies mentions friends follows followers check-ins' },
   { id: 'alerts', key: 'settings.alerts', G: AlertGlyph, tone: 'peach', group: 'you', keywords: 'traffic water power weather severity commute radius safety' },

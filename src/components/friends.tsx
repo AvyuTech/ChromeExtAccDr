@@ -87,7 +87,7 @@ export function AvatarStack({ ids, size = 24, max = 4 }: { ids: string[]; size?:
 export function TasteMatchPill({ personId }: { personId: string }) {
   const { settings } = useSettings();
   const m = tasteMatch(settings, personId);
-  return <span className="badge tone-violet">{m}% taste match</span>;
+  return <span className="badge">{m}% taste match</span>;
 }
 
 /* ---------- Follow ---------- */

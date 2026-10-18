@@ -334,7 +334,7 @@ export const settings: Dict = {
   'me.shortcuts': { en: 'Your stuff', gu: 'તમારી વસ્તુઓ', hi: 'आपकी चीज़ें' },
   'me.saved': { en: 'Saved', gu: 'સાચવેલું', hi: 'सहेजा गया' },
   'me.myReports': { en: 'My civic reports', gu: 'મારા નાગરિક રિપોર્ટ્સ', hi: 'मेरी नागरिक रिपोर्ट' },
-  'me.groups': { en: 'My groups', gu: 'મારા ગ્રુપ્સ', hi: 'मेरे ग्रुप' },
+  'me.groups': { en: 'My clubs', gu: 'મારા ક્લબ', hi: 'मेरे क्लब' },
   'me.impact': { en: 'Your city impact', gu: 'શહેર પર તમારી અસર', hi: 'शहर पर आपका असर' },
   'me.streetsFixed': { en: 'Fixed', gu: 'સુધર્યું', hi: 'ठीक हुआ' },
   'me.inProgress': { en: 'In progress', gu: 'ચાલુ છે', hi: 'जारी' },
@@ -427,4 +427,5 @@ export const settings: Dict = {
   'interest.nature': { en: 'Parks & lakes', gu: 'બગીચા અને તળાવ', hi: 'पार्क और झीलें' },
   'interest.shopping': { en: 'Shopping', gu: 'ખરીદી', hi: 'ख़रीदारी' },
   'interest.groups': { en: 'Meeting new people', gu: 'નવા લોકોને મળવું', hi: 'नए लोगों से मिलना' },
+  'settings.identity': { en: 'Identity & work', gu: 'ઓળખ અને કામ', hi: 'पहचान और काम' },
 };

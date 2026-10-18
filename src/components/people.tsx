@@ -1,4 +1,4 @@
-import { useCallback, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { eventPhoto, groupPhoto, photo, placePhoto, scenePhoto } from '../assets/photos';
 import { person } from '../data/core';
@@ -12,6 +12,7 @@ import { CheckGlyph, PinGlyph, TrashGlyph, type GlyphName } from '../icons';
 import { useAppData } from '../state/appData';
 import { Avatar, Cover } from './cards';
 import { AvatarStack, WantButton } from './friends';
+import { AskMeAbout, IdentitySheet, TrustLine, useIdentity, WorkLine } from './identity';
 
 /* Pieces shared by the Friends hub, profiles, lists and Me. */
 
@@ -77,6 +78,7 @@ export function ProfileHero({
   stats,
   online,
   footer,
+  mine,
 }: {
   who: Person;
   label: string;
@@ -89,7 +91,11 @@ export function ProfileHero({
   stats: Array<{ label: string; value: ReactNode }>;
   online?: boolean;
   footer?: ReactNode;
+  /** Your own profile: the identity sheet links to edit it. */
+  mine?: boolean;
 }) {
+  const identity = useIdentity(who.id);
+  const [idOpen, setIdOpen] = useState(false);
   return (
     <section className="profile-hero" aria-label={label}>
       <div className="profile-hero__cover">
@@ -118,9 +124,13 @@ export function ProfileHero({
       <div className="profile-hero__body">
         <h2 className="profile-hero__name">{name}</h2>
         <span className="profile-hero__sub">{sub}</span>
+        <WorkLine identity={identity} />
         {bio ? <p className="profile-hero__bio">{bio}</p> : null}
+        <TrustLine identity={identity} area={who.area} onOpen={() => setIdOpen(true)} />
+        <AskMeAbout identity={identity} />
         {badges ? <div className="profile-hero__badges">{badges}</div> : null}
       </div>
+      <IdentitySheet open={idOpen} onClose={() => setIdOpen(false)} name={name} identity={identity} area={who.area} mine={mine} />
       <div className="profile-hero__actions">{actions}</div>
       {footer}
     </section>

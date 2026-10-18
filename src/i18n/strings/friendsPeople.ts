@@ -90,4 +90,5 @@ export const friendsPeople: Dict = {
   'people.listNotFound': { en: 'This list isn’t available', gu: 'આ યાદી ઉપલબ્ધ નથી', hi: 'यह सूची उपलब्ध नहीं है' },
   'people.emptyListPlaces': { en: 'No places on this list', gu: 'આ યાદીમાં કોઈ સ્થળ નથી', hi: 'इस सूची में कोई जगह नहीं' },
   'people.friendsCount': { en: 'Friends', gu: 'મિત્રો', hi: 'दोस्त' },
+  'me.menu': { en: 'Menu', gu: 'મેનુ', hi: 'मेन्यू' },
 };

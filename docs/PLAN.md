@@ -24,6 +24,16 @@ Nearhood is for friends, family and neighbours to recommend good things to each 
 | **City events** | Not created in the app. They come from public sources (ticket sites, organisers' pages, reels, news). | Labelled with their source, link out for details and tickets. Friends' "want to go" is the social signal. |
 | **Alerts** | Official feeds (police, AMC, utilities, IMD) and verified neighbours. | Marked verified or unconfirmed. |
 
+## Knowing who people are
+
+Trust comes from knowing who is talking. Every member's profile shows:
+
+- **What they do**: their work in their own words (paediatrician, architect, founder), with a tick when confirmed by a work email, a professional licence or LinkedIn. It also shows next to their posts and replies, so an answer from a doctor reads as one.
+- **One-time checks**: phone (one-time code), government ID (matched once through DigiLocker; Nearhood keeps the result, never the number), home neighbourhood (utility bill or two neighbours) and how many neighbours vouched for them.
+- **Ask me about**: a few topics they're happy to help with.
+
+Only verified residents can post, review and run clubs.
+
 ## Filling the city before people do
 
 A new city is empty on day one. Public sources fill the gap so the app is useful immediately:

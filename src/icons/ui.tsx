@@ -618,6 +618,7 @@ export const KebabGlyph = g(
     <circle cx="12" cy="18.5" r="1.5" className="g-fill" stroke="none" />
   </>,
 );
+export const MenuGlyph = g('menu', <path d="M4 7h16M4 12h16M4 17h10" />);
 export const LocateGlyph = g(
   'locate',
   <>

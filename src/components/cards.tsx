@@ -27,6 +27,7 @@ import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 import { RichText, Sheet } from './ui';
+import { useIdentity } from './identity';
 
 /* ---------- Avatar: a real photo when we have one, initials otherwise ---------- */
 export function Avatar({ who, size = 40, ring }: { who: Person; size?: number; ring?: boolean }) {
@@ -161,15 +162,6 @@ export function AnswerCard({
 }
 
 /* ---------- Feed post ---------- */
-const TOPIC_TONE: Record<Post['type'], Tone> = {
-  question: 'peach',
-  recommendation: 'mint',
-  alert: 'amber',
-  lostfound: 'blue',
-  event: 'violet',
-  giveaway: 'teal',
-};
-
 export function PostCard({ post }: { post: Post }) {
   const t = useT();
   const navigate = useNavigate();
@@ -177,6 +169,8 @@ export function PostCard({ post }: { post: Post }) {
   const { has, toggle, data } = useAppData();
   const toast = useToast();
   const author = person(post.authorId);
+  // What someone does helps judge an answer: a paediatrician on a fever question.
+  const work = useIdentity(post.authorId).work;
   const up = has('upvoted', post.id);
   const saved = has('savedPosts', post.id);
   // Sample counts for posts upvoted in the seed data already include this person's vote.
@@ -196,11 +190,12 @@ export function PostCard({ post }: { post: Post }) {
         <div className="feed-post__who">
           <span className="feed-post__name">{author.name}</span>
           <span className="meta">
+            {work ? `${work.title} · ` : ''}
             {settings.privacy.showArea || post.authorId !== 'me' ? `${post.area} · ` : ''}
             {post.ago}
           </span>
         </div>
-        <span className={`badge badge--sm tone-${TOPIC_TONE[post.type]}`}>{post.topic}</span>
+        <span className="badge badge--sm">{post.topic}</span>
         <PostMenu post={post} />
       </div>
       <p className="feed-post__text" onClick={open}>

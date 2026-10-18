@@ -21,11 +21,11 @@ import {
   InfoGlyph,
   LockGlyph,
   LogoutGlyph,
+  MenuGlyph,
   PlusGlyph,
   ReportGlyph,
   SaveGlyph,
   ShareGlyph,
-  ShieldGlyph,
   SlidersGlyph,
   StepRing,
   UsersGlyph,
@@ -57,6 +57,7 @@ export default function Me() {
   const clubs = myClubs(data);
   const { apply } = useListEdits();
   const [confirm, setConfirm] = useState(false);
+  const [menu, setMenu] = useState(false);
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [newList, setNewList] = useState(false);
 
@@ -165,6 +166,9 @@ export default function Me() {
               <BellGlyph size={21} ringing={unread > 0} />
               {unread > 0 ? <span className="count-badge">{unread}</span> : null}
             </Link>
+            <button type="button" className="icon-btn icon-btn--ghost" aria-label={t('me.menu')} aria-haspopup="dialog" onClick={() => setMenu(true)}>
+              <MenuGlyph size={22} />
+            </button>
           </div>
         </header>
 
@@ -175,16 +179,12 @@ export default function Me() {
           sub={`@${profile.handle}`}
           place={`${neighbourhoodName(settings.location.home)}, ${settings.location.city}`}
           online
+          mine
           badges={
             <>
               {PEOPLE.me.badge ? (
-                <span className="badge tone-violet">
+                <span className="badge">
                   <UsersGlyph size={14} /> {PEOPLE.me.badge}
-                </span>
-              ) : null}
-              {profile.verifiedResident ? (
-                <span className="badge tone-mint">
-                  <ShieldGlyph size={14} /> {t('settings.account.verified')}
                 </span>
               ) : null}
             </>
@@ -470,50 +470,6 @@ export default function Me() {
           ) : null}
         </div>
 
-        <section className="set-group" aria-labelledby="me-stuff">
-          <h2 className="set-group__title" id="me-stuff">
-            {t('me.shortcuts')}
-          </h2>
-          <div className="list">
-            <SettingLink to="/me/saved" G={SaveGlyph} tone="violet" title={t('me.saved')} trail={<span className="set-trail">{savedCount}</span>} />
-            <SettingLink to="/friends" G={FriendsGlyph} tone="mint" title={t('people.friends')} trail={<span className="set-trail">{data.following.length}</span>} />
-            <SettingLink to="/city/reports" G={ReportGlyph} tone="amber" title={t('me.myReports')} trail={<span className="set-trail">{myReports.length}</span>} />
-            <SettingLink to="/groups" G={GroupsGlyph} tone="teal" title={t('me.groups')} trail={<span className="set-trail">{data.joinedGroups.length}</span>} />
-            <SettingLink
-              to="/messages"
-              G={ChatGlyph}
-              tone="blue"
-              title={t('nav.messages')}
-              trail={unreadChats ? <span className="badge badge--sm tone-mint">{t('me.unread', { n: unreadChats })}</span> : undefined}
-            />
-            <SettingLink
-              to="/updates"
-              G={BellGlyph}
-              tone="peach"
-              title={t('nav.updates')}
-              trail={unread ? <span className="badge badge--sm tone-mint">{t('me.unread', { n: unread })}</span> : undefined}
-            />
-          </div>
-        </section>
-
-        <section className="set-group" aria-labelledby="me-more">
-          <h2 className="set-group__title" id="me-more">
-            {t('me.more')}
-          </h2>
-          <div className="list">
-            <SettingLink to="/settings" G={SlidersGlyph} tone="violet" title={t('settings.title')} />
-            <SettingLink to="/settings/help" G={HelpGlyph} tone="yellow" title={t('settings.help')} />
-            <SettingLink to="/settings/about" G={InfoGlyph} tone="blue" title={t('settings.about')} />
-            <button type="button" className="list-row" onClick={() => setConfirm(true)}>
-              <GlyphTile G={LogoutGlyph} tone="red" />
-              <span className="list-row__body">
-                <span className="list-row__title" style={{ color: 'var(--red-ink)' }}>
-                  {t('settings.signOut')}
-                </span>
-              </span>
-            </button>
-          </div>
-        </section>
       </main>
 
       <Sheet open={newList} onClose={() => setNewList(false)} title={t('people.newList')}>
@@ -561,6 +517,62 @@ export default function Me() {
             {t('people.createList')}
           </button>
         </form>
+      </Sheet>
+
+      <Sheet open={menu} onClose={() => setMenu(false)} title={t('me.menu')}>
+        <div className="me-menu" onClick={(e) => (e.target as HTMLElement).closest('a') && setMenu(false)}>
+        <section className="set-group" aria-labelledby="me-stuff">
+          <h2 className="set-group__title" id="me-stuff">
+            {t('me.shortcuts')}
+          </h2>
+          <div className="list list--grouped">
+            <SettingLink to="/me/saved" G={SaveGlyph} tone="violet" title={t('me.saved')} trail={<span className="set-trail">{savedCount}</span>} />
+            <SettingLink to="/friends" G={FriendsGlyph} tone="mint" title={t('people.friends')} trail={<span className="set-trail">{data.following.length}</span>} />
+            <SettingLink to="/city/reports" G={ReportGlyph} tone="amber" title={t('me.myReports')} trail={<span className="set-trail">{myReports.length}</span>} />
+            <SettingLink to="/clubs" G={GroupsGlyph} tone="teal" title={t('me.groups')} trail={<span className="set-trail">{data.joinedGroups.length}</span>} />
+            <SettingLink
+              to="/messages"
+              G={ChatGlyph}
+              tone="blue"
+              title={t('nav.messages')}
+              trail={unreadChats ? <span className="badge badge--sm tone-mint">{t('me.unread', { n: unreadChats })}</span> : undefined}
+            />
+            <SettingLink
+              to="/updates"
+              G={BellGlyph}
+              tone="peach"
+              title={t('nav.updates')}
+              trail={unread ? <span className="badge badge--sm tone-mint">{t('me.unread', { n: unread })}</span> : undefined}
+            />
+          </div>
+        </section>
+
+        <section className="set-group" aria-labelledby="me-more">
+          <h2 className="set-group__title" id="me-more">
+            {t('me.more')}
+          </h2>
+          <div className="list list--grouped">
+            <SettingLink to="/settings" G={SlidersGlyph} tone="violet" title={t('settings.title')} />
+            <SettingLink to="/settings/help" G={HelpGlyph} tone="yellow" title={t('settings.help')} />
+            <SettingLink to="/settings/about" G={InfoGlyph} tone="blue" title={t('settings.about')} />
+            <button
+              type="button"
+              className="list-row"
+              onClick={() => {
+                setMenu(false);
+                setConfirm(true);
+              }}
+            >
+              <GlyphTile G={LogoutGlyph} tone="red" />
+              <span className="list-row__body">
+                <span className="list-row__title" style={{ color: 'var(--red-ink)' }}>
+                  {t('settings.signOut')}
+                </span>
+              </span>
+            </button>
+          </div>
+        </section>
+        </div>
       </Sheet>
 
       <Sheet open={confirm} onClose={() => setConfirm(false)} title={t('settings.signOutTitle')}>

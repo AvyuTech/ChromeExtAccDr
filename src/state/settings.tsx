@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { CityName } from '../data/core';
 import type { AlertKind, Severity, SourceId } from '../data/types';
 import { mergeDefaults, readJSON, removeKey, writeJSON } from './storage';
+import type { WorkProof } from '../data/identity';
 
 export type Language = 'en' | 'gu' | 'hi';
 export type ThemeChoice = 'system' | 'light' | 'dark';
@@ -16,6 +17,11 @@ export interface Settings {
     phone: string;
     bio: string;
     verifiedResident: boolean;
+    /** What you do; shown on your profile and next to your posts. */
+    work: { title: string; org: string; proof: '' | WorkProof };
+    /** Government ID matched once through DigiLocker. */
+    idVerified: boolean;
+    askMeAbout: string[];
   };
   location: {
     city: CityName;
@@ -113,6 +119,9 @@ export const DEFAULT_SETTINGS: Settings = {
     phone: '',
     bio: 'Coffee, cycling and finding the quiet corners of Amdavad.',
     verifiedResident: true,
+    work: { title: 'Product designer', org: '[Studio name]', proof: 'work email' },
+    idVerified: true,
+    askMeAbout: ['Cycling routes', 'Quiet cafés', 'Design careers'],
   },
   location: {
     city: 'Ahmedabad',

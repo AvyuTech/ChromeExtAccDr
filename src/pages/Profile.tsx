@@ -5,7 +5,7 @@ import { chatLink, ClubRows, clubsOf, DoneRing, PlanCard, ProfileAction, Profile
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { PEOPLE } from '../data/core';
 import { useT } from '../i18n';
-import { ChatGlyph, CheckGlyph, CopyGlyph, FlagGlyph, LockGlyph, MoreGlyph, PlusGlyph, ShareGlyph, ShieldGlyph, UserGlyph, UsersGlyph } from '../icons';
+import { ChatGlyph, CheckGlyph, CopyGlyph, FlagGlyph, LockGlyph, MoreGlyph, PlusGlyph, ShareGlyph, UserGlyph, UsersGlyph } from '../icons';
 import { compact } from '../lib/format';
 import { allCheckIns, canSee, collectionsFor, isFollowing, profileInfo, sharedWants } from '../lib/friends';
 import { useAppData } from '../state/appData';
@@ -117,16 +117,11 @@ export default function Profile() {
           place={p.area}
           badges={
             <>
-              {info.followsMe ? <span className="badge tone-mint">{t('people.followsYou')}</span> : null}
+              {info.followsMe ? <span className="badge">{t('people.followsYou')}</span> : null}
               <TasteMatchPill personId={id} />
               {p.badge ? (
-                <span className="badge tone-blue">
+                <span className="badge">
                   <UsersGlyph size={12} /> {p.badge}
-                </span>
-              ) : null}
-              {p.verified ? (
-                <span className="badge tone-mint">
-                  <ShieldGlyph size={12} /> Verified
                 </span>
               ) : null}
             </>

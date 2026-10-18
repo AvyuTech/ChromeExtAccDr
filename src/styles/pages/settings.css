@@ -217,9 +217,10 @@ button.list-row:disabled {
 }
 
 /* Outline glyph tiles in settings rows */
+/* Row icons are one quiet colour; colour is kept for meaning (alerts, verdicts) */
 .set-tile {
-  background: var(--tone-bg);
-  color: var(--tone-ink);
+  background: var(--surface-3);
+  color: var(--ink);
 }
 
 /* ---------- Choice tiles (commute mode) ---------- */

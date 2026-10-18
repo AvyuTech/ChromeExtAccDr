@@ -967,9 +967,11 @@
 .profile-head__stats {
   display: flex;
   flex-grow: 1;
+  align-self: flex-start;
   justify-content: space-around;
   gap: 4px;
-  margin: 0 0 2px;
+  /* Clear of the cover: the row starts 36px above the cover's edge */
+  margin: 48px 0 0;
 }
 .profile-head__stats > div {
   display: flex;

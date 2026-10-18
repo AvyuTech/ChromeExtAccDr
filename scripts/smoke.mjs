@@ -54,6 +54,7 @@ export const ROUTES = [
   '/me',
   '/me/saved',
   '/settings',
+  '/settings/identity',
   ...['account', 'location', 'notifications', 'alerts', 'appearance', 'language', 'accessibility', 'privacy', 'sources', 'data', 'safety', 'help', 'about'].map((s) => `/settings/${s}`),
   '/about/glyphs',
   '/onboarding',

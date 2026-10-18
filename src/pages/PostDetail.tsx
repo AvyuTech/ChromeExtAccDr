@@ -2,7 +2,6 @@ import { useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'r
 import { Link, useParams } from 'react-router-dom';
 import { placePhoto } from '../assets/photos';
 import { AnswerCard, Avatar, ShareButton } from '../components/cards';
-import { POST_TYPE_META } from '../components/social';
 import { EmptyState, PageHeader, SectionHead, Sheet, Tile } from '../components/ui';
 import { person } from '../data/core';
 import { placeById } from '../data/places';
@@ -13,6 +12,7 @@ import { FlagGlyph, ReplyGlyph, SaveGlyph, SendGlyph, UpvoteGlyph } from '../ico
 import { DEFAULT_APP_DATA, useAppData } from '../state/appData';
 import { enabledSources, useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
+import { identityOf } from '../data/identity';
 
 
 const REASONS = ['spam', 'wrong', 'rude', 'private', 'other'] as const;
@@ -67,7 +67,6 @@ function PostView({ post }: { post: Post }) {
 
   const author = person(post.authorId);
   const group = post.groupId ? groupById(post.groupId) : undefined;
-  const meta = POST_TYPE_META[post.type];
   const up = has('upvoted', post.id);
   const saved = has('savedPosts', post.id);
   // Seed counts already include this person's vote for posts upvoted in the sample data.
@@ -121,13 +120,14 @@ function PostView({ post }: { post: Post }) {
             <div className="feed-post__who">
               <span className="row row--wrap" style={{ gap: '2px 6px' }}>
                 <span className="feed-post__name">{author.name}</span>
-                {author.badge ? <span className="badge badge--sm tone-violet">{author.badge}</span> : null}
+                {author.badge ? <span className="badge badge--sm">{author.badge}</span> : null}
               </span>
               <span className="meta">
+                {identityOf(post.authorId).work ? `${identityOf(post.authorId).work!.title} · ` : ''}
                 {post.area} · {post.ago}
               </span>
             </div>
-            <span className={`badge badge--sm tone-${meta.tone}`}>{post.topic}</span>
+            <span className="badge badge--sm">{post.topic}</span>
           </div>
           <p className="post-detail__text">{post.text}</p>
           {group ? (
@@ -219,8 +219,8 @@ function PostView({ post }: { post: Post }) {
                         <span className="strong" style={{ fontSize: '0.8125rem' }}>
                           {r.authorId === 'me' ? t('social.you') : who.name}
                         </span>
-                        {who.badge && r.authorId !== 'me' ? <span className="badge badge--sm tone-violet">{who.badge}</span> : null}
-                        {r.helpful ? <span className="badge badge--sm tone-mint">{t('social.helpful')}</span> : null}
+                        {identityOf(r.authorId).work ? <span className="meta">· {identityOf(r.authorId).work!.title}</span> : null}
+                        {r.helpful ? <span className="badge badge--sm">{t('social.helpful')}</span> : null}
                         <span className="meta">· {r.ago}</span>
                       </div>
                       <p className="reply__text">{r.text}</p>
