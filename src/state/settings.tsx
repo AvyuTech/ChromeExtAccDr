@@ -43,7 +43,7 @@ export interface Settings {
     push: boolean;
     email: boolean;
     digest: 'off' | 'daily' | 'weekly';
-    categories: Record<'replies' | 'mentions' | 'events' | 'deals' | 'groups' | 'reports' | 'alerts' | 'friends', boolean>;
+    categories: Record<'replies' | 'mentions' | 'events' | 'groups' | 'reports' | 'alerts' | 'friends', boolean>;
     quietHours: boolean;
     quietFrom: string;
     quietTo: string;
@@ -132,7 +132,7 @@ export const DEFAULT_SETTINGS: Settings = {
     push: true,
     email: false,
     digest: 'weekly',
-    categories: { replies: true, mentions: true, events: true, deals: true, groups: true, reports: true, alerts: true, friends: true },
+    categories: { replies: true, mentions: true, events: true, groups: true, reports: true, alerts: true, friends: true },
     quietHours: true,
     quietFrom: '22:30',
     quietTo: '07:00',

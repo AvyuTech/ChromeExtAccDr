@@ -34,7 +34,7 @@ export default function Updates() {
   const [filter, setFilter] = useState<Filter>('all');
 
   // Nearhood doesn't run deals or bookings, so those updates never show.
-  const all = visibleNotifications(settings).filter((n) => n.kind !== 'deal');
+  const all = visibleNotifications(settings);
   const kinds = FILTERS.find((f) => f.id === filter)?.kinds;
   const shown = kinds ? all.filter((n) => kinds.includes(n.kind)) : all;
   const unread = all.filter((n) => !data.readNotifications.includes(n.id));

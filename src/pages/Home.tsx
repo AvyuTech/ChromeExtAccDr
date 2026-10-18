@@ -83,7 +83,7 @@ export default function Home() {
       EVENTS.filter((e) => ['Sat', 'Sun', 'Sat–Sun'].includes(e.day))
         .filter((e) => e.confirmed || settings.sources.showUnconfirmed)
         .filter((e) => e.sources.some(enabledSources(settings)))
-        .sort((a, b) => b.going - a.going),
+        .sort((a, b) => b.sources.length - a.sources.length || a.distanceKm - b.distanceKm),
     [settings],
   );
   const tonightEvents = EVENTS.filter((e) => e.day === 'Today');

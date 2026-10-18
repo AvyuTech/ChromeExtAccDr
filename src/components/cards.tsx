@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { eventPhoto, groupPhoto, personPhoto, placePhoto } from '../assets/photos';
 import { ALERT_KIND_META } from '../data/city';
 import { person, SOURCES } from '../data/core';
-import type { CityAlert, CityEvent, Deal, Group, Person, Place, Post, SourceId, Tone } from '../data/types';
+import type { CityAlert, CityEvent, Group, Person, Place, Post, SourceId, Tone } from '../data/types';
 import { useT } from '../i18n';
 import {
   AlertGlyph,
@@ -366,14 +366,6 @@ export function ShareButton({ title, path, label }: { title: string; path: strin
 }
 
 /* ---------- Events ---------- */
-export function eventStatus(e: CityEvent): { text: string; tone: 'mint' | 'muted' | 'amber' } {
-  if (!e.confirmed) return { text: e.unconfirmedNote ?? 'Unconfirmed', tone: 'amber' };
-  if (e.fillingFast) return { text: `${compact(e.going)} going · filling fast`, tone: 'mint' };
-  if (e.seatsLeft !== undefined && e.seatsLeft <= 12) return { text: `${e.seatsLeft} seats left`, tone: 'muted' };
-  if (e.going > 0) return { text: `${compact(e.going)} going`, tone: 'mint' };
-  return { text: `${compact(e.interested ?? 0)} interested`, tone: 'muted' };
-}
-
 /** Where an event was found, e.g. "From BookMyShow + 2 more". Nearhood lists events; it never sells them. */
 export function eventSourceLine(event: CityEvent) {
   const first = SOURCES[event.sources[0]]?.label ?? 'the web';
@@ -462,30 +454,6 @@ export function AlertCard({ alert }: { alert: CityAlert }) {
         </span>
       </span>
       <ChevronRightGlyph size={18} style={{ color: 'var(--tone-ink)', flexShrink: 0 }} />
-    </Link>
-  );
-}
-
-/* ---------- Deal ---------- */
-export function DealCard({ deal }: { deal: Deal }) {
-  const t = useT();
-  return (
-    <Link to={`/deals/${deal.id}`} className="media-row glyph-host">
-      <Cover src={deal.placeId ? placePhoto(deal.placeId) : undefined} glyph={deal.glyph} tone={deal.tone} className="media-row__thumb media-row__thumb--sm">
-        <span className="deal-ribbon">{deal.discount}</span>
-      </Cover>
-      <span className="stack grow" style={{ gap: 4, minWidth: 0 }}>
-        <span className="eyebrow" style={{ color: 'var(--accent)' }}>
-          {t('home.deal')} · {deal.ends}
-        </span>
-        <span className="strong" style={{ fontSize: '0.9063rem', lineHeight: 1.3 }}>
-          {deal.title}
-        </span>
-        <span className="meta">
-          {deal.merchant} · {km(deal.distanceKm)}
-        </span>
-      </span>
-      <ChevronRightGlyph size={18} style={{ color: 'var(--muted)', flexShrink: 0 }} />
     </Link>
   );
 }

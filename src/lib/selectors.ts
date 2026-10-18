@@ -25,7 +25,6 @@ const CATEGORY_FOR: Record<AppNotification['kind'], keyof Settings['notification
   mention: 'mentions',
   alert: 'alerts',
   event: 'events',
-  deal: 'deals',
   report: 'reports',
   group: 'groups',
   system: null,

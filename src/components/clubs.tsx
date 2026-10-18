@@ -26,15 +26,9 @@ export const KIND_META: Record<ClubKind, { glyph: GlyphName; tone: Tone; photo: 
   books: { glyph: 'library', tone: 'amber', photo: 'place-brew-lab' },
 };
 
-/** Clubs without a photo of their own borrow one that suits where they meet. */
-const CLUB_PHOTO: Record<string, string> = {
-  'founders-prahlad': 'place-quiet-cup',
-  'sunday-cricket': 'scene-sunset-friends',
-  'book-club-navrangpura': 'place-brew-lab',
-};
-
 export function clubPhoto(club: Group) {
-  return groupPhoto(club.id) ?? photo(CLUB_PHOTO[club.id] ?? KIND_META[club.kind].photo);
+  // Clubs people start borrow a photo that suits their kind.
+  return groupPhoto(club.id) ?? photo(KIND_META[club.kind].photo);
 }
 
 /* ---------- Data helpers ---------- */

@@ -1,4 +1,4 @@
-import type { CityAlert, CityPulse, CityService, CivicReport, EmergencyContact, Facility, IssueCategory, Severity } from './types';
+import type { CityAlert, CityPulse, CivicReport, EmergencyContact, Facility, IssueCategory, Severity } from './types';
 import type { GlyphName } from '../icons';
 
 export const ALERTS: CityAlert[] = [
@@ -307,22 +307,6 @@ export const REPORTS: CivicReport[] = [
 ];
 
 export const reportById = (id: string) => REPORTS.find((r) => r.id === id);
-
-export const SERVICES: CityService[] = [
-  { id: 'property-tax', name: 'Property tax', provider: 'Municipal corporation', description: 'Pay this year’s tax for your home.', glyph: 'property', tone: 'violet', group: 'Pay', due: 'Due in 18 days', amount: 6840 },
-  { id: 'electricity', name: 'Electricity bill', provider: 'Power utility', description: 'View and pay your monthly bill.', glyph: 'bolt', tone: 'yellow', group: 'Pay', due: 'Due in 6 days', amount: 2215 },
-  { id: 'gas', name: 'Piped gas bill', provider: 'Gas utility', description: 'Pay your two-monthly PNG bill.', glyph: 'gas', tone: 'peach', group: 'Pay', amount: 940 },
-  { id: 'water-bill', name: 'Water & drainage charges', provider: 'Municipal corporation', description: 'Included with property tax for most homes.', glyph: 'water-tap', tone: 'blue', group: 'Pay' },
-  { id: 'birth-cert', name: 'Birth & death certificates', provider: 'Municipal corporation', description: 'Apply or download a certified copy.', glyph: 'certificate', tone: 'teal', group: 'Apply' },
-  { id: 'shop-licence', name: 'Shop & establishment licence', provider: 'Municipal corporation', description: 'Register a new shop or renew a licence.', glyph: 'shopping', tone: 'clay', group: 'Apply' },
-  { id: 'tree-cutting', name: 'Tree trimming request', provider: 'Parks department', description: 'Ask for branches near wires to be trimmed.', glyph: 'tree', tone: 'green', group: 'Apply' },
-  { id: 'community-hall', name: 'Community hall booking', provider: 'Municipal corporation', description: 'Book halls for functions and meetings.', glyph: 'users', tone: 'violet', group: 'Book' },
-  { id: 'sports-complex', name: 'Sports complex slots', provider: 'Sports department', description: 'Swimming, badminton and gym slots.', glyph: 'sports', tone: 'green', group: 'Book' },
-  { id: 'library', name: 'Public library membership', provider: 'City libraries', description: 'Find branches and renew membership.', glyph: 'library', tone: 'amber', group: 'Book' },
-  { id: 'garbage-schedule', name: 'Waste pickup schedule', provider: 'Solid waste department', description: 'Door-to-door timings for your society.', glyph: 'bin', tone: 'clay', group: 'Know' },
-  { id: 'water-schedule', name: 'Water supply timings', provider: 'Water department', description: 'Daily supply slots for your ward.', glyph: 'water-tap', tone: 'blue', group: 'Know' },
-  { id: 'vaccination', name: 'Vaccination centres', provider: 'Health department', description: 'Find urban health centres near you.', glyph: 'health', tone: 'green', group: 'Know' },
-];
 
 /** National emergency numbers in India. */
 export const EMERGENCY: EmergencyContact[] = [

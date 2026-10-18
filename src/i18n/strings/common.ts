@@ -26,7 +26,6 @@ export const common: Dict = {
   'common.replies.one': { en: '1 reply', gu: '1 જવાબ', hi: '1 जवाब' },
   'common.verified': { en: 'Verified', gu: 'ચકાસાયેલ', hi: 'सत्यापित' },
   'common.free': { en: 'Free', gu: 'મફત', hi: 'मुफ़्त' },
-  'common.going': { en: '{n} going', gu: '{n} જઈ રહ્યા છે', hi: '{n} जा रहे हैं' },
   'common.search': { en: 'Search', gu: 'શોધો', hi: 'खोजें' },
   'common.close': { en: 'Close', gu: 'બંધ કરો', hi: 'बंद करें' },
   'common.settings': { en: 'Settings', gu: 'સેટિંગ્સ', hi: 'सेटिंग्स' },
@@ -84,7 +83,6 @@ export const common: Dict = {
   'chip.weekend': { en: 'This weekend', gu: 'આ સપ્તાહાંતે', hi: 'इस वीकेंड' },
   'chip.food': { en: 'Food', gu: 'ખાવાનું', hi: 'खाना' },
   'chip.events': { en: 'Events', gu: 'ઇવેન્ટ્સ', hi: 'इवेंट' },
-  'chip.deals': { en: 'Deals', gu: 'ડીલ્સ', hi: 'डील' },
   'chip.alerts': { en: 'City alerts', gu: 'શહેર ચેતવણીઓ', hi: 'शहर अलर्ट' },
 
   'answer.label': { en: 'Nearhood says', gu: 'Nearhood કહે છે', hi: 'Nearhood कहता है' },

@@ -13,7 +13,7 @@ export function placeOrigin(place: Place) {
   return {
     added: `Added by ${person(o.addedBy).name}${list ? ` in “${list.title}”` : ''} · ${o.addedWhen}`,
     confirmed: `Confirmed by ${o.confirmedBy} locals with verified visits`,
-    guide: o.guide ? `Checked by ${firstName(o.guide)}, a neighbourhood guide` : undefined,
+    guide: o.guide ? `Checked by ${firstName(o.guide)}, a Nearhood guide` : undefined,
     claim: o.publicPlace ? 'Public place · belongs to everyone' : o.claimed ? `Claimed by ${o.claimed.name}, ${o.claimed.role.toLowerCase()} · since ${o.claimed.since}` : 'Not claimed yet',
     claimable: !o.publicPlace && !o.claimed,
     away: !!o.outsideCity,

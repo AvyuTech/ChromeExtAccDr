@@ -533,7 +533,7 @@ export function IconAction({
 
 const ORIGIN_RULES = [
   'People add places when they check in. Nothing is imported or bought.',
-  'A place is listed after 3 verified visits, or once a neighbourhood guide checks it.',
+  'A place is listed after 3 verified visits, or once a Nearhood guide checks it.',
   'Owners can claim a page to fix hours, menu and photos, and to reply to people.',
   'Owners can’t post verdicts, pay for placement or hide reviews.',
   'Parks, lakes, markets and streets belong to everyone and can’t be claimed.',

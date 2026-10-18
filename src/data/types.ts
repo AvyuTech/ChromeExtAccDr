@@ -55,7 +55,7 @@ export interface PlaceOrigin {
   addedWhen: string;
   /** Distinct locals with verified visits who confirmed the name, pin and details. */
   confirmedBy: number;
-  /** Neighbourhood guide who reviewed the listing. */
+  /** Nearhood guide who reviewed the listing. */
   guide?: string;
   /** Owner or manager verified with a licence and a code sent to the venue's phone. */
   claimed?: { name: string; role: string; since: string };
@@ -105,7 +105,7 @@ export interface SpottedPlace {
   note: string;
   /** People with verified visits who confirmed it is real and open. */
   confirmedBy: string[];
-  /** Confirmations needed before it is listed (a neighbourhood guide counts for all). */
+  /** Confirmations needed before it is listed (a Nearhood guide counts for all). */
   needed: number;
   glyph: GlyphName;
   tone: Tone;
@@ -124,38 +124,17 @@ export interface CityEvent {
   area: string;
   /** Rupees; 0 means free. */
   price: number;
-  going: number;
-  interested?: number;
   sources: SourceId[];
   confirmed: boolean;
-  seatsLeft?: number;
   distanceKm: number;
   tags: Array<'couples' | 'kids' | 'free' | 'outdoor' | 'indoor' | 'solo' | 'friends' | 'family'>;
   description: string;
   organiser: string;
   tone: Tone;
   glyph: GlyphName;
-  fillingFast?: boolean;
   unconfirmedNote?: string;
   /** Where to read more or get tickets. Nearhood never books or sells. */
   link?: { label: string; url: string };
-}
-
-export interface Deal {
-  id: string;
-  title: string;
-  merchant: string;
-  placeId?: string;
-  area: string;
-  discount: string;
-  ends: string;
-  code?: string;
-  category: 'food' | 'cafe' | 'shopping' | 'wellness' | 'movies';
-  terms: string[];
-  tone: Tone;
-  glyph: GlyphName;
-  claimedBy: number;
-  distanceKm: number;
 }
 
 export type PostType = 'question' | 'recommendation' | 'alert' | 'lostfound' | 'event' | 'giveaway';
@@ -258,7 +237,7 @@ export interface Group {
   buys?: GroupBuy[];
 }
 
-export type NotificationKind = 'reply' | 'mention' | 'alert' | 'event' | 'deal' | 'report' | 'group' | 'system' | 'follow' | 'friend';
+export type NotificationKind = 'reply' | 'mention' | 'alert' | 'event' | 'report' | 'group' | 'system' | 'follow' | 'friend';
 
 export interface AppNotification {
   id: string;
@@ -344,18 +323,6 @@ export interface CityPulse {
   power: Array<{ area: string; window: string; reason: string; status: 'scheduled' | 'outage' | 'restored' }>;
   civic: { ward: string; resolvedPct: number; open: number; avgDays: number; resolvedThisWeek: number };
   parking: Array<{ id: string; name: string; area: string; free: number; total: number }>;
-}
-
-export interface CityService {
-  id: string;
-  name: string;
-  provider: string;
-  description: string;
-  glyph: GlyphName;
-  tone: Tone;
-  group: 'Pay' | 'Apply' | 'Book' | 'Know';
-  due?: string;
-  amount?: number;
 }
 
 export interface EmergencyContact {

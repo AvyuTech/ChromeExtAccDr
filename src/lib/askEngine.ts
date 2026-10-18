@@ -38,11 +38,9 @@ export type Intent =
 export type ResultRef =
   | { type: 'event'; id: string }
   | { type: 'place'; id: string }
-  | { type: 'deal'; id: string }
   | { type: 'alert'; id: string }
   | { type: 'corridor'; id: string }
   | { type: 'group'; id: string }
-  | { type: 'service'; id: string }
   | { type: 'emergency'; id: string }
   | { type: 'facility'; id: string }
   | { type: 'report'; id: string }

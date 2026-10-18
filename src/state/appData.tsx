@@ -10,9 +10,7 @@ export interface AppData {
   savedPlaces: string[];
   savedEvents: string[];
   going: string[];
-  interested: string[];
   joinedGroups: string[];
-  claimedDeals: string[];
   readNotifications: string[];
   readConversations: string[];
   plusOned: string[];
@@ -59,9 +57,7 @@ export const DEFAULT_APP_DATA: AppData = {
   savedPlaces: ['quiet-cup'],
   savedEvents: ['sufi-night'],
   going: [],
-  interested: ['sufi-night'],
   joinedGroups: ['amdavad-foodies', 'bodakdev-neighbours'],
-  claimedDeals: [],
   readNotifications: ['n7', 'n8', 'n9'],
   readConversations: [],
   plusOned: [],

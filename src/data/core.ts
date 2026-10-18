@@ -42,7 +42,7 @@ export function neighbourhoodName(id: string) {
 export const ME_ID = 'me';
 
 export const PEOPLE: Record<string, Person> = {
-  me: { id: 'me', name: 'Jay Mehta', initials: 'J', area: 'Bodakdev', tone: 'violet', badge: 'Neighbourhood guide' },
+  me: { id: 'me', name: 'Jay Mehta', initials: 'J', area: 'Bodakdev', tone: 'violet', badge: 'Nearhood guide' },
   riya: { id: 'riya', name: 'Riya S.', initials: 'R', area: 'Prahlad Nagar', tone: 'peach' },
   karan: { id: 'karan', name: 'Karan M.', initials: 'K', area: 'Thaltej', tone: 'green' },
   aditi: { id: 'aditi', name: 'Aditi', initials: 'A', area: 'Bodakdev', tone: 'violet', verified: true, badge: 'Top replier' },

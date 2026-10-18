@@ -65,11 +65,12 @@ const GROUP_PHOTO: Record<string, string> = {
   'parents-thaltej': 'event-kite-workshop',
   'green-amdavad': 'scene-lake',
   'pickleball-ahd': 'event-pickleball-social',
+  'founders-prahlad': 'place-quiet-cup',
+  'sunday-cricket': 'scene-sunset-friends',
+  'book-club-navrangpura': 'place-brew-lab',
 };
 export const groupPhoto = (id: string) => BY_KEY[GROUP_PHOTO[id] ?? ''];
 
-/** Deals use their venue's photo when they have one. */
-export const dealPhoto = (deal: { placeId?: string }) => (deal.placeId ? placePhoto(deal.placeId) : undefined);
 
 const CATEGORY_PHOTO: Record<string, string> = {
   food: 'scene-table',
