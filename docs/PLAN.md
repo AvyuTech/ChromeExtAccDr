@@ -34,7 +34,7 @@ A new city is empty on day one. Public sources fill the gap so the app is useful
 
 ## Other cities
 
-Your friends travel. When you open another city, Nearhood shows what *your* friends did and recommended there, plus their lists. Their trips stay out of your home city's lists.
+Kept simple: when friends check in on a trip, it shows in your friends feed tagged with the city ("In Mumbai") and stays out of your home city's lists. No city switching in Phase 1.
 
 ## Out of Phase 1 (cut)
 
@@ -42,4 +42,4 @@ Bill payments and city services, deals and coupons, booking or ticketing, RSVPs 
 
 ## Phase 2 (later, only if Phase 1 works)
 
-Collecting money for group buys through a partner, claimed pages with richer owner tools, verified club events with capped sign-ups, a city guide for visitors built from friends' lists.
+Collecting money for group buys through a partner, claimed pages with richer owner tools, verified club events with capped sign-ups, browsing another city through friends' check-ins.

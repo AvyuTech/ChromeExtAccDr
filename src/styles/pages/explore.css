@@ -512,18 +512,6 @@
   color: var(--muted);
 }
 
-/* City switcher in the eyebrow */
-.explore-city {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0;
-  border: none;
-  background: none;
-  font-family: var(--font-body);
-  text-align: left;
-}
-
 /* Reels picks: tall photo tiles with a play pill */
 .reel-card__play {
   width: 0;

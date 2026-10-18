@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaceStack, GroupRow, PlaceRow } from '../components/cards';
-import { CheckInCard, CollectionCard } from '../components/friends';
+import { CollectionCard } from '../components/friends';
 import { CityMap, eventPos, NEIGHBOURHOOD_POS, PLACE_POS, type MapPin } from '../components/CityMap';
 import { FriendPickCard } from '../components/community';
 import { SectionHead, Sheet } from '../components/ui';
@@ -16,7 +16,7 @@ import type { Place, PlaceCategory, Tone } from '../data/types';
 import { useT } from '../i18n';
 import { CheckGlyph, ChevronDownGlyph, HeartGlyph, ChevronRightGlyph, NamedGlyph, PinGlyph, SaveGlyph, SearchGlyph, SquiggleMark, StarGlyph, type GlyphName } from '../icons';
 import { km } from '../lib/format';
-import { friendCities, friendsIn, friendsMustTries, placeCommunity } from '../lib/friends';
+import { friendsMustTries, placeCommunity } from '../lib/friends';
 import { spottedPlaces } from '../lib/places';
 import { visibleAlerts } from '../lib/selectors';
 import { useAppData } from '../state/appData';
@@ -120,14 +120,7 @@ export default function Explore() {
   ];
 
   const newThisWeek = PLACES.filter((p) => p.isNew).slice(0, 3);
-  const [params, setParams] = useSearchParams();
-  const [citySheet, setCitySheet] = useState(false);
-  const cities = friendCities(data);
-  const awayCity = params.get('city') && params.get('city') !== settings.location.city ? params.get('city')! : null;
-  const pickCity = (city: string | null) => {
-    setCitySheet(false);
-    setParams(city ? { city } : {}, { replace: true });
-  };
+
   const suggestedGroups = GROUPS.filter((g) => !data.joinedGroups.includes(g.id)).slice(0, 2);
   const mustTries = friendsMustTries(data);
   // Lists by other people first; your own lists live on your profile.
@@ -150,10 +143,7 @@ export default function Explore() {
       <main className="page explore">
         <header className="explore-head">
           <div className="stack" style={{ gap: 8, minWidth: 0 }}>
-            <button type="button" className="eyebrow muted explore-city" onClick={() => setCitySheet(true)} aria-haspopup="dialog">
-              {t('discover.explore.eyebrow', { city: awayCity ?? settings.location.city })}
-              <ChevronDownGlyph size={12} />
-            </button>
+            <span className="eyebrow muted">{t('discover.explore.eyebrow', { city: settings.location.city })}</span>
             <h1 className="hero-title">
               {t('discover.explore.headline')}
               <SquiggleMark width={30} className="explore-head__squiggle" />
@@ -163,33 +153,6 @@ export default function Explore() {
             <SaveGlyph size={22} />
           </Link>
         </header>
-        {awayCity ? (
-          <section className="section away" aria-labelledby="away-title">
-            <p className="meta" style={{ marginTop: -6 }}>
-              {t('discover.away.sub', { city: settings.location.city })}
-            </p>
-            {friendsIn(awayCity, data).length ? (
-              <>
-                <h2 className="section__title" id="away-title">
-                  {t('discover.away.title', { city: awayCity })}
-                </h2>
-                <div className="feed">
-                  {friendsIn(awayCity, data).map((c) => (
-                    <CheckInCard key={c.id} c={c} />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <p className="body-sm muted" id="away-title">
-                {t('discover.away.none', { city: awayCity })}
-              </p>
-            )}
-            <button type="button" className="btn btn--soft btn--sm" style={{ alignSelf: 'flex-start' }} onClick={() => pickCity(null)}>
-              {t('discover.away.back', { city: settings.location.city })}
-            </button>
-          </section>
-        ) : (
-          <>
         <button type="button" className="home-location explore-area" onClick={() => setAreaSheet(true)}>
           <PinGlyph size={16} />
           {areaLabel}
@@ -507,34 +470,7 @@ export default function Explore() {
             <GroupRow key={g.id} group={g} />
           ))}
         </section>
-          </>
-        )}
       </main>
-
-      <Sheet open={citySheet} onClose={() => setCitySheet(false)} title={t('discover.away.pick')}>
-        <div className="list">
-          <button type="button" className="list-row" aria-pressed={!awayCity} onClick={() => pickCity(null)}>
-            <span className="list-row__body">
-              <span className="list-row__title">{settings.location.city}</span>
-              <span className="list-row__meta">{t('discover.away.home')}</span>
-            </span>
-            {!awayCity ? <CheckGlyph size={20} style={{ color: 'var(--accent)' }} /> : null}
-          </button>
-        </div>
-        <span className="field__label">{t('discover.away.friendsBeen')}</span>
-        <div className="list">
-          {cities.map((c) => (
-            <button key={c.city} type="button" className="list-row" aria-pressed={awayCity === c.city} onClick={() => pickCity(c.city)}>
-              <FaceStack ids={c.friendIds} size={26} />
-              <span className="list-row__body">
-                <span className="list-row__title">{c.city}</span>
-                <span className="list-row__meta">{t('discover.away.count', { n: c.count })}</span>
-              </span>
-              {awayCity === c.city ? <CheckGlyph size={20} style={{ color: 'var(--accent)' }} /> : null}
-            </button>
-          ))}
-        </div>
-      </Sheet>
 
       <Sheet open={areaSheet} onClose={() => setAreaSheet(false)} title={t('discover.explore.radius')}>
         <div className="chip-wrap">
