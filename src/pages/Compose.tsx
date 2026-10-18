@@ -18,7 +18,6 @@ const TYPES: Array<{ id: PostType; key: string }> = [
   { id: 'recommendation', key: 'social.type.recommendation' },
   { id: 'alert', key: 'social.type.alert' },
   { id: 'lostfound', key: 'social.type.lostfound' },
-  { id: 'event', key: 'social.type.event' },
   { id: 'giveaway', key: 'social.type.giveaway' },
 ];
 
@@ -39,7 +38,7 @@ const DEFAULT_TOPIC: Record<Exclude<PostType, 'alert'>, string> = {
   giveaway: 'Give away',
 };
 
-const TOPICS = ['Question', 'Recommendation', 'Food', 'New place', 'Traffic', 'Water', 'Power', 'Safety', 'Events', 'Sports', 'Kids', 'Shopping', 'Lost & found', 'Give away', 'Other'];
+const TOPICS = ['Question', 'Recommendation', 'Food', 'New place', 'Traffic', 'Water', 'Power', 'Safety', 'Sports', 'Kids', 'Clubs', 'Lost & found', 'Give away', 'Other'];
 
 const STOP = new Set(['what', 'where', 'which', 'when', 'with', 'from', 'that', 'this', 'have', 'there', 'anyone', 'near', 'good', 'some', 'about', 'they', 'your', 'will', 'just', 'also', 'into', 'than', 'then', 'them']);
 const MAX = 500;
@@ -53,17 +52,8 @@ function words(text: string) {
   );
 }
 
-/** "19:30" → "7:30 pm" */
-function prettyTime(hhmm: string) {
-  const [h, m] = hhmm.split(':').map(Number);
-  if (Number.isNaN(h)) return hhmm;
-  const suffix = h >= 12 ? 'pm' : 'am';
-  const h12 = h % 12 === 0 ? 12 : h % 12;
-  return m ? `${h12}:${String(m).padStart(2, '0')} ${suffix}` : `${h12} ${suffix}`;
-}
-
+/** Events aren't posts any more (meetups live in clubs), so old event links open a question. */
 function asType(v: string | null): PostType {
-  if (v === 'events') return 'event';
   return TYPES.some((x) => x.id === v) ? (v as PostType) : 'question';
 }
 
@@ -93,9 +83,6 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
   const [alertKind, setAlertKind] = useState<AlertKind>('traffic');
   const [topic, setTopic] = useState(() => (type === 'alert' ? ALERT_KIND_META.traffic.label : DEFAULT_TOPIC[type as Exclude<PostType, 'alert'>]));
   const [target, setTarget] = useState(() => (presetGroup && groupById(presetGroup) ? presetGroup : 'neighbourhood'));
-  const [day, setDay] = useState('Sat');
-  const [time, setTime] = useState('18:00');
-  const [venue, setVenue] = useState('');
   const [lostFound, setLostFound] = useState<'lost' | 'found'>('lost');
   const [photo, setPhoto] = useState<string | null>(null);
   const [tried, setTried] = useState(false);
@@ -138,11 +125,6 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
     if (type === 'lostfound') {
       const prefix = lostFound === 'lost' ? 'Lost: ' : 'Found: ';
       if (!/^(lost|found)\b/i.test(body)) body = prefix + body;
-    }
-    if (type === 'event') {
-      const parts = [`When: ${day}, ${prettyTime(time)}`];
-      if (venue.trim()) parts.push(`Where: ${venue.trim()}`);
-      body = `${body}\n\n${parts.join(' · ')}`;
     }
     const id = `my-${Date.now()}`;
     const post: Post = {
@@ -203,6 +185,10 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
               );
             })}
           </div>
+          <Link to="/clubs?create=meetup" className="compose-club-link">
+            <NamedGlyph name="calendar" size={15} />
+            {t('social.meetupInClub')}
+          </Link>
         </fieldset>
 
         {type === 'lostfound' ? (
@@ -304,36 +290,6 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
           </p>
         ) : null}
 
-        {type === 'event' ? (
-          <div className="stack" style={{ gap: 12 }}>
-            <div className="grid-2">
-              <div className="field">
-                <label className="field__label" htmlFor="event-day">
-                  {t('social.day')}
-                </label>
-                <select id="event-day" className="select" value={day} onChange={(e) => setDay(e.target.value)}>
-                  <option value="Today">{t('social.today')}</option>
-                  <option value="Tomorrow">{t('social.tomorrow')}</option>
-                  <option value="Sat">Saturday</option>
-                  <option value="Sun">Sunday</option>
-                </select>
-              </div>
-              <div className="field">
-                <label className="field__label" htmlFor="event-time">
-                  {t('social.time')}
-                </label>
-                <input id="event-time" type="time" className="input" value={time} onChange={(e) => setTime(e.target.value)} />
-              </div>
-            </div>
-            <div className="field">
-              <label className="field__label" htmlFor="event-venue">
-                {t('social.venue')}
-              </label>
-              <input id="event-venue" className="input" value={venue} placeholder="Society clubhouse, Vastrapur" onChange={(e) => setVenue(e.target.value)} />
-            </div>
-          </div>
-        ) : null}
-
         <div className="field">
           <label className="field__label" htmlFor="compose-topic">
             {t('social.topic')}
@@ -354,11 +310,15 @@ function ComposeForm({ params }: { params: URLSearchParams }) {
           <select id="compose-target" className="select" value={target} onChange={(e) => setTarget(e.target.value)}>
             <option value="neighbourhood">{t('social.myNeighbourhood', { name: homeName })}</option>
             <option value="city">{t('social.wholeCity', { city: settings.location.city })}</option>
-            {groupOptions.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
+            {groupOptions.length ? (
+              <optgroup label={t('social.yourClubs')}>
+                {groupOptions.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </optgroup>
+            ) : null}
           </select>
         </div>
 

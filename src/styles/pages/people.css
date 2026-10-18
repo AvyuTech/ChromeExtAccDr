@@ -783,3 +783,48 @@ a.want-row__title:hover {
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
+
+/* Clubs tab on Me and profiles: flat rows */
+.club-rows {
+  display: flex;
+  flex-direction: column;
+}
+.club-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--divider);
+  color: var(--ink);
+  text-decoration: none;
+}
+.club-row:last-child {
+  border-bottom: none;
+}
+.club-row__photo {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+.club-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.club-row__name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9063rem;
+  font-weight: 700;
+}
+.club-row__next {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

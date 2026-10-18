@@ -144,7 +144,7 @@ export function SafetySection() {
 const FAQ = [
   {
     q: 'Where do Nearhood answers come from?',
-    a: 'Each answer merges what neighbours said with ticket listings, maps, local news and official city feeds. The chips under an answer show which sources were used, and you can switch sources off in Sources & AI answers.',
+    a: 'Nearhood says merges what friends and neighbours said with labelled public sources: reels, maps, local news, organisers’ pages and official city feeds. The chips under an answer show which sources were used, and you can switch sources off in Sources & AI answers. Source content never counts as a review.',
   },
   {
     q: 'What does "sources agree" mean?',
@@ -156,7 +156,15 @@ const FAQ = [
   },
   {
     q: 'Who can see my posts and profile?',
-    a: 'Posts are visible to people in your neighbourhood and groups. Choose who can see your profile and message you in Privacy.',
+    a: 'Posts are visible to people in your area and your clubs. Choose who can see your profile and message you in Privacy.',
+  },
+  {
+    q: 'Can I book tickets or pay for things here?',
+    a: 'No. Nearhood is for recommending and doing things together. Events link out to the organiser or ticket site, club meetups just show who’s in, and group buys only gather people; the deal and the money happen outside the app.',
+  },
+  {
+    q: 'How do clubs work?',
+    a: 'Any verified resident can start a club: neighbours, founders, cricket lovers, parents. Members plan meetups and gather people to buy things together. Find clubs on the Clubs tab, including a map of where they meet.',
   },
   {
     q: 'How do I change my neighbourhood?',
@@ -168,7 +176,7 @@ const GUIDELINES = [
   'Be kind. Disagree with ideas, not people.',
   'Share first-hand information and say when you are unsure.',
   'Verify alerts before forwarding them; link the source if you have one.',
-  'No ads outside deal posts, and say if you were paid or invited.',
+  'No ads or selling. Say if you were paid or invited somewhere.',
   'Do not post other people’s phone numbers, addresses or photos of children.',
 ];
 
@@ -303,7 +311,7 @@ export function AboutSection() {
           {t('settings.about.data')}
         </h2>
         <p className="body-sm">
-          This version runs on sample data for Ahmedabad. Neighbours, places, events, deals and reports are illustrative; names in square brackets are placeholders. Neighbourhood names and the
+          This version runs on sample data for Ahmedabad. Neighbours, places, clubs, events and reports are illustrative; names in square brackets are placeholders. Neighbourhood names and the
           emergency numbers (112, 100, 101, 108, 181, 1098, 1930) are real.
         </p>
       </section>
@@ -314,8 +322,9 @@ export function AboutSection() {
           {t('settings.about.how')}
         </h2>
         <p className="body-sm">
-          When you ask something, Nearhood works out what you mean (events, cafés, traffic, water…), gathers matching items from every source you allow, and writes a short answer that names
-          its sources. Official city feeds always count; social and community sources can be switched off in Sources & AI answers.
+          When you ask something, Nearhood works out what you mean (cafés, events, clubs, traffic, water…), puts what friends and neighbours said first, adds labelled items from every
+          source you allow, and writes a short answer, Nearhood says, that names its sources. Official city feeds always count; social and community sources can be switched off in
+          Sources & AI answers.
         </p>
       </section>
 
@@ -345,7 +354,10 @@ const HUMAN_RULES: Array<{ key: string; glyph: GlyphName; tone: Tone }> = [
   { key: 'settings.human.r4', glyph: 'pin', tone: 'peach' },
   { key: 'settings.human.r5', glyph: 'spark', tone: 'violet' },
   { key: 'settings.human.r6', glyph: 'shield', tone: 'mint' },
-  { key: 'settings.human.r7', glyph: 'getaways', tone: 'teal' },
+  { key: 'settings.human.r7', glyph: 'calendar', tone: 'blue' },
+  { key: 'settings.human.r8', glyph: 'users', tone: 'teal' },
+  { key: 'settings.human.r9', glyph: 'reel', tone: 'peach' },
+  { key: 'settings.human.r10', glyph: 'getaways', tone: 'teal' },
 ];
 
 export function HumanSection() {

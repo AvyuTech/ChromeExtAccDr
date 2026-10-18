@@ -170,7 +170,7 @@ export function CheckInCard({ c, showPlace = true, footer, layout = 'card' }: { 
   const profile = c.authorId === 'me' ? '/me' : `/people/${c.authorId}`;
   const spend = c.spend === undefined ? undefined : c.spend === 0 ? 'Free' : `~${rupees(c.spend)} pp`;
   const facts = [
-    place?.origin.outsideCity ? `Outside ${settings.location.city}` : undefined,
+    c.city ? `In ${c.city}` : place?.origin.outsideCity ? `Outside ${settings.location.city}` : undefined,
     c.invited ? 'Invited · not counted' : undefined,
     spend,
     c.withIds?.length ? `With ${c.withIds.map((w) => person(w).name.split(' ')[0]).join(', ')}` : undefined,

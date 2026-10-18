@@ -5,7 +5,7 @@ import {
   aqiBand,
   BellGlyph,
   ChatGlyph,
-  CityGlyph,
+  GroupsGlyph,
   CountdownRing,
   ExploreGlyph,
   GLYPHS,
@@ -34,12 +34,9 @@ const CATEGORY: GlyphName[] = [
   'food',
   'cafe',
   'events',
-  'deals',
-  'alert',
-  'movies',
-  'getaways',
   'groups',
-  'services',
+  'alert',
+  'getaways',
   'safety',
   'report',
   'music',
@@ -72,7 +69,7 @@ export default function Glyphs() {
   const navGlyphs = [
     { label: 'Home', G: HomeGlyph },
     { label: 'Explore', G: ExploreGlyph },
-    { label: 'City', G: CityGlyph },
+    { label: 'Clubs', G: GroupsGlyph },
     { label: 'Me', G: MeGlyph },
   ];
 
@@ -102,7 +99,7 @@ export default function Glyphs() {
 
         <section className="glyph-section stack" aria-labelledby="g-nav">
           <SectionHead id="g-nav" title="Tab bar" />
-          <p className="body-sm muted">Tap a tab: the roof hops, the compass needle swings, the city's windows light up and its tower broadcasts, the neighbourhood ring turns.</p>
+          <p className="body-sm muted">Tap a tab: the roof hops, the compass needle swings, the club gathers round, the ring turns.</p>
           <div className="glyph-grid glyph-grid--4" role="radiogroup" aria-label="Active tab">
             {navGlyphs.map(({ label, G }, i) => (
               <button key={label} type="button" role="radio" aria-checked={nav === i} className="glyph-cell nav-item" onClick={() => setNav(i)} style={{ color: nav === i ? 'var(--accent)' : 'var(--muted)' }}>

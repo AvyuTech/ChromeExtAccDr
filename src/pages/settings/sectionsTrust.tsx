@@ -178,11 +178,12 @@ export function PrivacySection() {
 type ToggleSource = keyof Settings['sources']['enabled'];
 
 const SOURCE_META: Record<ToggleSource, { G: GlyphComp; tone: 'peach' | 'violet' | 'teal' | 'blue' | 'mint'; what: string }> = {
-  tickets: { G: EventsGlyph, tone: 'peach', what: 'Ticket listings, prices and seats left' },
-  instagram: { G: ReelGlyph, tone: 'violet', what: 'Public reels and posts about places and events' },
-  maps: { G: PinGlyph, tone: 'teal', what: 'Ratings, opening hours and reviews' },
+  // Outside sources fill gaps and are always labelled; none of them counts as a review.
+  tickets: { G: EventsGlyph, tone: 'peach', what: 'Event listings from ticket sites and organisers; Nearhood links out' },
+  instagram: { G: ReelGlyph, tone: 'violet', what: 'Public reels and posts about places and events, labelled' },
+  maps: { G: PinGlyph, tone: 'teal', what: 'Addresses, pins and opening hours' },
   news: { G: NewsGlyph, tone: 'blue', what: 'Local news coverage' },
-  neighbours: { G: UsersGlyph, tone: 'mint', what: 'Replies and posts from people nearby' },
+  neighbours: { G: UsersGlyph, tone: 'mint', what: 'Replies and check-ins from people nearby' },
 };
 
 const OFFICIAL: Array<{ id: SourceId; G: GlyphComp }> = [

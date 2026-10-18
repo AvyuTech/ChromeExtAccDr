@@ -1,7 +1,7 @@
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import { CheckInCard, CheckInGrid, CollectionCard, FollowButton, TasteMatchPill, useFollow } from '../components/friends';
-import { chatLink, DoneRing, PlanCard, ProfileAction, ProfileHero, shareOrCopy, TabStrip, ViewToggle, WantRow } from '../components/people';
+import { chatLink, ClubRows, clubsOf, DoneRing, PlanCard, ProfileAction, ProfileHero, shareOrCopy, TabStrip, ViewToggle, WantRow } from '../components/people';
 import { EmptyState, PageHeader, Sheet } from '../components/ui';
 import { PEOPLE } from '../data/core';
 import { useT } from '../i18n';
@@ -11,8 +11,8 @@ import { allCheckIns, canSee, collectionsFor, isFollowing, profileInfo, sharedWa
 import { useAppData } from '../state/appData';
 import { useToast } from '../state/toast';
 
-type Tab = 'checkins' | 'want' | 'lists';
-const TABS: Tab[] = ['checkins', 'want', 'lists'];
+type Tab = 'checkins' | 'want' | 'clubs' | 'lists';
+const TABS: Tab[] = ['checkins', 'want', 'clubs', 'lists'];
 
 const TASTE_LABEL: Record<string, string> = {
   cafes: 'Cafés',
@@ -89,6 +89,7 @@ export default function Profile() {
   const open = list.filter((w) => !w.done);
   const done = list.filter((w) => w.done);
   const lists = collectionsFor(data, id);
+  const clubs = clubsOf(id);
 
   const profileUrl = `${window.location.origin}${window.location.pathname}#/people/${id}`;
   const share = async () => {
@@ -182,6 +183,14 @@ export default function Profile() {
                 </>
               ),
             },
+            {
+              id: 'clubs',
+              label: (
+                <>
+                  {t('people.tab.clubs')} <span className="muted">{clubs.length}</span>
+                </>
+              ),
+            },
             { id: 'lists', label: t('people.tab.lists') },
           ]}
         />
@@ -248,6 +257,14 @@ export default function Profile() {
               </>
             ) : (
               <EmptyState glyph="todo" title={t('people.emptyWant')} body={`${first} hasn’t added anything to try yet.`} />
+            )
+          ) : null}
+
+          {tab === 'clubs' ? (
+            clubs.length ? (
+              <ClubRows clubs={clubs.map((c) => c.club)} adminIds={clubs.filter((c) => c.admin).map((c) => c.club.id)} />
+            ) : (
+              <EmptyState glyph="groups" title={t('people.emptyClubs')} body={`${first} isn’t in any clubs yet.`} />
             )
           ) : null}
 

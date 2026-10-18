@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { itemPhoto, placePhoto } from '../assets/photos';
 import { Cover } from '../components/cards';
 import { AvatarStack, CheckInCard, CheckInGrid, CollectionCard } from '../components/friends';
-import { DoneRing, ProfileAction, ProfileHero, shareOrCopy, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
+import { ClubRows, DoneRing, myClubs, ProfileAction, ProfileHero, shareOrCopy, TabStrip, useListEdits, ViewToggle, WantRow } from '../components/people';
 import { EmptyState, Sheet } from '../components/ui';
 import { REPORTS } from '../data/city';
 import { PEOPLE, neighbourhoodName } from '../data/core';
@@ -44,8 +44,8 @@ const FIRST_PHOTOS = [itemPhoto('Cold brew'), itemPhoto('Dosa'), itemPhoto('Sunr
 const BASE = { helpful: 318 };
 const CHAMPION_AT = 3;
 
-type Tab = 'checkins' | 'want' | 'lists' | 'impact';
-const TABS: Tab[] = ['checkins', 'want', 'lists', 'impact'];
+type Tab = 'checkins' | 'want' | 'clubs' | 'lists' | 'impact';
+const TABS: Tab[] = ['checkins', 'want', 'clubs', 'lists', 'impact'];
 
 export default function Me() {
   const t = useT();
@@ -54,6 +54,7 @@ export default function Me() {
   const [params, setParams] = useSearchParams();
   const { settings, update } = useSettings();
   const { data, toggleWant, setWantDone, removeWant, addCollection } = useAppData();
+  const clubs = myClubs(data);
   const { apply } = useListEdits();
   const [confirm, setConfirm] = useState(false);
   const [view, setView] = useState<'grid' | 'list'>('grid');
@@ -244,6 +245,14 @@ export default function Me() {
                 </>
               ),
             },
+            {
+              id: 'clubs',
+              label: (
+                <>
+                  {t('people.tab.clubs')} <span className="muted">{clubs.length}</span>
+                </>
+              ),
+            },
             { id: 'lists', label: t('people.tab.lists') },
             { id: 'impact', label: t('people.tab.impact') },
           ]}
@@ -340,6 +349,33 @@ export default function Me() {
                 </div>
               ) : (
                 <EmptyState glyph="todo" title={t('people.emptyWant')} body="Add places, dishes and plans you want to get to. Friends can copy them too." />
+              )}
+            </>
+          ) : null}
+
+          {tab === 'clubs' ? (
+            <>
+              <div className="row row--between checkin-count">
+                <span className="meta strong">
+                  {clubs.length} {clubs.length === 1 ? 'club' : 'clubs'}
+                </span>
+                <Link to="/clubs/new" className="section__link">
+                  {t('people.startClub')}
+                </Link>
+              </div>
+              {clubs.length ? (
+                <ClubRows clubs={clubs} adminIds={clubs.filter((g) => g.admins.includes('me')).map((g) => g.id)} />
+              ) : (
+                <EmptyState
+                  glyph="groups"
+                  title={t('people.emptyClubs')}
+                  body="Join a club near you, or start one: neighbours, founders, cricket lovers, parents."
+                  action={
+                    <Link to="/clubs" className="btn btn--primary btn--sm">
+                      {t('people.findClubs')}
+                    </Link>
+                  }
+                />
               )}
             </>
           ) : null}

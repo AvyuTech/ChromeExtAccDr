@@ -193,6 +193,17 @@
   background: var(--accent-tint-2);
   color: var(--accent-strong);
 }
+.compose-club-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: 2px;
+  font-size: 0.7813rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+}
 .compose-text {
   min-height: 120px;
   font-size: 0.9375rem;

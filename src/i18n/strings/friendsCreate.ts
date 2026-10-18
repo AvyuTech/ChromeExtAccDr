@@ -27,9 +27,9 @@ export const friendsCreate: Dict = {
   'checkin.spot.photo': { en: 'Add a photo', gu: 'ફોટો ઉમેરો', hi: 'फ़ोटो जोड़ें' },
   'checkin.spot.photoWhy': { en: 'Helps others find it. Also used for your check-in.', gu: 'બીજાને શોધવામાં મદદ કરે છે. તમારા ચેક-ઇનમાં પણ વપરાશે.', hi: 'दूसरों को ढूँढने में मदद करता है। आपके चेक-इन में भी लगेगा।' },
   'checkin.spot.rule': {
-    en: 'New places go live after 3 verified visits or a neighbourhood guide’s check. No business listings.',
-    gu: 'નવી જગ્યા 3 ચકાસાયેલી મુલાકાત કે પડોશ ગાઇડની તપાસ પછી દેખાય છે. વ્યવસાયો જાતે લિસ્ટ કરી શકતા નથી.',
-    hi: 'नई जगह 3 सत्यापित विज़िट या किसी नेबरहुड गाइड की जाँच के बाद दिखती है। कारोबार ख़ुद लिस्ट नहीं हो सकते।',
+    en: 'New places go live after 3 verified visits or a Nearhood guide’s check. No business listings.',
+    gu: 'નવી જગ્યા 3 ચકાસાયેલી મુલાકાત કે Nearhood ગાઇડની તપાસ પછી દેખાય છે. વ્યવસાયો જાતે લિસ્ટ કરી શકતા નથી.',
+    hi: 'नई जगह 3 सत्यापित विज़िट या किसी Nearhood गाइड की जाँच के बाद दिखती है। कारोबार ख़ुद लिस्ट नहीं हो सकते।',
   },
   'checkin.spot.save': { en: 'Add place and check in', gu: 'જગ્યા ઉમેરો અને ચેક-ઇન કરો', hi: 'जगह जोड़ें और चेक-इन करें' },
   'checkin.spot.pending': { en: 'Not listed yet', gu: 'હજુ લિસ્ટ નથી', hi: 'अभी लिस्ट नहीं' },

@@ -9,7 +9,7 @@ import { CITIES, NEIGHBOURHOODS, person } from '../data/core';
 import { PLACES } from '../data/places';
 import type { AlertKind } from '../data/types';
 import { LANGUAGES, useT } from '../i18n';
-import { AlertGlyph, BackGlyph, BellGlyph, CheckGlyph, Logo, NamedGlyph, ReportGlyph, SparkGlyph, SparkleMark, Wordmark } from '../icons';
+import { AlertGlyph, BackGlyph, BellGlyph, CheckGlyph, CheckInGlyph, FriendsGlyph, GroupsGlyph, Logo, NamedGlyph, SparkleMark, Wordmark } from '../icons';
 import { km } from '../lib/format';
 import { useSettings } from '../state/settings';
 import type { GlyphComp } from './settings/parts';
@@ -23,20 +23,22 @@ const INTERESTS: Array<{ id: string; photo: string }> = [
   { id: 'cafes', photo: 'dish-latte-art' },
   { id: 'events', photo: 'scene-concert' },
   { id: 'music', photo: 'event-sufi-night' },
-  { id: 'comedy', photo: 'event-open-mic' },
-  { id: 'heritage', photo: 'place-adalaj' },
   { id: 'sports', photo: 'event-pickleball-social' },
+  { id: 'fitness', photo: 'event-sunrise-yoga' },
   { id: 'kids', photo: 'event-kite-workshop' },
+  { id: 'founders', photo: 'scene-table' },
+  { id: 'books', photo: 'place-brew-lab' },
+  { id: 'heritage', photo: 'place-adalaj' },
   { id: 'nature', photo: 'place-vastrapur-lake' },
-  { id: 'shopping', photo: 'place-law-garden' },
-  { id: 'deals', photo: 'dish-samosa' },
   { id: 'groups', photo: 'scene-friends' },
 ];
 
+/** Phase 1 in four lines: friends, places by people, clubs, and the city basics. */
 const PROMISES: Array<{ G: GlyphComp; title: string; body: string }> = [
-  { G: SparkGlyph, title: 'onboarding.ask', body: 'onboarding.askBody' },
-  { G: AlertGlyph, title: 'onboarding.alerts', body: 'onboarding.alertsBody' },
-  { G: ReportGlyph, title: 'onboarding.fix', body: 'onboarding.fixBody' },
+  { G: FriendsGlyph, title: 'onboarding.friends', body: 'onboarding.friendsBody' },
+  { G: CheckInGlyph, title: 'onboarding.places', body: 'onboarding.placesBody' },
+  { G: GroupsGlyph, title: 'onboarding.clubs', body: 'onboarding.clubsBody' },
+  { G: AlertGlyph, title: 'onboarding.city', body: 'onboarding.cityBody' },
 ];
 
 const KINDS = Object.keys(ALERT_KIND_META) as AlertKind[];
@@ -67,11 +69,12 @@ function Collage() {
         </span>
       </span>
       <span className="onb-float onb-float--plans">
-        <SparkleMark size={14} />5 plans tonight
+        <SparkleMark size={14} />
+        Sunday cricket · 14 in
       </span>
       <span className="onb-float onb-float--faces">
         <FaceStack ids={['aditi', 'karan', 'farah']} size={22} />
-        <small>18 neighbours replied</small>
+        <small>3 friends loved this</small>
       </span>
       <span className="onb-float onb-float--pin">
         <Logo size={30} tile animated={false} />

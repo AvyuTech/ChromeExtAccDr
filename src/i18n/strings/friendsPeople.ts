@@ -8,6 +8,10 @@ export const friendsPeople: Dict = {
   'people.tab.checkins': { en: 'Check-ins', gu: 'ચેક-ઇન', hi: 'चेक-इन' },
   'people.tab.want': { en: 'Want to try', gu: 'અજમાવવું છે', hi: 'आज़माना है' },
   'people.tab.lists': { en: 'Lists', gu: 'યાદીઓ', hi: 'सूचियाँ' },
+  'people.tab.clubs': { en: 'Clubs', gu: 'ક્લબ', hi: 'क्लब' },
+  'people.emptyClubs': { en: 'No clubs yet', gu: 'હજુ કોઈ ક્લબ નથી', hi: 'अभी कोई क्लब नहीं' },
+  'people.findClubs': { en: 'Find clubs', gu: 'ક્લબ શોધો', hi: 'क्लब खोजें' },
+  'people.startClub': { en: 'Start a club', gu: 'ક્લબ શરૂ કરો', hi: 'क्लब शुरू करें' },
   'people.tab.impact': { en: 'City impact', gu: 'શહેર પર અસર', hi: 'शहर पर असर' },
 
   'people.planTogether': { en: 'Plan together', gu: 'સાથે યોજના બનાવો', hi: 'साथ में प्लान करें' },

@@ -1,10 +1,12 @@
 import { useCallback, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { eventPhoto, photo, placePhoto, scenePhoto } from '../assets/photos';
+import { eventPhoto, groupPhoto, photo, placePhoto, scenePhoto } from '../assets/photos';
 import { person } from '../data/core';
 import { eventById } from '../data/events';
 import { placeById } from '../data/places';
-import type { Collection, Person, Tone, WantItem } from '../data/types';
+import { GROUPS } from '../data/social';
+import type { AppData } from '../state/appData';
+import type { Collection, Group, Person, Tone, WantItem } from '../data/types';
 import { useT } from '../i18n';
 import { CheckGlyph, PinGlyph, TrashGlyph, type GlyphName } from '../icons';
 import { useAppData } from '../state/appData';
@@ -366,4 +368,51 @@ export async function shareOrCopy(text: string, url: string): Promise<'shared' |
   } catch (e) {
     return e instanceof DOMException && e.name === 'AbortError' ? 'cancelled' : 'failed';
   }
+}
+
+/* ---------- Clubs on profiles ---------- */
+
+/** Clubs this person started or joined on this device, then the sample clubs they belong to. */
+export function myClubs(data: AppData): Group[] {
+  const all = [...data.myClubs, ...GROUPS.filter((g) => !data.myClubs.some((m) => m.id === g.id))];
+  return all.filter((g) => data.joinedGroups.includes(g.id));
+}
+
+/** Clubs someone runs, or shows up in through a meetup or a group buy. */
+export function clubsOf(personId: string): Array<{ club: Group; admin: boolean }> {
+  return GROUPS.flatMap((g) => {
+    const admin = g.admins.includes(personId);
+    const active = admin || g.meetups?.some((m) => m.hostId === personId || m.going.includes(personId)) || g.buys?.some((b) => b.hostId === personId || b.joined.includes(personId));
+    return active ? [{ club: g, admin }] : [];
+  }).sort((a, b) => Number(b.admin) - Number(a.admin));
+}
+
+/** Flat rows: club photo, name, what it is, and its next meetup. */
+export function ClubRows({ clubs, adminIds = [] }: { clubs: Group[]; adminIds?: string[] }) {
+  return (
+    <div className="club-rows">
+      {clubs.map((g) => {
+        const next = g.meetups?.[0];
+        return (
+          <Link key={g.id} to={`/clubs/${g.id}`} className="club-row">
+            <Cover src={groupPhoto(g.id)} glyph={g.glyph} tone={g.tone} className="club-row__photo" />
+            <span className="club-row__body">
+              <span className="club-row__name">
+                {g.name}
+                {adminIds.includes(g.id) ? <span className="badge badge--sm tone-violet">Admin</span> : null}
+              </span>
+              <span className="meta">
+                {g.area} · {g.members.toLocaleString('en-IN')} members
+              </span>
+              {next ? (
+                <span className="club-row__next">
+                  {next.title} · {next.when}
+                </span>
+              ) : null}
+            </span>
+          </Link>
+        );
+      })}
+    </div>
+  );
 }

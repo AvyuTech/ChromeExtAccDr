@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { eventPhoto, groupPhoto, personPhoto, placePhoto } from '../assets/photos';
+import { eventPhoto, groupPhoto, personPhoto } from '../assets/photos';
 import { Avatar } from '../components/cards';
 import { FollowButton } from '../components/friends';
 import { NOTIFICATION_META } from '../components/social';
 import { EmptyState, PageHeader } from '../components/ui';
 import { person } from '../data/core';
-import { DEALS } from '../data/social';
 import type { AppNotification } from '../data/types';
 import { useT } from '../i18n';
 import { BellOffGlyph, NamedGlyph } from '../icons';
@@ -15,14 +14,14 @@ import { useAppData } from '../state/appData';
 import { useSettings } from '../state/settings';
 import { useToast } from '../state/toast';
 
-type Filter = 'all' | 'friends' | 'replies' | 'city' | 'events' | 'reports';
+type Filter = 'all' | 'friends' | 'replies' | 'clubs' | 'city' | 'reports';
 
 const FILTERS: Array<{ id: Filter; key: string; kinds: AppNotification['kind'][] | null }> = [
   { id: 'all', key: 'social.filter.all', kinds: null },
   { id: 'friends', key: 'feed.friends.tab', kinds: ['follow', 'friend'] },
   { id: 'replies', key: 'social.filter.replies', kinds: ['reply', 'mention'] },
+  { id: 'clubs', key: 'social.filter.clubs', kinds: ['group', 'event'] },
   { id: 'city', key: 'social.filter.city', kinds: ['alert', 'system'] },
-  { id: 'events', key: 'social.filter.events', kinds: ['event', 'deal'] },
   { id: 'reports', key: 'social.filter.reports', kinds: ['report'] },
 ];
 
@@ -34,7 +33,8 @@ export default function Updates() {
   const toast = useToast();
   const [filter, setFilter] = useState<Filter>('all');
 
-  const all = visibleNotifications(settings);
+  // Nearhood doesn't run deals or bookings, so those updates never show.
+  const all = visibleNotifications(settings).filter((n) => n.kind !== 'deal');
   const kinds = FILTERS.find((f) => f.id === filter)?.kinds;
   const shown = kinds ? all.filter((n) => kinds.includes(n.kind)) : all;
   const unread = all.filter((n) => !data.readNotifications.includes(n.id));
@@ -166,9 +166,8 @@ export default function Updates() {
 function NotifVisual({ n, live }: { n: AppNotification; live: boolean }) {
   const meta = NOTIFICATION_META[n.kind];
   const eventId = n.link.startsWith('/event/') ? n.link.slice(7) : undefined;
-  const groupId = n.link.startsWith('/groups/') ? n.link.slice(8) : undefined;
-  const deal = n.kind === 'deal' ? DEALS.find((d) => n.body.includes(d.title) || n.title.includes(d.title)) : undefined;
-  const src = n.actorId ? personPhoto(n.actorId) : eventId ? eventPhoto(eventId) : groupId ? groupPhoto(groupId) : deal?.placeId ? placePhoto(deal.placeId) : undefined;
+  const groupId = n.link.match(/^\/(?:groups|clubs)\/(.+)$/)?.[1];
+  const src = n.actorId ? personPhoto(n.actorId) : eventId ? eventPhoto(eventId) : groupId ? groupPhoto(groupId) : undefined;
   const badge = (
     <span className={`notif-visual__badge tone-${meta.tone}`}>
       <NamedGlyph name={meta.glyph} size={10} />

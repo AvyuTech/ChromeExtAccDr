@@ -15,7 +15,6 @@ import {
   EventsGlyph,
   FriendsGlyph,
   GroupsGlyph,
-  DealsGlyph,
   MailGlyph,
   PinGlyph,
   ReplyGlyph,
@@ -280,9 +279,8 @@ export function LocationSection() {
 const CATEGORY_GLYPHS: Array<{ key: keyof Settings['notifications']['categories']; G: GlyphComp; tone: 'violet' | 'blue' | 'mint' | 'teal' | 'amber' | 'peach' | 'yellow' }> = [
   { key: 'replies', G: ReplyGlyph, tone: 'violet' },
   { key: 'mentions', G: UserGlyph, tone: 'blue' },
-  { key: 'events', G: EventsGlyph, tone: 'peach' },
-  { key: 'deals', G: DealsGlyph, tone: 'mint' },
   { key: 'groups', G: GroupsGlyph, tone: 'teal' },
+  { key: 'events', G: EventsGlyph, tone: 'peach' },
   { key: 'reports', G: ReportGlyph, tone: 'amber' },
   { key: 'alerts', G: AlertGlyph, tone: 'yellow' },
   { key: 'friends', G: FriendsGlyph, tone: 'violet' },
@@ -322,7 +320,7 @@ export function NotificationsSection() {
           value={n.digest}
           onChange={(v) => update('notifications', { digest: v })}
           options={(['off', 'daily', 'weekly'] as const).map((d) => ({ value: d, label: t(`settings.digest.${d}`) }))}
-          hint={n.digest === 'off' ? 'No summary emails or notifications.' : `A ${n.digest} round-up of events, alerts and new places near you.`}
+          hint={n.digest === 'off' ? 'No summary emails or notifications.' : `A ${n.digest} round-up of what friends liked, club meetups, alerts and new places.`}
         />
       </Group>
 
