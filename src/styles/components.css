@@ -1982,3 +1982,143 @@ a.feed-post__name:hover {
 .share-friend.is-on span:last-child {
   color: var(--accent);
 }
+
+/* ---------- People, pages and clubs each look like themselves ---------- */
+.entity-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--muted);
+  vertical-align: -2px;
+}
+.entity-pic {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.entity-pic__img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--surface-3);
+  color: var(--muted);
+}
+.entity-pic__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* People: round */
+.entity-pic--person .entity-pic__img {
+  border-radius: 50%;
+}
+/* Pages: a square, like a shop sign */
+.entity-pic--page .entity-pic__img,
+.entity-pic--public .entity-pic__img {
+  border-radius: 22%;
+}
+/* Clubs: a stack of squares, like a group */
+.entity-pic--club .entity-pic__img {
+  border-radius: 30%;
+  box-shadow:
+    4px -4px 0 -1px var(--ground),
+    4px -4px 0 0 var(--border-strong);
+}
+.entity-pic__badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 0 0 1.5px var(--ground);
+}
+.entity-line {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.entity-line b {
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+/* ---------- Action bar: one main action, then small icons ---------- */
+.action-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.action-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.action-main.is-on {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+.action-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+.action-icon.is-on {
+  color: var(--accent);
+  border-color: var(--accent-line);
+}
+.action-icon__tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--ground);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.action-icon:hover .action-icon__tip,
+.action-icon:focus-visible .action-icon__tip {
+  opacity: 1;
+}
